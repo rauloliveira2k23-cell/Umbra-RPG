@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0b0d">
+  <meta name="description" content="Umbra: O Segredo da Torre — um RPG de fantasia sombria. Explore ruínas, enfrente criaturas e descubra o que se esconde na torre.">
+  <title>Umbra: O Segredo da Torre</title>
+  <style>
+    :root{--bg:#0c0b0d;--panel:#151316;--panel2:#1c181b;--line:#393035;--text:#eee7df;--muted:#b2a6a0;--red:#9c3d36;--red2:#c45b4b;--gold:#c7a779;--max:1180px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;line-height:1.6}a{color:inherit;text-decoration:none}button{font:inherit}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+    .topline{height:3px;background:linear-gradient(90deg,transparent,var(--red),var(--gold),var(--red),transparent)}
+    header{position:absolute;z-index:5;top:3px;left:0;right:0;border-bottom:1px solid #ffffff18;background:linear-gradient(#080708b8,transparent)}
+    .nav{height:86px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:13px;letter-spacing:.16em;text-transform:uppercase;font-size:14px}.brand-mark{width:38px;height:44px;display:grid;place-items:center;color:var(--gold)}.brand-mark svg{width:100%;height:100%}.brand strong{display:block;font-size:14px;letter-spacing:.2em}.brand small{display:block;color:#b5a6a0;font:10px/1.4 Arial,sans-serif;letter-spacing:.28em;margin-top:3px}.nav-links{display:flex;align-items:center;gap:28px;color:#d1c5bf;font:12px Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}.nav-links a:hover{color:var(--gold)}.nav-actions{display:flex;gap:10px;align-items:center}.btn{display:inline-flex;justify-content:center;align-items:center;min-height:45px;padding:0 20px;border:1px solid #7c6660;background:transparent;color:var(--text);cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font:11px Arial,sans-serif;transition:.2s}.btn:hover{border-color:var(--gold);background:#ffffff0a}.btn-primary{border-color:var(--red);background:linear-gradient(135deg,#7e2927,#4d1e20);box-shadow:0 7px 24px #0006}.btn-primary:hover{background:linear-gradient(135deg,#a34036,#672326);border-color:#d47a66}.menu-toggle{display:none}
+    .hero{min-height:760px;position:relative;display:flex;align-items:center;overflow:hidden;background:radial-gradient(ellipse at 73% 36%,#473138 0,#21191f 23%,#100e12 57%,#0c0b0d 78%)}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0c0b0d 0%,#0c0b0de8 31%,#0c0b0d45 63%,#0c0b0d28 100%),linear-gradient(0deg,#0c0b0d 0%,transparent 26%,transparent 75%,#0c0b0d88 100%);z-index:1}.hero-art{position:absolute;right:0;top:0;width:72%;height:100%;opacity:.9}.hero-art svg{width:100%;height:100%;display:block}.hero-content{position:relative;z-index:2;padding-top:100px;padding-bottom:90px;max-width:650px}.eyebrow{display:flex;align-items:center;gap:13px;color:var(--gold);font:11px Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase}.eyebrow:before{content:"";width:35px;height:1px;background:var(--red2)}h1{font-size:clamp(48px,7vw,86px);line-height:.98;font-weight:normal;letter-spacing:-.045em;margin:25px 0 22px;text-shadow:0 5px 25px #0009}h1 span{display:block;color:#c4a37d;font-style:italic;font-size:.77em;letter-spacing:-.02em;margin-top:12px}.hero p{font-size:18px;color:#c7bbb4;max-width:470px;margin:0 0 32px}.hero-buttons{display:flex;flex-wrap:wrap;gap:13px}.hero-note{margin-top:22px;color:#847771;font:10px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase}.scroll-mark{position:absolute;z-index:2;bottom:25px;left:50%;transform:translateX(-50%);color:#a89a92;font:10px Arial,sans-serif;letter-spacing:.25em;text-transform:uppercase;display:flex;align-items:center;gap:12px}.scroll-mark:after{content:"";height:30px;width:1px;background:linear-gradient(var(--gold),transparent);position:absolute;top:24px;left:50%}
+    .section{padding:100px 0;position:relative}.section-head{text-align:center;max-width:720px;margin:0 auto 48px}.kicker{color:var(--red2);font:11px Arial,sans-serif;letter-spacing:.25em;text-transform:uppercase}.section h2{font-size:clamp(34px,4vw,52px);font-weight:normal;line-height:1.1;margin:12px 0 18px}.section-head p{color:var(--muted);font-size:17px;margin:0}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.feature{min-height:260px;padding:29px 28px;border:1px solid var(--line);background:linear-gradient(145deg,#1b171a,#100f11);position:relative;overflow:hidden}.feature:after{content:"";position:absolute;width:120px;height:120px;border:1px solid #a65b4b22;transform:rotate(45deg);right:-54px;bottom:-58px}.feature .num{font:11px Arial,sans-serif;letter-spacing:.2em;color:var(--gold)}.feature h3{font-weight:normal;font-size:26px;margin:29px 0 10px}.feature p{color:var(--muted);font-size:15px;margin:0;max-width:300px}.divider{height:1px;background:linear-gradient(90deg,transparent,#5a403e,transparent)}
+    .story{background:linear-gradient(180deg,#0c0b0d,#171216 48%,#0c0b0d)}.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}.sigil-art{min-height:380px;position:relative;display:grid;place-items:center;border:1px solid #413238;background:radial-gradient(circle,#39242a 0,#1b151a 42%,#0e0c0f 75%);overflow:hidden}.sigil-art:before,.sigil-art:after{content:"";position:absolute;inset:22px;border:1px solid #a9785540;transform:rotate(45deg)}.sigil-art:after{inset:65px;transform:rotate(0deg);border-color:#a9785525}.sigil{width:190px;height:220px;color:#c19a72;filter:drop-shadow(0 0 22px #9b4a3c44);position:relative;z-index:1}.story-copy .kicker{display:block}.story-copy h2{margin-top:12px}.story-copy p{color:var(--muted);font-size:16px}.story-copy .btn{margin-top:15px}
+    .cta{padding:75px 0;background:linear-gradient(90deg,#241619,#171115 50%,#241619);border-top:1px solid #473035;border-bottom:1px solid #473035;text-align:center}.cta h2{margin:0 0 13px;font-weight:normal;font-size:clamp(31px,4vw,46px)}.cta p{margin:0 auto 25px;color:var(--muted);max-width:620px}.status{display:inline-flex;align-items:center;gap:9px;color:#c8b9ad;font:10px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;margin-bottom:22px}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:#b86d53;box-shadow:0 0 10px #b86d5377}
+    footer{padding:30px 0;color:#81756f;font:11px Arial,sans-serif;letter-spacing:.08em}.footer-row{display:flex;justify-content:space-between;gap:20px;align-items:center}.footer-brand{color:#c5b5a9;letter-spacing:.18em;text-transform:uppercase}.footer-links{display:flex;gap:20px}.footer-links a:hover{color:var(--gold)}
+    .modal-backdrop{position:fixed;inset:0;background:#050405d9;display:none;place-items:center;z-index:20;padding:20px}.modal-backdrop.open{display:grid}.modal{width:min(460px,100%);border:1px solid #6d4a45;background:linear-gradient(145deg,#21191d,#100e11);padding:32px;box-shadow:0 25px 90px #000b;position:relative}.modal h2{font-weight:normal;font-size:32px;margin:0 0 10px}.modal p{color:var(--muted);font-size:15px}.modal-close{position:absolute;right:14px;top:10px;background:none;border:0;color:#d6c7bd;font-size:28px;cursor:pointer}.modal .btn{margin-top:10px}.modal small{display:block;color:#8f7e77;font:11px/1.6 Arial,sans-serif;margin-top:17px}.toast{margin-top:15px;color:var(--gold);font-size:14px;min-height:22px}
+    @media(max-width:850px){.nav-links{gap:15px}.nav-links a:nth-child(2){display:none}.hero{min-height:700px}.hero-art{width:100%;opacity:.68}.hero:before{background:linear-gradient(90deg,#0c0b0df2 0%,#0c0b0dbb 55%,#0c0b0d55 100%),linear-gradient(0deg,#0c0b0d 0%,transparent 35%,#0c0b0d55 100%)}.features{grid-template-columns:1fr}.feature{min-height:210px}.feature h3{margin-top:18px}.story-grid{grid-template-columns:1fr;gap:35px}.sigil-art{min-height:300px}.section{padding:75px 0}}
+    @media(max-width:560px){.wrap{width:min(var(--max),calc(100% - 30px))}.nav{height:72px}.brand{gap:8px}.brand-mark{width:30px;height:36px}.brand strong{font-size:11px}.brand small{font-size:8px}.nav-links{display:none}.nav-actions .btn{min-height:38px;padding:0 11px;font-size:9px}.nav-actions .btn-primary{display:none}.hero{min-height:690px}.hero-content{padding-top:90px}.hero p{font-size:16px}.hero-buttons .btn{width:100%}.section-head{margin-bottom:32px}.footer-row{flex-direction:column;text-align:center}.footer-links{flex-wrap:wrap;justify-content:center}.modal{padding:27px 23px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#inicio" aria-label="Umbra início">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 48" fill="none"><path d="M20 2 36 11v19L20 46 4 30V11L20 2Z" stroke="currentColor" stroke-width="1.3"/><path d="M20 9 29 15v13L20 38 11 28V15L20 9Z" stroke="currentColor" stroke-width=".8"/><path d="M20 13v19M14 20l6-7 6 7-6 12-6-12Z" stroke="currentColor" stroke-width="1.2"/></svg></span>
+        <span><strong>Umbra</strong><small>O Segredo da Torre</small></span>
+      </a>
+      <nav class="nav-links" aria-label="Navegação principal"><a href="#universo">O universo</a><a href="#jornada">A jornada</a><a href="#status">Desenvolvimento</a></nav>
+      <div class="nav-actions"><button class="btn" data-modal="login">Entrar</button><button class="btn btn-primary" data-modal="cadastro">Criar conta</button></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 1000 850" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="moon"><stop stop-color="#c7a78b" stop-opacity=".85"/><stop offset="1" stop-color="#9b6262" stop-opacity="0"/></radialGradient><linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#514047"/><stop offset=".5" stop-color="#241c24"/><stop offset="1" stop-color="#100e13"/></linearGradient><linearGradient id="fog" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#b69a9d" stop-opacity="0"/><stop offset=".5" stop-color="#a98b91" stop-opacity=".28"/><stop offset="1" stop-color="#b69a9d" stop-opacity="0"/></linearGradient></defs>
+          <circle cx="675" cy="230" r="190" fill="url(#moon)"/><circle cx="675" cy="230" r="73" fill="#c7a78b" opacity=".23"/>
+          <g fill="#100e13" opacity=".72"><path d="M0 475 100 420 175 457 245 382 312 450 390 395 465 455 540 410 620 465 700 400 785 455 865 390 1000 470V850H0Z"/><path d="M0 550 150 500 250 545 380 490 500 540 630 490 760 540 880 495 1000 545V850H0Z"/></g>
+          <g fill="url(#stone)" stroke="#78616a" stroke-opacity=".32" stroke-width="2">
+            <path d="M550 610V340H575V278L607 242 640 278V340H660V610Z"/><path d="M606 250V190L625 150 644 190V250Z"/><path d="M590 340V300H620V340M640 340V300H670V340" fill="#100e13"/>
+            <path d="M660 610V280H692V220L725 177 758 220V280H788V610Z"/><path d="M724 184V112L743 72 762 112V184Z"/><path d="M706 280V238H736V280M758 280V238H788V280" fill="#100e13"/>
+            <path d="M785 610V390H810V340L835 310 860 340V390H882V610Z"/><path d="M833 315V265L847 232 861 265V315Z"/>
+            <path d="M475 610V450H500V415L525 388 550 415V450H570V610Z"/><path d="M520 393V354L533 326 546 354V393Z"/>
+          </g>
+          <g fill="#0b0a0d"><path d="M0 620 90 570 165 610 235 560 320 610 410 565 500 620 590 570 690 625 790 575 880 620 1000 570V850H0Z"/><path d="M490 850V610L530 580 560 610V850M555 850V645L600 605 635 645V850M700 850V650L740 610 775 650V850"/></g>
+          <g fill="url(#fog)"><ellipse cx="600" cy="620" rx="500" ry="42"/><ellipse cx="760" cy="680" rx="420" ry="55"/><ellipse cx="430" cy="740" rx="570" ry="48"/></g>
+          <g stroke="#bc8d68" stroke-opacity=".4" fill="none"><path d="M740 73V45M724 88l-22-16M758 88l22-16M625 151V132M607 166l-14-12M644 166l14-12"/><path d="M0 795Q240 730 430 790T1000 775" stroke-opacity=".2"/></g>
+        </svg>
+      </div>
+      <div class="wrap hero-content">
+        <div class="eyebrow">Uma aventura de fantasia sombria</div>
+        <h1>Há segredos<br>que deveriam<br><span>permanecer nas sombras.</span></h1>
+        <p>Além das ruínas, monstros antigos despertam. Prepare suas armas, escolha seu caminho e descubra o que aguarda no coração da Torre.</p>
+        <div class="hero-buttons"><a class="btn btn-primary" href="#jornada">Conheça a jornada <span aria-hidden="true">&nbsp;↗</span></a><button class="btn" data-modal="cadastro">A aventura se aproxima</button></div>
+        <div class="hero-note">Explore · Enfrente · Sobreviva</div>
+      </div>
+      <div class="scroll-mark">Desça para explorar</div>
+    </section>
+
+    <section class="section" id="universo">
+      <div class="wrap">
+        <div class="section-head"><div class="kicker">Um mundo à beira da ruína</div><h2>As sombras escondem<br>mais do que monstros.</h2><p>Em Umbra, cada passagem pode guardar uma relíquia esquecida, uma criatura mortal ou uma pista sobre a origem da Torre.</p></div>
+        <div class="features">
+          <article class="feature"><div class="num">I / COMBATE</div><h3>Domine suas armas</h3><p>Encare cada confronto com aço, precisão e estratégia. Aprenda os movimentos dos inimigos e encontre a abertura para atacar.</p></article>
+          <article class="feature"><div class="num">II / EXPLORAÇÃO</div><h3>Ruínas esquecidas</h3><p>Avance por regiões sombrias, descubra caminhos ocultos e desvende os vestígios de uma história enterrada há séculos.</p></article>
+          <article class="feature"><div class="num">III / PROGRESSÃO</div><h3>Forje seu destino</h3><p>Encontre equipamentos, fortaleça seu personagem e prepare-se para ameaças cada vez mais perigosas.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+    <section class="section story" id="jornada">
+      <div class="wrap story-grid">
+        <div class="sigil-art" aria-hidden="true"><svg class="sigil" viewBox="0 0 200 230" fill="none"><path d="M100 7 174 49v87l-74 86-74-86V49L100 7Z" stroke="currentColor" stroke-width="1.2"/><path d="M100 26 157 59v70l-57 67-57-67V59l57-33Z" stroke="currentColor" stroke-opacity=".6"/><path d="M100 42v124M68 81l32-39 32 39-32 85-32-85Z" stroke="currentColor" stroke-width="2"/><path d="M81 92h38M86 112h28M91 132h18" stroke="currentColor" stroke-opacity=".75"/><circle cx="100" cy="81" r="5" fill="currentColor"/></svg></div>
+        <div class="story-copy"><span class="kicker">A torre chama</span><h2>Uma jornada.<br>Incontáveis perigos.</h2><p>Nem toda lenda nasceu para ser desvendada. A Torre permanece no horizonte, envolta em névoa e histórias contraditórias. Sua verdade não será revelada sem luta.</p><p>Prepare-se para explorar, sobreviver e escrever sua própria história no mundo de Umbra.</p><a class="btn" href="#status">Acompanhar o projeto&nbsp; ↘</a></div>
+      </div>
+    </section>
+
+    <section class="cta" id="status"><div class="wrap"><div class="status">Projeto em desenvolvimento</div><h2>O mundo de Umbra está sendo forjado.</h2><p>Esta é a primeira página do projeto. Recursos como contas, salvamento na nuvem e acesso ao jogo serão conectados em etapas futuras.</p><button class="btn btn-primary" data-modal="cadastro">Quero acompanhar</button></div></section>
+  </main>
+  <footer><div class="wrap footer-row"><div><span class="footer-brand">Umbra: O Segredo da Torre</span><div style="margin-top:7px">Um projeto independente em desenvolvimento.</div></div><div class="footer-links"><a href="#inicio">Início</a><a href="#universo">O universo</a><a href="#status">Projeto</a></div><div>© <span id="year"></span> Umbra</div></div></footer>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal"><button class="modal-close" aria-label="Fechar janela" id="closeModal">×</button><div class="kicker">Os portões ainda estão fechados</div><h2 id="modalTitle">A aventura se aproxima.</h2><p id="modalText">O sistema de contas ainda não foi conectado. Estamos preparando a estrutura para que você possa entrar em Umbra quando essa etapa estiver pronta.</p><button class="btn btn-primary" id="modalOk">Entendi</button><small>Este botão é apenas demonstrativo. Nenhuma conta é criada e nenhum dado pessoal ou senha é solicitado ou armazenado nesta página.</small><div class="toast" id="modalToast" aria-live="polite"></div></div>
+  </div>
+  <script>
+    const backdrop=document.getElementById('modalBackdrop');
+    const title=document.getElementById('modalTitle');
+    const message=document.getElementById('modalText');
+    function openModal(kind){
+      if(kind==='login'){title.textContent='Seu retorno virá.';message.textContent='O acesso de jogadores ainda está em desenvolvimento. Quando a autenticação estiver conectada, você poderá entrar com segurança e continuar sua jornada.';}
+      else{title.textContent='A aventura se aproxima.';message.textContent='O cadastro ainda não está disponível. Estamos preparando as contas de jogador e o salvamento do progresso para uma próxima etapa.';}
+      backdrop.classList.add('open');document.getElementById('closeModal').focus();
+    }
+    function closeModal(){backdrop.classList.remove('open');}
+    document.querySelectorAll('[data-modal]').forEach(button=>button.addEventListener('click',()=>openModal(button.dataset.modal)));
+    document.getElementById('closeModal').addEventListener('click',closeModal);
+    document.getElementById('modalOk').addEventListener('click',closeModal);
+    backdrop.addEventListener('click',event=>{if(event.target===backdrop)closeModal()});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape')closeModal()});
+    document.getElementById('year').textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>
