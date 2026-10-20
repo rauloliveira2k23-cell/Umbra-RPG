@@ -1,0 +1,2253 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RPG 3D — Campo de Treino v104</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9bc8e8;font-family:system-ui,Arial;touch-action:none}
+  #stage{position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;touch-action:none}
+  #game{display:block;width:100%;height:100%}
+  #hud{position:absolute;inset:0;pointer-events:none;color:white;text-shadow:0 2px 3px #18351e}
+  #mapNameHud{position:absolute;top:10px;left:calc(50% + 55px);transform:translateX(calc(-100% - 8px));z-index:10;padding:5.5px 12.5px;max-width:calc(50% - 125px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg,#18352feF,#10251fe8);border:1px solid #e4d5a688;border-radius:10px;color:#fff2c6;font-size:clamp(9.4px,1.4vw,13.3px);font-weight:900;letter-spacing:.06em;text-align:center;box-shadow:0 3px 12px #0006;text-shadow:0 1px 3px #000}
+  #waveHud{position:absolute;top:10px;left:calc(50% + 55px);transform:translateX(8px);z-index:10;padding:5.5px 11.5px;min-width:81px;text-align:center;background:linear-gradient(180deg,#392044ed,#21142eea);border:1px solid #f3a5e488;border-radius:8px;color:#ffe1f5;font-size:clamp(9.4px,1.33vw,12.5px);font-weight:1000;letter-spacing:.04em;box-shadow:0 3px 12px #0006;text-shadow:0 1px 3px #000;pointer-events:none}
+  @media (orientation:portrait){#stage{width:100vh;height:100vw;transform-origin:top left;transform:rotate(90deg) translateY(-100%);}}
+  #statusHud{position:absolute;top:10px;left:10px;width:146px;padding:7px;background:#14251fd9;border:1px solid #ffffff55;border-radius:10px;box-sizing:border-box;display:grid;gap:4px;text-shadow:0 1px 2px #000;pointer-events:none}
+  #hudQuickActions{position:absolute;top:10px;left:164px;display:flex;gap:7px;pointer-events:auto}
+  .hudIconBtn{width:43px;height:43px;border:1px solid #ffffffa8;border-radius:11px;background:#263e34ed;color:#fff;font-size:24px;display:grid;place-items:center;box-shadow:0 3px 0 #07130eaa,0 3px 8px #0005;touch-action:manipulation;text-shadow:0 1px 2px #000}
+  .hudIconBtn:active{transform:translateY(2px);filter:brightness(1.2)}
+  #fullscreenBtn{position:absolute;top:12px;right:12px;z-index:20;pointer-events:auto;visibility:visible;opacity:1;width:46px;height:46px;display:grid;place-items:center;border:2px solid #ffffff;border-radius:50%;padding:0;background:#263746f5;color:#fff;font-size:30px;line-height:1;font-weight:900;text-shadow:0 1px 3px #000;box-shadow:0 3px 12px #000c;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+  #fullscreenBtn:active{filter:brightness(1.2);transform:scale(.95)}
+  .stat{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px;font-size:10px;font-weight:800}
+  .stat-value{font-variant-numeric:tabular-nums;font-size:10px}
+  .bar{grid-column:1 / -1;height:5px;border-radius:8px;background:#ffffff35;overflow:hidden;box-shadow:inset 0 1px 2px #0005}
+  .bar-fill{height:100%;width:100%;border-radius:8px}
+  #healthFill{background:#e74646}#manaFill{background:#3d9bff}#staminaFill{background:#4cdb72}#expFill{background:#e6b94f}
+  .controls{position:absolute;bottom:22px;left:0;right:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;gap:10px}
+  #stickArea{pointer-events:auto;position:relative;width:132px;height:132px;flex:0 0 132px;border-radius:50%;background:#132b2d55;border:2px solid #ffffff65;box-shadow:inset 0 0 0 8px #ffffff12}
+  #stick{position:absolute;width:54px;height:54px;left:37px;top:37px;border-radius:50%;background:#f4f6f2d9;border:2px solid #fff;box-shadow:0 3px 8px #0005}
+  #buttons{pointer-events:auto;display:grid;grid-template-columns:repeat(2, minmax(58px,76px));grid-template-rows:repeat(4,48px);gap:6px;align-items:center;justify-items:center}
+  .btn{width:100%;height:46px;border:1px solid #ffffffa8;border-radius:14px;background:#2876d7e8;color:#fff;font-size:11px;font-weight:800;box-shadow:0 4px 0 #0b2117aa;touch-action:none;user-select:none;-webkit-user-select:none}
+  .btn.attack{background:#d93636ed}
+  .btn.defend{background:#246ed0ed}
+  .btn:active,.btn.active{filter:brightness(1.22);transform:translateY(2px);box-shadow:0 2px 0 #0b2117aa}
+  .btn.skill{background:#324c82e8;border-radius:13px;height:46px;width:100%;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.05;padding:3px 2px;transition:filter .15s,background .15s,opacity .15s}
+  .btn.skill .skill-label{font-size:8px;font-weight:900;white-space:normal;overflow-wrap:anywhere;text-align:center;max-width:100%;line-height:1.05}
+  .btn.skill .skill-status{font-size:8px;font-weight:800;color:#e5f2ff;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .btn.skill.skill-unavailable{background:#555b63d9!important;border-color:#9299a0!important;filter:grayscale(1);color:#c8cdd2;box-shadow:0 3px 0 #24282caa}
+  .btn.skill.skill-unavailable .skill-status{color:#d2d5d8}
+  .btn.skill.skill-locked{background:#30343ad9!important;filter:grayscale(1);color:#aeb4bb}
+  .btn.skill:active{background:#6e7fe9}
+  #message{position:absolute;left:50%;top:23%;transform:translateX(-50%);padding:10px 15px;border-radius:12px;background:#18351edb;font-weight:800;opacity:0;transition:opacity .2s;white-space:nowrap}
+  #message.show{opacity:1}
+  #message.skill-message{top:11%;padding:4px 10px;background:linear-gradient(100deg,#10142ba8,#35205bb8,#111b38a8);border:1px solid #a9eaff99;border-radius:10px;color:#f4fbff;font-family:Papyrus,"Copperplate Gothic Light",fantasy,cursive;font-size:clamp(14px,3vw,23px);font-weight:1000;font-style:italic;letter-spacing:1px;text-transform:uppercase;text-shadow:0 0 4px #fff,0 0 9px #6beaff,0 0 15px #7b4dff,1px 2px 2px #09051b;box-shadow:0 0 8px #6a54ff66,inset 0 0 8px #6beaff18;max-width:68vw;white-space:normal;text-align:center;pointer-events:none}
+  #message.skill-message.show{animation:spellNamePop .32s ease-out}
+  @keyframes spellNamePop{from{opacity:0;transform:translateX(-50%) scale(.72);filter:blur(4px)}to{opacity:1;transform:translateX(-50%) scale(1);filter:blur(0)}}
+  #openChestBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:13px 20px;border:1px solid #ffffffcc;border-radius:14px;background:#684526f2;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px;box-shadow:0 4px 0 #2e1b0c,0 5px 16px #0008;text-shadow:0 1px 2px #000;touch-action:manipulation;white-space:nowrap}
+  #openChestBtn.visible{display:block}
+  #openChestBtn:active{transform:translate(-50%,-48%);filter:brightness(1.15)}
+  #useLeverBtn{position:absolute;left:50%;top:61%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:13px 20px;border:1px solid #fff2b8;border-radius:14px;background:#8a5b1ff2;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px;box-shadow:0 4px 0 #3d260c,0 5px 16px #0008;text-shadow:0 1px 2px #000;touch-action:manipulation;white-space:nowrap}
+  #useLeverBtn.visible{display:block}
+  #tutorialOverlay{display:none!important}
+  #spawnCountdown{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:95;display:none;align-items:center;justify-content:center;width:auto;height:auto;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:#fff;font-size:clamp(64px,15vw,112px);font-weight:1000;line-height:1;text-align:center;-webkit-text-stroke:3px #111;text-shadow:2px 2px 0 #111,-2px 2px 0 #111,2px -2px 0 #111,-2px -2px 0 #111,0 5px 12px #000b;paint-order:stroke fill;pointer-events:none}
+  #spawnCountdown.visible{display:flex}
+  #deathOverlay{position:fixed;inset:0;z-index:2147483647;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:#000;pointer-events:auto;color:#fff;text-align:center;text-shadow:0 2px 5px #000}
+  #deathOverlay.visible{display:flex}
+  #deathAnnouncement{display:none;font-size:clamp(42px,12vw,82px);font-weight:1000;letter-spacing:2px;color:#ff4141;-webkit-text-stroke:2px #250000;text-shadow:0 0 18px #f00,0 4px 12px #000}
+  #deathOverlay.announcing{background:rgba(0,0,0,.72);pointer-events:none}
+  #deathOverlay.announcing #deathAnnouncement{display:block}
+  #deathOverlay.announcing #deathCard{display:none}
+  #deathCard{width:min(100%,360px);padding:26px 22px;border:2px solid #c8a36a;border-radius:18px;background:#050505;box-shadow:0 12px 45px #000b}
+  #deathCard h2{margin:0 0 8px;font-size:clamp(28px,7vw,40px);color:#ff7777;letter-spacing:2px}
+  #deathCard p{margin:0 0 20px;color:#f3dfcf}
+  .deathActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .deathActions button{min-height:48px;border:1px solid #f0d6a4;border-radius:11px;font-weight:950;color:#fff;touch-action:manipulation}
+  #restoreBtn{background:linear-gradient(#43834a,#24502b)}#restartBtn{background:linear-gradient(#94602e,#61351b)}
+  #tutorialOverlay.open{display:flex}
+  #tutorialCard{width:min(100%,460px);padding:22px;border:2px solid #d6b36c;border-radius:16px;background:linear-gradient(145deg,#27382c,#17231c 65%,#33271b);box-shadow:0 12px 45px #000b}
+  #tutorialCard h2{margin:0 0 10px;color:#f4d69b;font-size:22px}
+  #tutorialCard p,#tutorialCard li{font-size:14px;line-height:1.5}
+  #tutorialClose{display:block;margin:16px 0 0 auto;border:1px solid #f2d7a3;border-radius:10px;padding:10px 16px;background:#5a713a;color:white;font-weight:900;touch-action:manipulation}
+  #inventoryOverlay{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:clamp(8px,2.5vw,24px);box-sizing:border-box;background:#07110ee8;pointer-events:auto;text-shadow:none;color:#f8f1df}
+  #inventoryOverlay.open{display:flex}
+  #inventoryWindow{width:min(100%,1040px);max-height:94dvh;display:flex;flex-direction:column;gap:12px;padding:clamp(10px,2vw,18px);box-sizing:border-box;border:2px solid #b58a4d;border-radius:16px;background:linear-gradient(145deg,#27382c,#17231c 65%,#33271b);box-shadow:0 12px 45px #000b;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+  #inventoryTop{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto}
+  #menuTabs{display:flex;gap:6px;align-items:center;flex:1;justify-content:center}.menuTab{border:1px solid #c9b080;border-radius:9px;padding:7px 10px;background:#26372b;color:#e8dfca;font-weight:900;font-size:12px;touch-action:manipulation}.menuTab.active{background:#98713a;color:#fff4d5;box-shadow:0 0 0 2px #f2d69b55 inset}
+  #inventoryTitle{font-size:clamp(16px,2.4vw,24px);font-weight:950;letter-spacing:.5px;color:#f4d69b}
+  #closeInventoryBtn,#closeAttributesBtn{flex:0 0 auto;border:1px solid #e5d3b4;border-radius:10px;padding:8px 12px;background:#6b392b;color:#fff;font-weight:900;font-size:12px;touch-action:manipulation}
+  #inventoryPanels{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,.72fr) minmax(0,1fr);align-items:start;gap:clamp(8px,1.5vw,14px);min-height:0}
+  #playerInventoryPanel{grid-column:1}
+  #characterEquipmentPanel{grid-column:2;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+  #chestInventoryPanel{grid-column:3}
+  #specialSkillsPanel{grid-column:3;display:flex;flex-direction:column;gap:8px}
+  #specialSkillsList{display:grid;grid-template-columns:1fr;gap:7px}
+  .specialSkillSlot{display:flex;align-items:center;gap:8px;min-width:0;padding:9px 7px;border:1px solid #c9b08066;border-radius:9px;background:linear-gradient(145deg,#26372d,#111d17);color:#f8f1df;text-align:left}
+  .specialSkillSlot.available{border-color:#c9a45e;background:linear-gradient(145deg,#514329,#25261b)}
+  .specialSkillNumber{display:flex;flex:0 0 30px;width:30px;height:30px;align-items:center;justify-content:center;overflow:hidden;border:1px solid #d6b36c;border-radius:8px;background:#101811;font-size:15px;font-weight:950;color:#f4d69b}.specialSkillNumber svg{display:block;width:25px;height:25px;overflow:visible}
+  .specialSkillText{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .specialSkillName{font-size:11px;font-weight:900;line-height:1.15;overflow-wrap:anywhere}
+  .specialSkillSource{font-size:9px;line-height:1.35;color:#cfc5ae;overflow-wrap:anywhere;white-space:pre-line}
+  #specialSkillsHint{margin:0;font-size:10px;line-height:1.35;color:#cfc5ae}
+  #inventoryPanels.chestMode{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  #inventoryPanels.chestMode #playerInventoryPanel{grid-column:1}
+  #inventoryPanels.chestMode #chestInventoryPanel{grid-column:2}
+  #inventoryPanels.chestMode #specialSkillsPanel{display:none}
+  #inventoryPanels.chestMode .inventoryGrid{gap:3px}
+  #inventoryPanels.chestMode .inventorySlot{aspect-ratio:1.72/1;padding:1px;border-radius:5px}
+  #inventoryPanels.chestMode .inventorySlot .itemIcon{font-size:clamp(14px,2.2vw,21px)}
+  #inventoryPanels.chestMode .inventorySlot .slotNumber{top:1px;left:2px;font-size:7px}
+  #characterFigure{width:100%;height:clamp(125px,22vh,210px);display:block;border-radius:10px;background:radial-gradient(ellipse at 50% 40%,#52654d,#17251e 72%);border:1px solid #c9b08066}
+  #equipmentSlots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .equipmentSlot{min-width:0;min-height:74px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px dashed #d6b36c99;border-radius:8px;background:#0b1511a8;color:#f8f1df;font-size:10px;font-weight:800;text-align:center;touch-action:none;user-select:none;-webkit-user-select:none}
+  .equipmentSlot .equipIcon{font-size:23px;line-height:1.1;filter:grayscale(1);opacity:.48}
+  .equipmentSlot.equipped .equipIcon{filter:none;opacity:1}
+  .equipmentSlot .equipLabel{font-size:9px;color:#d6c8a9;line-height:1.1}
+  .equipmentSlot.equipped{border-style:solid;background:linear-gradient(145deg,#655034,#382b1e)}
+  .equipmentSlot.dropTarget{border-color:#fff0a6;background:#61713a;box-shadow:inset 0 0 0 2px #fff0a655}
+  .inventoryPanel{min-width:0;padding:clamp(7px,1.5vw,12px);border:1px solid #c9b08088;border-radius:12px;background:#0b1511a8}
+  .inventoryPanel h3{margin:0 0 8px;font-size:clamp(12px,1.8vw,16px);color:#f5e6c6}
+  .inventoryGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+  .inventorySlot{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;aspect-ratio:1.05/1;border:1px solid #c9b08066;border-radius:7px;background:linear-gradient(145deg,#35463a,#1b2921);color:#f8f1df;padding:2px;box-sizing:border-box;touch-action:none;overflow:hidden;user-select:none;-webkit-user-select:none}
+  .inventorySlot.level-locked::after{content:"";position:absolute;inset:0;background:rgba(235,25,32,.48);pointer-events:none;z-index:3}.inventorySlot.level-locked::before{content:"🔒";position:absolute;right:3px;bottom:2px;font-size:12px;z-index:4;filter:drop-shadow(0 1px 2px #000)}
+  .inventorySlot.dragging{opacity:.38;outline:2px dashed #f4d69b;outline-offset:-3px}
+  .inventorySlot.dropTarget{border-color:#fff0a6;background:linear-gradient(145deg,#7b8746,#4c5d2d);box-shadow:inset 0 0 0 2px #fff0a655}
+  #itemDetails{display:none;flex:0 0 auto;min-height:78px;gap:6px;padding:12px 44px 12px 14px;border:1px solid #d6b36c88;border-radius:10px;background:#0b1511f5;color:#f8f1df;box-sizing:border-box;overflow-wrap:anywhere;position:relative;z-index:2}
+  #itemDetailsClose{position:absolute;right:8px;top:8px;width:30px;height:30px;border:1px solid #e5d3b4;border-radius:8px;background:#6b392b;color:#fff;font-size:18px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+  #itemDetailsClose:active{filter:brightness(1.25);transform:scale(.96)}
+  #itemDetails.visible{display:grid}
+  #itemDetailsName{font-size:15px;font-weight:950;color:#f4d69b}
+  #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}
+  #itemDetailsDescription{font-size:12px;line-height:1.45;color:#e6dfcf;white-space:pre-line}
+  .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}
+  .potionIcon:before{content:"";position:absolute;left:4px;top:-7px;width:6px;height:5px;border:1px solid #d7d9c8;border-bottom:0;border-radius:2px 2px 0 0;background:#a7aa9d}
+  #usePotionBtn,#equipItemBtn{justify-self:start;border:1px solid #b6d9a0;border-radius:7px;background:#315b37;color:#fff5d8;font-weight:900;padding:7px 12px;touch-action:manipulation}#equipItemBtn{background:#765329;border-color:#f0d08a}#itemDetailsName{display:flex;align-items:center;gap:8px}#itemDetailsIcon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px}#itemDetailsIcon svg{width:30px;height:30px;display:block}
+  .inventorySlot.filled{border-color:#d8b16b;background:linear-gradient(145deg,#655034,#382b1e);box-shadow:inset 0 0 0 1px #f1d49a22}
+  .inventorySlot .itemIcon{font-size:clamp(17px,3.1vw,29px);line-height:1.1}
+  .inventorySlot .itemIcon svg,.equipmentSlot .equipIcon svg{display:block;width:1.35em;height:1.35em;overflow:visible}
+  .inventorySlot .itemIcon svg{width:1.65em;height:1.65em}
+  .inventorySlot .slotNumber{position:absolute;top:2px;left:4px;font-size:8px;color:#d8d0bc99}
+  #inventoryHint{display:none!important}
+  #attributesOverlay{position:relative;inset:auto;z-index:1;display:none;align-items:stretch;justify-content:stretch;padding:0;box-sizing:border-box;background:transparent;pointer-events:auto;text-shadow:none;color:#f8f1df;min-height:0}
+  #attributesOverlay.open{display:flex}
+  #attributesWindow{width:100%;max-height:none;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:0;box-sizing:border-box;border:0;border-radius:0;background:transparent;box-shadow:none}
+  #attributesTop{display:none;align-items:center;justify-content:space-between;gap:10px}
+  #attributesTitle{font-size:clamp(17px,2.5vw,24px);font-weight:950;color:#f4d69b}
+  #skillPoints{padding:10px;border:1px solid #d6b36c88;border-radius:10px;background:#0b1511a8;text-align:center;font-size:15px;font-weight:900;color:#f8d989}
+  .attributeRow{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border:1px solid #c9b08066;border-radius:12px;background:#0b1511a8}
+  .attributeIcon{font-size:30px;text-align:center}
+  .attributeName{font-weight:900;color:#f5e6c6}
+  .attributeValue{font-size:13px;color:#d6d0c2;margin-top:3px}
+  .upgradeBtn{position:relative;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:82px;width:92px;min-height:43px;overflow:hidden;border:1px solid #f2d7a3;border-radius:9px;padding:5px 7px;background:#17291d;color:#fff;font-weight:900;font-size:11px;white-space:nowrap;touch-action:manipulation}
+  .upgradeProgress{position:absolute;inset:0 auto 0 0;width:0%;background:linear-gradient(90deg,#397b42aa,#83d46aaa);transition:width .2s;pointer-events:none}
+  .upgradeProgressLabel,.upgradeProgressCaption{position:relative;z-index:1;text-align:center;text-shadow:0 1px 3px #000}
+  .upgradeProgressLabel{font-size:13px;line-height:1.1}
+  .upgradeProgressCaption{font-size:9px;opacity:.9}
+  .upgradeBtn:disabled{opacity:.6;filter:grayscale(.45)}
+  #attributesHint{margin:0;color:#cfc5ae;font-size:11px;text-align:center}
+  @media (max-height:480px){#inventoryWindow{gap:6px;padding:8px;max-height:96dvh}#inventoryPanels{gap:6px}.inventoryPanel{padding:6px}.inventoryPanel h3{margin-bottom:5px}.inventoryGrid{gap:3px}.inventorySlot{aspect-ratio:1.15/1}.inventorySlot .itemIcon{font-size:19px}#inventoryHint{font-size:9px}#characterFigure{height:105px}.equipmentSlot{min-height:54px}#itemDetails{min-height:60px;padding:8px}}
+  @media (max-width:560px){#inventoryPanels.chestMode .inventoryGrid{gap:2px}#inventoryPanels.chestMode .inventorySlot{aspect-ratio:1.85/1}#inventoryPanels.chestMode .inventorySlot .itemIcon{font-size:17px}#inventoryOverlay{padding:5px}#inventoryWindow{gap:7px;padding:8px;max-height:96dvh}#inventoryPanels{grid-template-columns:minmax(0,1fr) minmax(112px,.72fr);gap:5px}#playerInventoryPanel{grid-column:1}#characterEquipmentPanel{grid-column:2}#specialSkillsPanel{grid-column:1 / -1}#specialSkillsList{grid-template-columns:repeat(2,minmax(0,1fr))}#chestInventoryPanel{grid-column:1 / -1}#characterFigure{height:clamp(100px,20vh,155px)}.inventoryPanel{padding:5px}.inventoryGrid{gap:3px}.inventorySlot{border-radius:5px}.inventorySlot .itemIcon{font-size:24px}.equipmentSlot{min-height:62px;font-size:9px}.equipmentSlot .equipIcon{font-size:19px}#itemDetails{padding:10px;min-height:82px}#itemDetailsDescription{font-size:12px;line-height:1.5}}
+  @media (max-width:430px){#fullscreenBtn{top:8px;right:8px;width:42px;height:42px;font-size:26px}#buttons{grid-template-columns:repeat(2,58px);grid-template-rows:repeat(4,42px);gap:4px}.btn{height:40px;font-size:9px;border-radius:12px}.btn.skill{height:37px;font-size:8px}.btn.skill .skill-label{font-size:7px}.btn.skill .skill-status{font-size:7px}.controls{padding:0 10px;bottom:18px}#stickArea{width:108px;height:108px;flex-basis:108px;transform:translateY(-16px)}#stick{left:27px;top:27px}#statusHud{top:10px;left:10px;width:136px;padding:6px;gap:4px}#hudQuickActions{left:154px;gap:5px}.hudIconBtn{width:39px;height:39px;font-size:22px}.stat{font-size:9px}.stat-value{font-size:9px}}
+  #stickArea{transform:translateY(-26px)}
+  #wizardInteractBtn{position:absolute;z-index:18;left:50%;bottom:clamp(112px,18vh,170px);transform:translateX(-50%);display:none;padding:12px 22px;border:1px solid #b8d9ff;border-radius:14px;background:linear-gradient(180deg,#285fa6,#173768);color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 18px #07152c99;touch-action:manipulation}
+  #wizardInteractBtn.visible{display:block}
+  #wizardSpeech{position:absolute;z-index:25;left:50%;top:18%;transform:translateX(-50%);display:none;min-width:180px;max-width:min(86vw,420px);min-height:44px;padding:14px 18px;border:2px solid #b9d9ff;border-radius:16px;background:rgba(10,25,53,.96);color:#fff;box-shadow:0 8px 24px #0008;text-align:center}
+  #wizardSpeech.visible{display:block}
+  #wizardSpeech:after{content:"";position:absolute;left:50%;bottom:-11px;width:18px;height:18px;background:#0a1935;border-right:2px solid #b9d9ff;border-bottom:2px solid #b9d9ff;transform:translateX(-50%) rotate(45deg)}
+  :fullscreen{width:100%;height:100%;background:#000}
+  :fullscreen #stage{width:100vw;height:100dvh}
+
+</style>
+</head>
+<body>
+<div id="stage">
+<canvas id="game"></canvas>
+<div id="hud">
+ <div id="mapNameHud" aria-label="Mapa atual">CAMPO DE TREINO</div>
+ <div id="waveHud" aria-label="Orda atual">Orda - 0</div>
+ <div id="statusHud" aria-label="Status do personagem">
+  <div class="stat"><span>❤️ Vida</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="healthFill"></div></div></div>
+  <div class="stat"><span>💧 Mana</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="manaFill"></div></div></div>
+  <div class="stat"><span>⚡ Estamina</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="staminaFill"></div></div></div>
+  <div class="stat"><span id="playerLevelHud">⭐ Nível: 1</span><span class="stat-value">0 / 100</span><div class="bar"><div class="bar-fill" id="expFill" style="width:0%"></div></div></div>
+ </div>
+ <div id="hudQuickActions" aria-label="Menus do personagem">
+  <button id="backpackBtn" class="hudIconBtn" type="button" aria-label="Abrir mochila" title="Mochila">🎒</button>
+
+ </div>
+ <button id="fullscreenBtn" type="button" aria-label="Ativar tela cheia" title="Tela cheia / sair da tela cheia">⛶</button>
+ <button id="openChestBtn" type="button">📦 ABRIR BAÚ</button>
+ <button id="useLeverBtn" type="button">⚙️ VIRAR A ALAVANCA</button>
+ <button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
+ <div id="wizardSpeech" role="status" aria-live="polite"></div>
+ <div id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle"><div id="tutorialCard"><h2 id="tutorialTitle">📜 Tutorial ativado!</h2><p>A alavanca despertou o campo de treinamento. Use os controles para aprender os movimentos básicos.</p><ul><li><b>Joystick / WASD:</b> movimentar o personagem.</li><li><b>BATER / J:</b> atacar ou disparar com a balestra.</li><li><b>DEFENDER / K:</b> bloquear com o escudo equipado.</li><li><b>PULAR / Espaço:</b> saltar obstáculos.</li><li><b>CORRER / Shift:</b> correr mais rápido.</li></ul><button id="tutorialClose" type="button">ENTENDI</button></div></div>
+ <div id="spawnCountdown" aria-live="assertive">5</div>
+
+ <div id="inventoryOverlay" aria-label="Inventários" role="dialog" aria-modal="true">
+  <div id="inventoryWindow">
+   <div id="inventoryTop"><div id="inventoryTitle">🎒 PERSONAGEM</div><div id="menuTabs"><button type="button" id="tabBackpack" class="menuTab active">🎒 Mochila</button><button type="button" id="tabAttributes" class="menuTab">🧬 Atributos</button></div><button id="closeInventoryBtn" type="button">✕ FECHAR</button></div>
+   <div id="inventoryPanels">
+    <section id="playerInventoryPanel" class="inventoryPanel"><h3>🧍 MOCHILA</h3><div id="playerInventory" class="inventoryGrid"></div></section>
+    <section id="characterEquipmentPanel" class="inventoryPanel">
+     <h3>🧑 PERSONAGEM</h3>
+     <svg id="characterFigure" viewBox="0 0 180 220" role="img" aria-label="Ilustração do herói loiro com camisa verde, calça marrom, espada e escudo">
+      <defs><linearGradient id="heroShirt" x1="0" x2="1"><stop offset="0" stop-color="#315d38"/><stop offset=".5" stop-color="#4c8a4b"/><stop offset="1" stop-color="#25482e"/></linearGradient><linearGradient id="heroPants" x1="0" x2="1"><stop offset="0" stop-color="#63442c"/><stop offset=".5" stop-color="#92663d"/><stop offset="1" stop-color="#4c3424"/></linearGradient></defs>
+      <ellipse cx="90" cy="202" rx="43" ry="8" fill="#000" opacity=".28"/>
+      <path d="M68 128 L64 177 L61 196 L79 196 L87 151 L94 151 L101 196 L120 196 L112 175 L111 128Z" fill="url(#heroPants)" stroke="#38271c" stroke-width="2"/>
+      <path d="M59 192 Q70 188 81 194 L82 204 L54 204 Q51 199 59 192Z M101 194 Q112 188 123 193 L129 203 L100 204Z" fill="#171b1a" stroke="#080d0c" stroke-width="2"/>
+      <path d="M62 70 Q90 57 118 70 L124 125 Q91 138 57 125Z" fill="url(#heroShirt)" stroke="#1d3925" stroke-width="2"/>
+      <path d="M63 76 L45 86 L38 119 L49 123 L63 101 M117 76 L135 86 L143 116 L132 121 L116 100" fill="#d7a879" stroke="#8e6345" stroke-width="3"/>
+      <path d="M72 65 L72 79 Q90 89 108 79 L108 65" fill="#d7a879"/>
+      <ellipse cx="90" cy="43" rx="26" ry="31" fill="#e8bd8e" stroke="#8e6345" stroke-width="2"/>
+      <path d="M64 42 Q59 17 78 12 Q101 1 116 20 L119 41 L108 32 L96 22 L80 31 L68 48Z" fill="#d6ad3e" stroke="#947225" stroke-width="2"/>
+      <path d="M68 47 Q72 58 82 58 M112 46 Q108 58 99 58" fill="none" stroke="#9a6c4b" stroke-width="2"/>
+      <ellipse cx="80" cy="43" rx="3" ry="4" fill="#34281f"/><ellipse cx="101" cy="43" rx="3" ry="4" fill="#34281f"/><path d="M84 56 Q91 61 98 55" fill="none" stroke="#8c4e3c" stroke-width="2"/>
+      <path d="M44 91 L31 117 L45 135 L58 124 L53 105Z" fill="#3e6caa" stroke="#b8c8cc" stroke-width="3"/><path d="M43 98 L50 117 L44 127 L37 117Z" fill="#8fb4d4"/>
+      <path d="M137 98 L149 87 L155 91 L151 116 L139 139 L133 134 L142 112Z" fill="#bfc9d0" stroke="#f0e8d6" stroke-width="2"/><path d="M144 113 L153 119 L147 128 L138 122Z" fill="#72502f"/>
+      <path d="M74 82 L106 82 L101 91 L79 91Z" fill="#b58a4d"/><path d="M89 82 L93 82 L93 128 L89 128Z" fill="#b58a4d" opacity=".7"/>
+     </svg>
+     <div id="equipmentSlots">
+      <button type="button" class="equipmentSlot" data-equip-slot="rightHand"><span class="equipIcon">⚔️</span><span class="equipLabel">Mão principal</span></button>
+      <button type="button" class="equipmentSlot" data-equip-slot="leftHand"><span class="equipIcon">🛡️</span><span class="equipLabel">Mão secundária</span></button>
+      <button type="button" class="equipmentSlot" data-equip-slot="amulet"><span class="equipIcon">📿</span><span class="equipLabel">Amuleto</span></button>
+     </div>
+     <p style="margin:0;font-size:10px;line-height:1.35;color:#cfc5ae;text-align:center">Arraste um item para um espaço compatível para equipar ou trocar.</p>
+    </section>
+    <section id="specialSkillsPanel" class="inventoryPanel">
+     <h3>✨ HABILIDADES ESPECIAIS</h3>
+     <div id="specialSkillsList">
+      <div class="specialSkillSlot" data-skill-slot="1"><span class="specialSkillNumber">1</span><span class="specialSkillText"><span class="specialSkillName">Habilidade da mão principal</span><span class="specialSkillSource">Mão principal: equipe uma arma</span></span></div>
+      <div class="specialSkillSlot" data-skill-slot="2"><span class="specialSkillNumber">2</span><span class="specialSkillText"><span class="specialSkillName">Habilidade da mão principal</span><span class="specialSkillSource">Mão principal: equipe uma arma</span></span></div>
+      <div class="specialSkillSlot" data-skill-slot="3"><span class="specialSkillNumber">3</span><span class="specialSkillText"><span class="specialSkillName">Habilidade da mão secundária</span><span class="specialSkillSource">Mão secundária: equipe um item de suporte</span></span></div>
+      <div class="specialSkillSlot" data-skill-slot="4"><span class="specialSkillNumber">4</span><span class="specialSkillText"><span class="specialSkillName">Habilidade do amuleto</span><span class="specialSkillSource">Amuleto: equipe um amuleto</span></span></div>
+     </div>
+     
+    </section>
+    <section id="chestInventoryPanel" class="inventoryPanel"><h3>📦 INVENTÁRIO DO BAÚ</h3><div id="chestInventory" class="inventoryGrid"></div></section>
+   </div>
+   <div id="itemDetails" aria-live="polite"><button id="itemDetailsClose" type="button" aria-label="Fechar informações do item" title="Fechar">✕</button><div id="itemDetailsName"><span id="itemDetailsIcon"></span><span id="itemDetailsNameText"></span></div><div id="itemDetailsType"></div><div id="itemDetailsDescription"></div><button id="usePotionBtn" type="button" style="display:none">🧪 USAR POÇÃO</button><button id="equipItemBtn" type="button" style="display:none">🗡️ EQUIPAR ITEM</button></div>
+   <p id="inventoryHint">Toque em um item para ver suas informações. Arraste-o para outro espaço vazio para movê-lo.</p>
+  </div>
+ </div>
+ <div id="attributesOverlay" aria-label="Atributos do personagem" role="dialog" aria-modal="true">
+  <div id="attributesWindow">
+   <div id="attributesTop"><div id="attributesTitle">🧬 ATRIBUTOS</div><button id="closeAttributesBtn" type="button">✕ FECHAR</button></div>
+   <div id="skillPoints">Pontos de habilidade disponíveis: <span id="skillPointsValue">0</span></div>
+   <div class="attributeRow"><div class="attributeIcon">❤️</div><div><div class="attributeName">Vida</div><div class="attributeValue" id="healthAttributeValue">100</div></div><button class="upgradeBtn" data-attribute="health" type="button"><span class="upgradeProgress"></span><span class="upgradeProgressLabel">0/10</span><span class="upgradeProgressCaption">MELHORAR</span></button></div>
+   <div class="attributeRow"><div class="attributeIcon">💧</div><div><div class="attributeName">Mana</div><div class="attributeValue" id="manaAttributeValue">100</div></div><button class="upgradeBtn" data-attribute="mana" type="button"><span class="upgradeProgress"></span><span class="upgradeProgressLabel">0/10</span><span class="upgradeProgressCaption">MELHORAR</span></button></div>
+   <div class="attributeRow"><div class="attributeIcon">⚡</div><div><div class="attributeName">Estamina</div><div class="attributeValue" id="staminaAttributeValue">100</div></div><button class="upgradeBtn" data-attribute="stamina" type="button"><span class="upgradeProgress"></span><span class="upgradeProgressLabel">0/10</span><span class="upgradeProgressCaption">MELHORAR</span></button></div>
+   <p id="attributesHint">Cada melhoria adiciona 10 ao atributo e custa 10 pontos de habilidade.</p>
+  </div>
+ </div>
+ <div id="message"></div>
+ <div class="controls">
+  <div id="stickArea" aria-label="Analógico virtual"><div id="stick"></div></div>
+  <div id="buttons">
+   <button class="btn attack" data-action="attack" style="grid-column:1;grid-row:1">⚔ BATER</button>
+   <button class="btn defend" data-action="defend" style="grid-column:2;grid-row:1">🛡 DEFENDER</button>
+   <button class="btn" data-action="jump" style="grid-column:1;grid-row:2">⬆ PULAR</button>
+   <button class="btn" data-action="run" style="grid-column:2;grid-row:2">🏃 CORRER</button>
+   <button class="btn skill" data-action="skill1" style="grid-column:1;grid-row:3"><span class="skill-label">HABILIDADE 1</span><span class="skill-status" data-skill-status="1">10 mana</span></button>
+   <button class="btn skill" data-action="skill2" style="grid-column:2;grid-row:3"><span class="skill-label">HABILIDADE 2</span><span class="skill-status" data-skill-status="2">25 mana</span></button>
+   <button class="btn skill" data-action="skill3" style="grid-column:1;grid-row:4"><span class="skill-label">HABILIDADE 3</span><span class="skill-status" data-skill-status="3">Indisponível</span></button>
+   <button class="btn skill" data-action="skill4" style="grid-column:2;grid-row:4"><span class="skill-label">HABILIDADE 4</span><span class="skill-status" data-skill-status="4">Indisponível</span></button>
+  </div>
+ </div>
+</div>
+</div>
+ <div id="deathOverlay" role="dialog" aria-modal="true" aria-labelledby="deathTitle"><div id="deathAnnouncement">VOCÊ MORREU</div><div id="deathCard"><h2 id="deathTitle">VOCÊ MORREU</h2><p>Seu personagem foi derrotado.</p><div class="deathActions"><button id="restoreBtn" type="button">✚ RESTAURAR</button><button id="restartBtn" type="button">↻ RECOMEÇAR</button></div></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const canvas=document.querySelector('#game');
+const stage=document.querySelector('#stage');
+function gameSize(){return innerHeight>innerWidth?{w:innerHeight,h:innerWidth}:{w:innerWidth,h:innerHeight}}
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
+const initialSize=gameSize();renderer.setSize(initialSize.w,initialSize.h,false);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9dc9e8);
+scene.fog=new THREE.Fog(0x9dc9e8,25,62);
+const camera=new THREE.PerspectiveCamera(55,initialSize.w/initialSize.h,.1,150);
+camera.position.set(0,5,9);
+
+scene.add(new THREE.HemisphereLight(0xdaf1ff,0x4e6834,2.0));
+const sun=new THREE.DirectionalLight(0xfff2d6,2.3);
+sun.position.set(-12,22,9);sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-28;sun.shadow.camera.right=28;sun.shadow.camera.top=28;sun.shadow.camera.bottom=-28;
+scene.add(sun);
+
+const mat=(color,roughness=1)=>new THREE.MeshStandardMaterial({color,roughness});
+const grassMats=[mat(0x4e9a42),mat(0x579f43),mat(0x468b3b),mat(0x62a94c),mat(0x3f8438)];
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(70,70),grassMats[0]);
+ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
+
+// Natural green patches scattered across the meadow.
+for(let i=0;i<150;i++){
+ const r=1.0+Math.random()*4.2;
+ const patch=new THREE.Mesh(new THREE.CircleGeometry(r,12),grassMats[Math.floor(Math.random()*grassMats.length)]);
+ patch.rotation.x=-Math.PI/2;patch.position.set((Math.random()-.5)*54,-.105+Math.random()*.008,(Math.random()-.5)*54);
+ patch.scale.set(1,0.65+Math.random()*.7,1);patch.receiveShadow=true;scene.add(patch);
+}
+// Cada pedra visual também registra um volume físico aproximado para colisão e salto.
+const stoneMats=[mat(0x858b88),mat(0x737c7b),mat(0x9b9d91)];
+const rockColliders=[];
+const archColliders=[];
+const platformColliders=[];
+for(let i=0;i<19;i++){
+ const s=.22+Math.random()*.48;
+ const x=(Math.random()-.5)*59,z=(Math.random()-.5)*59;
+ // Mantém livre a área do pedestal e dos degraus: pedras sobrepostas podem causar z-fighting.
+ const pedestalFootprint=5.65+s*1.6;
+ if(Math.abs(x-0)<pedestalFootprint && Math.abs(z-(-7))<pedestalFootprint)continue;
+ // Mantém uma área livre de 4 metros ao redor do baú, incluindo a margem da pedra.
+ if(Math.hypot(x-3.0,z-10.5)<4+s*1.5)continue;
+ const stone=new THREE.Mesh(new THREE.DodecahedronGeometry(s,0),stoneMats[i%stoneMats.length]);
+ const sx=1+Math.random(),sy=.55+Math.random()*.4,sz=.8+Math.random()*.5;
+ stone.position.set(x,s*.45,z);
+ stone.scale.set(sx,sy,sz);
+ stone.rotation.set(Math.random(),Math.random()*3,Math.random());
+ stone.castShadow=true;stone.receiveShadow=true;scene.add(stone);
+ rockColliders.push({x,z,r:s*Math.max(sx,sz)*.78,top:s*.45+s*sy,platformR:Math.max(.22,s*Math.min(sx,sz)*.72)});
+}
+// Duas rochas grandes, baixas e escaláveis: colisão lateral e topo para pousar.
+const jumpableRocks=[{x:-11,z:5,r:1.12,top:.68},{x:12,z:13,r:1.12,top:.68}];
+for(const r of jumpableRocks){
+ const rock=new THREE.Mesh(new THREE.CylinderGeometry(r.r*.88,r.r,r.top,7,1),stoneMats[1]);
+ rock.position.set(r.x,r.top/2,r.z);rock.rotation.y=.18;rock.castShadow=true;rock.receiveShadow=true;scene.add(rock);
+ rockColliders.push({x:r.x,z:r.z,r:r.r*.98,top:r.top,platformR:r.r*.72});
+ // Facetas rochosas nas laterais para quebrar a silhueta perfeitamente geométrica.
+ for(let i=0;i<5;i++){
+  const a=i*Math.PI*2/5+.25;
+  const facet=new THREE.Mesh(new THREE.DodecahedronGeometry(.34,0),stoneMats[(i+1)%stoneMats.length]);
+  facet.position.set(r.x+Math.cos(a)*r.r*.72,r.top*.55,r.z+Math.sin(a)*r.r*.72);
+  facet.scale.set(1.05,.75,.9);facet.rotation.y=a;facet.castShadow=true;facet.receiveShadow=true;scene.add(facet);
+ }
+}
+// Flores distribuídas por todo o campo, inclusive junto às muralhas.
+const flowerColors=[0xffdc35,0xb77bfa,0xf04d51];
+const flowerMats=flowerColors.map(c=>new THREE.MeshStandardMaterial({color:c,roughness:.65}));
+const stemMat=mat(0x286b30);
+for(let i=0;i<125;i++){
+ const x=(Math.random()-.5)*63,z=(Math.random()-.5)*63;
+ if(Math.hypot(x,z)<2.8)continue;
+ const group=new THREE.Group();
+ const stem=new THREE.Mesh(new THREE.CylinderGeometry(.018,.025,.18,5),stemMat);stem.position.y=.09;group.add(stem);
+ const color=flowerMats[Math.floor(Math.random()*3)];
+ for(let p=0;p<5;p++){
+  const petal=new THREE.Mesh(new THREE.SphereGeometry(.055,6,5),color);
+  const a=p*Math.PI*2/5;petal.position.set(Math.cos(a)*.07,.2,Math.sin(a)*.07);petal.scale.set(1,.65,1);group.add(petal);
+ }
+ const center=new THREE.Mesh(new THREE.SphereGeometry(.035,6,5),mat(0xffe9a1));center.position.y=.21;group.add(center);
+ group.position.set(x,0,z);group.rotation.y=Math.random()*6.28;scene.add(group);
+}
+
+// Character: young blond adventurer with shield, sword, and articulated limbs.
+const hero=new THREE.Group();scene.add(hero);
+const skin=mat(0xf1c49b),hair=mat(0xf0c62d),shirt=mat(0x2b9b50),pants=mat(0x765033),shoe=mat(0x171a20),eye=mat(0x262d30);
+function part(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){
+ const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
+}
+const torso=part(hero,new THREE.CapsuleGeometry(.31,.43,4,8),shirt,0,1.17,0,1,1,.72);
+part(hero,new THREE.SphereGeometry(.29,12,10),skin,0,1.77,0,.9,1,.9);
+part(hero,new THREE.SphereGeometry(.30,10,8),hair,0,1.94,-.035,1.02,.55,1.0);
+part(hero,new THREE.BoxGeometry(.15,.17,.14),hair,-.2,1.83,.12);
+part(hero,new THREE.BoxGeometry(.15,.13,.13),hair,.05,1.96,.16);
+part(hero,new THREE.SphereGeometry(.035,6,6),eye,-.105,1.79,.252);
+part(hero,new THREE.SphereGeometry(.035,6,6),eye,.105,1.79,.252);
+
+// Braços articulados em ombro, cotovelo e mão para permitir gestos naturais.
+const armL=new THREE.Group();armL.position.set(-.36,1.38,0);hero.add(armL);
+part(armL,new THREE.CapsuleGeometry(.105,.20,3,6),shirt,0,-.14,0);
+const elbowL=new THREE.Group();elbowL.position.set(0,-.29,0);armL.add(elbowL);
+part(elbowL,new THREE.SphereGeometry(.092,8,7),shirt,0,0,0);
+const handL=new THREE.Group();handL.position.set(0,-.035,0);elbowL.add(handL);
+part(handL,new THREE.CapsuleGeometry(.085,.20,3,6),shirt,0,-.12,0);
+part(handL,new THREE.SphereGeometry(.105,7,6),skin,0,-.255,.035);
+const armR=new THREE.Group();armR.position.set(.36,1.38,0);hero.add(armR);
+part(armR,new THREE.CapsuleGeometry(.105,.20,3,6),shirt,0,-.14,0);
+const elbowR=new THREE.Group();elbowR.position.set(0,-.29,0);armR.add(elbowR);
+part(elbowR,new THREE.SphereGeometry(.092,8,7),shirt,0,0,0);
+const handR=new THREE.Group();handR.position.set(0,-.035,0);elbowR.add(handR);
+part(handR,new THREE.CapsuleGeometry(.085,.20,3,6),shirt,0,-.12,0);
+part(handR,new THREE.SphereGeometry(.105,7,6),skin,0,-.255,.045);
+
+// REGRA FIXA: escudo sempre na mão ESQUERDA (handL); nunca anexar ao braço direito.
+const shieldGroup=new THREE.Group();shieldGroup.position.set(-.02,-.18,.24);shieldGroup.scale.setScalar(1.25);shieldGroup.visible=false;handL.add(shieldGroup);
+const shieldShape=new THREE.Shape();
+shieldShape.moveTo(-.24,.22);shieldShape.lineTo(.24,.22);shieldShape.lineTo(.21,-.12);shieldShape.lineTo(0,-.39);shieldShape.lineTo(-.21,-.12);shieldShape.closePath();
+const shieldGeo=new THREE.ExtrudeGeometry(shieldShape,{depth:.065,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.014,bevelThickness:.014});
+const shieldRim=new THREE.Mesh(shieldGeo,mat(0xd3b36a));shieldRim.position.z=0;shieldRim.scale.set(1.13,1.08,1);shieldGroup.add(shieldRim);
+// The blue front plate sits on the front face of the thicker shield body.
+const shieldFace=new THREE.Mesh(new THREE.ShapeGeometry(shieldShape),mat(0x287be0));shieldFace.position.z=.083;shieldGroup.add(shieldFace);
+const shieldBoss=new THREE.Mesh(new THREE.CircleGeometry(.075,8),mat(0xe2c77d));shieldBoss.position.set(0,.01,.09);shieldGroup.add(shieldBoss);
+[shieldRim,shieldFace,shieldBoss].forEach(o=>{o.castShadow=true;o.receiveShadow=true});
+
+// Espada reta em um único eixo (+Z): pomo, empunhadura, guarda, lâmina e ponta ficam alinhados.
+// A espada continua filha da mão direita; apenas corrigimos a orientação local das peças.
+const swordGroup=new THREE.Group();swordGroup.position.set(.02,-.22,.08);swordGroup.visible=false;
+swordGroup.rotation.set(0,0,0);handR.add(swordGroup);
+const grip=part(swordGroup,new THREE.CylinderGeometry(.035,.04,.22,7),mat(0x493022),0,0,-.04);
+grip.rotation.x=Math.PI/2; // eixo do cabo alinhado com a lâmina
+const pommel=part(swordGroup,new THREE.SphereGeometry(.055,7,6),mat(0xe2c77d),0,0,-.16);
+const guard=part(swordGroup,new THREE.BoxGeometry(.27,.055,.075),mat(0xe2c77d),0,0,.075);
+const blade=part(swordGroup,new THREE.BoxGeometry(.105,.045,.58),mat(0xcbd8df,.35),0,0,.405);
+const tip=part(swordGroup,new THREE.ConeGeometry(.074,.17,4),mat(0xe4edf0,.3),0,0,.78);
+tip.rotation.x=Math.PI/2;
+// Aura azul mágica centrada no mesmo eixo reto da lâmina.
+const swordAuraMat=new THREE.MeshBasicMaterial({color:0x28aaff,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+const swordAuraBlade=new THREE.Mesh(new THREE.BoxGeometry(.19,.105,.69),swordAuraMat);swordAuraBlade.position.set(0,0,.425);swordAuraBlade.visible=false;swordGroup.add(swordAuraBlade);
+const swordAuraTipMat=new THREE.MeshBasicMaterial({color:0x9beaff,transparent:true,opacity:.58,blending:THREE.AdditiveBlending,depthWrite:false});
+const swordAuraTip=new THREE.Mesh(new THREE.ConeGeometry(.105,.22,6),swordAuraTipMat);swordAuraTip.position.set(0,0,.79);swordAuraTip.rotation.x=Math.PI/2;swordAuraTip.visible=false;swordGroup.add(swordAuraTip);
+const swordAuraLight=new THREE.PointLight(0x168cff,0,2.8);swordAuraLight.position.set(0,.02,.48);swordGroup.add(swordAuraLight);
+// REGRA FIXA: balestra sempre na mão DIREITA (handR); recarga feita pela mão ESQUERDA (handL).
+const crossbowGroup=new THREE.Group();crossbowGroup.position.set(.02,-.04,.14);crossbowGroup.visible=false;handR.add(crossbowGroup);
+// Balestra redesenhada: coronha de madeira trabalhada, trilho metálico, arco recurvo e corda.
+const crossbowWood=mat(0x54301f),crossbowWoodLight=mat(0x956039),crossbowMetal=mat(0x343e49),crossbowSteel=mat(0xaebbc4),crossbowString=mat(0xe5d9bd),crossbowGold=mat(0xc49a50);
+part(crossbowGroup,new THREE.BoxGeometry(.105,.43,.105),crossbowWood,0,.005,0,1,.92,1);
+part(crossbowGroup,new THREE.BoxGeometry(.075,.34,.025),crossbowWoodLight,0,.015,.057);
+part(crossbowGroup,new THREE.BoxGeometry(.16,.105,.12),crossbowWood,0,-.205,-.015);
+part(crossbowGroup,new THREE.BoxGeometry(.055,.22,.075),crossbowWood,0,-.235,-.01,1,1,.8);
+part(crossbowGroup,new THREE.BoxGeometry(.075,.31,.045),crossbowMetal,0,.105,.066);
+part(crossbowGroup,new THREE.BoxGeometry(.035,.27,.018),crossbowSteel,0,.115,.093);
+part(crossbowGroup,new THREE.BoxGeometry(.31,.045,.065),crossbowMetal,0,.18,.015);
+part(crossbowGroup,new THREE.BoxGeometry(.23,.018,.035),crossbowGold,0,.207,.035);
+const limbCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(-.36,.34,0),new THREE.Vector3(-.29,.29,0),new THREE.Vector3(-.18,.24,0),new THREE.Vector3(0,.22,0),new THREE.Vector3(.18,.24,0),new THREE.Vector3(.29,.29,0),new THREE.Vector3(.36,.34,0)]);
+const bowLimb=new THREE.Mesh(new THREE.TubeGeometry(limbCurve,18,.035,6,false),crossbowWoodLight);bowLimb.castShadow=true;crossbowGroup.add(bowLimb);
+const limbMetal=new THREE.Mesh(new THREE.TubeGeometry(limbCurve,18,.012,5,false),crossbowMetal);limbMetal.position.z=.025;crossbowGroup.add(limbMetal);
+const stringGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-.36,.34,.035),new THREE.Vector3(0,.13,.035),new THREE.Vector3(.36,.34,.035)]);
+const crossbowStringMesh=new THREE.Line(stringGeo,new THREE.LineBasicMaterial({color:0xe5d9bd}));crossbowGroup.add(crossbowStringMesh);
+part(crossbowGroup,new THREE.BoxGeometry(.09,.035,.045),crossbowMetal,0,.245,.035);
+// Aljava presa às costas, com três flechas visíveis enquanto a balestra estiver equipada.
+const quiverGroup=new THREE.Group();quiverGroup.position.set(.16,1.27,-.245);quiverGroup.rotation.z=-.16;quiverGroup.rotation.x=-.08;quiverGroup.visible=false;hero.add(quiverGroup);
+const quiverLeather=mat(0x5a3424),quiverTrim=mat(0xb58a4c),quiverInside=mat(0x29231e),backArrowWood=mat(0x93683d),backArrowFeather=mat(0xd8d0b8);
+const quiverBody=part(quiverGroup,new THREE.CylinderGeometry(.105,.145,.58,9,1,true),quiverLeather,0,0,0);
+const quiverTopRing=part(quiverGroup,new THREE.TorusGeometry(.105,.015,5,12),quiverTrim,0,.27,0);quiverTopRing.rotation.x=Math.PI/2;
+const quiverBottomRing=part(quiverGroup,new THREE.TorusGeometry(.115,.018,5,10),quiverTrim,0,-.27,0);quiverBottomRing.rotation.x=Math.PI/2;
+for(let i=0;i<3;i++){
+ const ax=(i-1)*.065,az=(i===1?.025:-.015),baseY=.20+(i===1?.045:0);
+ const shaft=part(quiverGroup,new THREE.CylinderGeometry(.012,.012,.48,5),backArrowWood,ax,baseY+.12,az);
+ const head=part(quiverGroup,new THREE.ConeGeometry(.027,.09,5),crossbowSteel,ax,baseY+.405,az);head.rotation.z=0;
+ part(quiverGroup,new THREE.BoxGeometry(.045,.065,.012),backArrowFeather,ax-.012,baseY-.13,az);
+ part(quiverGroup,new THREE.BoxGeometry(.045,.065,.012),backArrowFeather,ax+.012,baseY-.13,az);
+}
+// Flecha de recarga visível na mão esquerda durante a animação de preparação.
+const reloadArrow=new THREE.Group();reloadArrow.visible=false;handL.add(reloadArrow);
+const reloadShaft=part(reloadArrow,new THREE.CylinderGeometry(.012,.012,.52,5),mat(0x8a6038),0,-.02,.03);reloadShaft.rotation.x=Math.PI/2;
+const reloadTip=part(reloadArrow,new THREE.ConeGeometry(.035,.11,5),mat(0xb9c4cb),0,-.02,.30);reloadTip.rotation.x=Math.PI/2;
+for(const side of [-1,1])part(reloadArrow,new THREE.BoxGeometry(.045,.018,.055),mat(0xb9a47b),side*.018,-.02,-.22);
+reloadArrow.position.set(0,-.22,.06);reloadArrow.rotation.z=-.28;
+// Poses neutras usadas para suavizar a saída da animação de recarga.
+const armRestQuaternion=new THREE.Quaternion();
+const elbowRestQuaternion=new THREE.Quaternion();
+// Pernas articuladas em três partes: coxa, joelho e canela/pé.
+// O pivô do joelho permite inclinar a coxa para a frente e a canela para trás no impulso.
+function makeLeg(x){
+ const hip=new THREE.Group();hip.position.set(x,.72,0);hero.add(hip);
+ part(hip,new THREE.CapsuleGeometry(.13,.23,3,6),pants,0,-.19,0);
+ const knee=new THREE.Group();knee.position.set(0,-.39,0);hip.add(knee);
+ part(knee,new THREE.SphereGeometry(.115,8,7),pants,0,0,0);
+ part(knee,new THREE.CapsuleGeometry(.105,.16,3,6),pants,0,-.12,0);
+ part(knee,new THREE.BoxGeometry(.22,.13,.34),shoe,0,-.19,.07);
+ return {hip,knee};
+}
+const legL=makeLeg(-.16),legR=makeLeg(.16);
+hero.position.set(0,0,7.5); // Ponto inicial mais distante do pedestal, com espaço para explorar.
+
+// NPC guia: mago humano com túnica azul, chapéu pontudo, cajado e livro.
+const wizard=new THREE.Group();wizard.position.set(-3.2,0,3.0);wizard.rotation.y=Math.PI;scene.add(wizard);
+const wizardBlue=mat(0x183d91),wizardBlueLight=mat(0x3569c6),wizardTrim=mat(0xd6c8ff),wizardSkin=mat(0xe5b991),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x5d243c),bookPages=mat(0xf0e2bd);
+part(wizard,new THREE.CapsuleGeometry(.34,.62,4,8),wizardBlue,0,1.02,0,1.1,1.2,.82);
+part(wizard,new THREE.ConeGeometry(.22,.34,8),wizardBlue,0,.42,0,1.6,1,1.5); // base larga da túnica
+part(wizard,new THREE.SphereGeometry(.255,12,10),wizardSkin,0,1.78,0,.95,1,.9);
+part(wizard,new THREE.ConeGeometry(.34,.62,10),wizardBlueLight,0,2.27,-.015,1,1,1);
+part(wizard,new THREE.TorusGeometry(.23,.035,6,12),wizardTrim,0,2.02,0,1,1,.9);
+part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,-.38,1.16,0,1,1,.9).rotation.z=-.42;
+part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,.38,1.16,0,1,1,.9).rotation.z=.42;
+part(wizard,new THREE.SphereGeometry(.105,8,8),wizardSkin,-.53,1.02,.015);
+part(wizard,new THREE.SphereGeometry(.105,8,8),wizardSkin,.53,1.02,.015);
+// Cajado na mão esquerda (haste e cristal azul).
+part(wizard,new THREE.CylinderGeometry(.035,.05,1.55,8),wizardWood,-.67,1.15,.02);
+part(wizard,new THREE.SphereGeometry(.13,10,8),wizardBlueLight,-.67,1.98,.02);
+part(wizard,new THREE.OctahedronGeometry(.115),wizardTrim,-.67,2.0,.02);
+// Livro aberto/encadernado na mão direita.
+part(wizard,new THREE.BoxGeometry(.34,.43,.09),bookCover,.63,1.12,.03,1,1,1);
+part(wizard,new THREE.BoxGeometry(.29,.37,.025),bookPages,.63,1.12,.082);
+part(wizard,new THREE.BoxGeometry(.025,.38,.02),wizardGold,.63,1.12,.1);
+const wizardInteractBtn=document.querySelector('#wizardInteractBtn'),wizardSpeech=document.querySelector('#wizardSpeech');
+let wizardSpeechOpen=false;
+wizardInteractBtn.addEventListener('click',()=>{wizardSpeechOpen=!wizardSpeechOpen;wizardSpeech.classList.toggle('visible',wizardSpeechOpen);});
+
+
+// Helper for solid architectural pieces.
+function addBox(w,h,d,m,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o;}
+// Baú de madeira próximo ao ponto inicial, com detalhes metálicos e colisão física.
+const chestX=3.0, chestZ=10.5;
+const woodDark=mat(0x684126),woodMain=mat(0x8b592f),woodLight=mat(0xa96e39),ironMat=mat(0xd0b36b,.55);
+addBox(1.02,.52,.72,woodMain,chestX,.30,chestZ);
+// Planks on the front make the chest read clearly as wooden.
+for(let i=-1;i<=1;i++){
+ addBox(.025,.43,.018,woodLight,chestX+i*.29,.30,chestZ+.371);
+}
+// Lid sits on a rear hinge so the interaction button can visibly open it.
+const chestLid=new THREE.Group();
+chestLid.position.set(chestX,.65,chestZ-.36);scene.add(chestLid);
+const lidBase=new THREE.Mesh(new THREE.BoxGeometry(1.10,.20,.80),woodDark);
+lidBase.position.set(0,0,.36);lidBase.castShadow=true;lidBase.receiveShadow=true;chestLid.add(lidBase);
+const lidTop=new THREE.Mesh(new THREE.BoxGeometry(1.04,.14,.74),woodLight);
+lidTop.position.set(0,.08,.36);lidTop.castShadow=true;lidTop.receiveShadow=true;chestLid.add(lidTop);
+// Iron bands are split between the body and the hinged lid, preserving the closed appearance.
+for(const xoff of [-.36,.36]){
+ addBox(.075,.44,.83,ironMat,chestX+xoff,.32,chestZ);
+ const lidBand=new THREE.Mesh(new THREE.BoxGeometry(.075,.18,.83),ironMat);
+ lidBand.position.set(xoff,.015,.36);lidBand.castShadow=true;lidBand.receiveShadow=true;chestLid.add(lidBand);
+}
+addBox(.18,.22,.055,ironMat,chestX,.52,chestZ+.415);
+addBox(.07,.08,.035,woodDark,chestX,.49,chestZ+.45);
+rockColliders.push({x:chestX,z:chestZ,r:.66,top:.83,platformR:.42});
+let chestOpened=false;
+const openChestBtn=document.querySelector('#openChestBtn');
+const inventoryOverlay=document.querySelector('#inventoryOverlay');
+const attributesOverlay=document.querySelector('#attributesOverlay');
+document.querySelector('#inventoryWindow').appendChild(attributesOverlay);
+const chestInventoryPanel=document.querySelector('#chestInventoryPanel');
+const attributeState={health:100,mana:100,stamina:100};
+let skillPoints=0;
+const currentResources={health:100,mana:100,stamina:100};
+let playerDead=false,deathAnimationTime=0,deathScreenTimer=null,slimeAttackOwner=null,nextSlimeAttackSide=1;
+let levelUpAura=null,levelUpAuraTimer=0;
+let heroKnockbackTimer=0,heroKnockbackX=0,heroKnockbackZ=0,heroKnockbackPower=0;
+const resourceValueEls={
+ health:document.querySelector('#healthFill').closest('.stat').querySelector('.stat-value'),
+ mana:document.querySelector('#manaFill').closest('.stat').querySelector('.stat-value'),
+ stamina:document.querySelector('#staminaFill').closest('.stat').querySelector('.stat-value')
+};
+// XP necessária para subir: nível 1→2 = 100, 2→3 = 200, 3→4 = 300 etc.
+const experienceState={current:0,required:100,level:1};
+const experienceValueEl=document.querySelector('#expFill').closest('.stat').querySelector('.stat-value');
+function updateAttributeHud(){
+ for(const key of ['health','mana','stamina']){
+  resourceValueEls[key].textContent=`${Math.floor(currentResources[key])} / ${attributeState[key]}`;
+  document.querySelector(`#${key}Fill`).style.width=`${Math.min(100,currentResources[key]/attributeState[key]*100)}%`;
+  document.querySelector(`#${key}AttributeValue`).textContent=String(attributeState[key]);
+ }
+ document.querySelector('#playerLevelHud').textContent=`⭐ Nível: ${experienceState.level}`;
+ experienceValueEl.textContent=`${experienceState.current} / ${experienceState.required}`;
+ document.querySelector('#expFill').style.width=`${Math.min(100,experienceState.current/experienceState.required*100)}%`;
+}
+function applyPlayerDamage(amount,defending=false,sourceName='Ataque inimigo',damageAlreadyApplied=false){
+ if(!damageAlreadyApplied) currentResources.health=Math.max(0,currentResources.health-amount);
+ // Feedback de dano unificado: flash vermelho e recuo para qualquer fonte de dano.
+ hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&!o.userData.damageBaseColor)o.userData.damageBaseColor=o.material.color.clone();});
+ hero.userData.damageFlashTimer=.28;
+ const awayX=hero.position.x-(hero.userData.lastAttackerX??(hero.position.x-Math.sin(hero.rotation.y)));
+ const awayZ=hero.position.z-(hero.userData.lastAttackerZ??(hero.position.z-Math.cos(hero.rotation.y)));
+ const len=Math.hypot(awayX,awayZ)||1;
+ heroKnockbackX=awayX/len;heroKnockbackZ=awayZ/len;heroKnockbackPower=defending?4.2:6.2;heroKnockbackTimer=defending?.20:.30;
+ updateAttributeHud();
+ // O flash vermelho e o recuo já comunicam o dano; não exibir mensagem redundante.
+ if(currentResources.health<=0)triggerPlayerDeath();
+}
+function awardExperience(amount){
+ if(!Number.isFinite(amount)||amount<=0)return;
+ experienceState.current+=amount;
+ let leveledUp=false;
+ while(experienceState.current>=experienceState.required){
+  experienceState.current-=experienceState.required;
+  experienceState.level++;
+  experienceState.required=experienceState.level*100;
+  leveledUp=true;
+  awardLevelUpPoints(10);
+ }
+ updateAttributeHud();
+ if(leveledUp){say(`✨ NÍVEL AUMENTADO! Você chegou ao nível ${experienceState.level}! +10 pontos de atributo`);createLevelUpAura();}
+ else say(`Você recebeu ${amount} de experiência!`);
+}
+function createLevelUpAura(){
+ if(levelUpAura){scene.remove(levelUpAura);levelUpAura.geometry.dispose();levelUpAura.material.dispose();}
+ // Aura volumétrica azul que envolve o corpo inteiro, em vez de um anel no chão.
+ const geo=new THREE.CylinderGeometry(.82,.68,2.35,32,1,true);
+ const material=new THREE.MeshBasicMaterial({color:0x38aaff,transparent:true,opacity:.62,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+ levelUpAura=new THREE.Mesh(geo,material);levelUpAura.position.set(hero.position.x,hero.position.y+1.12,hero.position.z);scene.add(levelUpAura);
+ const innerGeo=new THREE.CylinderGeometry(.58,.48,2.15,24,1,true);
+ const innerMat=new THREE.MeshBasicMaterial({color:0x9fe4ff,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+ const inner=new THREE.Mesh(innerGeo,innerMat);inner.userData.levelAuraInner=true;levelUpAura.add(inner);levelUpAuraTimer=3.5;
+}
+function restoreMana(amount){
+ const before=currentResources.mana;
+ currentResources.mana=Math.min(attributeState.mana,currentResources.mana+amount);
+ const restored=currentResources.mana-before;
+ updateAttributeHud();
+ if(restored>0)say(`Aura absorvida: +${restored} de mana!`);
+ else say('Sua mana já está cheia!');
+}
+function spendStamina(amount, actionName='ação'){
+ if(currentResources.stamina+1e-6<amount){say(`Estamina insuficiente para ${actionName}! Precisa de ${amount}, você tem ${Math.floor(currentResources.stamina)}.`);return false;}
+ currentResources.stamina=Math.max(0,currentResources.stamina-amount);updateAttributeHud();return true;
+}
+function drainStaminaPerSecond(rate,dt,actionName){
+ if(rate<=0||dt<=0||currentResources.stamina<=0)return;
+ currentResources.stamina=Math.max(0,currentResources.stamina-rate*dt);
+ if(currentResources.stamina===0&&actions.defend){
+  actions.defend=false;document.querySelector('[data-action="defend"]')?.classList.remove('active');say('Sem estamina: você abaixou o escudo.');
+ }
+}
+function renderAttributes(){
+ document.querySelector('#skillPointsValue').textContent=String(skillPoints);
+ document.querySelectorAll('.upgradeBtn').forEach(button=>{
+  const progress=Math.min(10,skillPoints);
+  button.disabled=skillPoints<10;
+  button.querySelector('.upgradeProgress').style.width=`${progress*10}%`;
+  button.querySelector('.upgradeProgressLabel').textContent=`${progress}/10`;
+  button.setAttribute('aria-label',skillPoints>=10?'Melhorar atributo: custa 10 pontos e adiciona 10 ao atributo':`Progresso para melhorar atributo: ${progress} de 10 pontos`);
+ });
+ updateAttributeHud();
+}
+// Call this from the level-up reward when the experience/level system is connected.
+function awardLevelUpPoints(points=10){skillPoints+=points;renderAttributes();}
+function openAttributes(){renderAttributes();inventoryOverlay.classList.add('open');attributesOverlay.classList.add('open');document.querySelector('#inventoryPanels').style.display='none';document.querySelector('#itemDetails').style.display='none';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#inventoryTitle').textContent='🧬 PERSONAGEM';document.querySelector('#tabAttributes').classList.add('active');document.querySelector('#tabBackpack').classList.remove('active');openChestBtn.classList.remove('visible');}
+function closeAttributes(){attributesOverlay.classList.remove('open');}
+document.querySelector('#tabAttributes').addEventListener('click',openAttributes);
+document.querySelector('#tabBackpack').addEventListener('click',()=>{attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#inventoryTitle').textContent='🎒 PERSONAGEM';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');});
+document.querySelector('#closeAttributesBtn').addEventListener('click',closeAttributes);
+document.querySelectorAll('.upgradeBtn').forEach(button=>button.addEventListener('click',()=>{
+ const key=button.dataset.attribute;
+ if(skillPoints<10)return;
+ skillPoints-=10;attributeState[key]+=10;currentResources[key]+=10;renderAttributes();
+}));
+document.querySelector('#backpackBtn').addEventListener('click',()=>{if(inventoryOverlay.classList.contains('open')){closeInventory();return;}attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryTitle').textContent='🎒 MOCHILA';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');openInventory('player');});
+const playerInventoryEl=document.querySelector('#playerInventory');
+const chestInventoryEl=document.querySelector('#chestInventory');
+const itemCatalog={
+ shield:{id:'shield',name:'Escudo do aprendiz',icon:'🛡️',type:'Item de suporte — mão esquerda',itemRole:'support',itemCategory:'offhand',skills:{3:{name:'Véu de Defesa',description:'Cria uma barreira circular de luz amarela ao redor do personagem por 6 segundos. A barreira acompanha seus movimentos e bloqueia projéteis em 360°.',effect:'defenseVeil',duration:6,manaCost:20,cooldown:20}},description:'Enquanto estiver equipado, segure o botão DEFENDER para bloquear e reduzir o dano recebido. Habilidade 3: Véu de Defesa — barreira circular de 360° por 6 segundos, custo de 20 de mana e recarga de 20 segundos.'},
+ sword:{id:'sword',name:'Espada do aprendiz',icon:'🗡️',type:'Arma corpo a corpo — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:7,skills:{1:{name:'Lâmina Giratória',description:'Aponta a espada à frente com as duas mãos e gira por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Disparo Cortante',description:'Segure para mirar a trajetória do disparo cortante; a espada se ergue durante a mira e, ao soltar, dispara quase instantaneamente, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Use o botão ATACAR para executar um corte para a frente que causa 7 de dano por acerto. Habilidade 1: Lâmina Giratória (5 segundos, área circular de 6 metros de diâmetro). Habilidade 2: Disparo Cortante (golpe em linha reta).'},
+ crossbow:{id:'crossbow',name:'Balestra do aprendiz',icon:'⌁',type:'Arma de longo alcance — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'projectile',damage:12,skills:{1:{name:'Chuva de Flechas',description:'Invoca por 4 segundos uma chuva de flechas numa área circular de 6 metros, posicionada cerca de 4 metros à frente do personagem no momento da conjuração. A área fica fixa no local escolhido. Causa 11 de dano por segundo dentro da área.',effect:'arrowRain',damage:11,duration:4,radius:6,manaCost:25,staminaCost:5,cooldown:20},2:{name:'Disparo Múltiplo',description:'Após uma animação de recarga, dispara 20 flechas imbuídas em mana em um leque mais fechado para a frente, causando 7 de dano por flecha que acertar.',effect:'multiShot',damage:7,arrows:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Dispara uma flecha para a frente ao atacar. Cada flecha causa 12 de dano ao atingir uma criatura. Habilidade 1: Chuva de Flechas (4 segundos, raio de 6 metros, área fixa a cerca de 4 metros à frente, 11 de dano por segundo). Habilidade 2: Disparo Múltiplo (20 flechas azuis em leque fechado, 7 de dano cada). Enquanto estiver equipada, não é possível usar item na mão esquerda.'}
+};
+// Sistema genérico de armas: o dano vem dos dados do próprio item na mochila.
+// Para criar uma arma nova, cadastre weaponClass ('melee' ou 'projectile') e damage.
+// Cada arma corpo a corpo usa um único tipo de ataque; armas futuras podem implementar modos próprios depois.
+function getWeaponData(){
+ const item=equippedItems.rightHand;
+ return item&&item.weaponClass?item:null;
+}
+function damageCreature(creature,amount,source='weapon'){
+ if(!creature||!creature.alive||!Number.isFinite(amount)||amount<=0)return false;
+ creature.health=Math.max(0,creature.health-amount);
+ // Feedback visual e físico para confirmar cada acerto. Cada criatura tem material próprio
+ // para que o flash vermelho não altere a cor de outros slimes.
+ creature.damageFlashTimer=.28;
+ const awayX=creature.root.position.x-hero.position.x,awayZ=creature.root.position.z-hero.position.z;
+ const awayLen=Math.hypot(awayX,awayZ)||1;
+ creature.knockbackX=awayX/awayLen;creature.knockbackZ=awayZ/awayLen;
+ if(Math.hypot(awayX,awayZ)<.001){creature.knockbackX=Math.sin(hero.rotation.y);creature.knockbackZ=Math.cos(hero.rotation.y);}
+ // Durante o giro, os inimigos em contato recebem dano contínuo sem serem expulsos da área.
+ if(source!=='swordSpin'){creature.knockbackTimer=.24;creature.knockbackPower=5.2;}else{creature.knockbackTimer=0;creature.knockbackPower=0;}
+ creature.barFill.scale.x=Math.max(.001,creature.health/creature.maxHealth);
+ creature.barFill.position.x=-(1-creature.health/creature.maxHealth)*.34;
+ creature.root.userData.lastDamageSource=source;
+ if(creature.health<=0){
+  if(slimeAttackOwner===creature)slimeAttackOwner=null;
+  // Finalização universal: qualquer criatura viva que chegue a zero concede XP uma única vez.
+  // O valor fica registrado na própria criatura ao nascer, sem depender de onda ou drop visual.
+  creature.alive=false;
+  creature.root.visible=false;
+  if(creature.attackRing)creature.attackRing.visible=false;
+  if(!creature.xpAwarded){
+   const variant=String(creature.variant||'').toLowerCase();
+   const xpAmount=Number.isFinite(creature.xpReward)&&creature.xpReward>0
+    ? creature.xpReward
+    : ((variant==='green'||variant==='acid'||creature.waveNumber===3)?90:((variant==='yellow'||creature.waveNumber===2)?60:50));
+   creature.xpAwarded=true; // marcar antes de creditar impede recompensa duplicada
+   awardExperience(xpAmount);
+   console.info(`[XP] ${variant||creature.type||'criatura'} derrotado: +${xpAmount} XP`);
+  }
+  if(creature.type==='slime') spawnSlimeDrops(creature);
+  say(`Criatura derrotada! +${creature.xpReward||((String(creature.variant).toLowerCase()==='green'||creature.waveNumber===3)?90:((creature.waveNumber===2||creature.variant==='yellow')?60:50))} XP.`);
+  // A próxima orda só começa quando o jogador voltar a puxar a alavanca.
+  if(creature.type==='slime' && creature.waveNumber===1 && currentWave===1 && !wave2Started && !creatures.some(c=>c.alive&&c.waveNumber===1)){
+   wave2Started=true;countdownWave=2;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
+  }
+  if(creature.type==='slime' && creature.waveNumber===2 && currentWave===2 && !wave3Started && !creatures.some(c=>c.alive&&c.waveNumber===2)){
+   wave3Started=true;countdownWave=3;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
+  }
+  if(creature.type==='slime' && creature.waveNumber===3 && currentWave===3 && !creatures.some(c=>c.alive&&c.waveNumber===3)){
+   countdownWave=0;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
+   say('Todas as ordas foram concluídas!');
+  }
+ }
+ return true;
+}
+const playerItems=Array(30).fill(null);
+const makePotion=(id,name,resource,color)=>({id,name,icon:'🧪',potion:true,stackable:true,quantity:1,resource,color,restore:10,type:'Poção consumível',description:`Restaura 10 pontos de ${resource==='health'?'vida':resource==='stamina'?'estamina':'mana'}.`});
+const chestItems=Array(20).fill(null);
+const silverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:10,description:'10 moedas de prata.'};
+[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,{...makePotion('health-potion','Poção pequena de vida','health','#e8343e'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
+let suppressInventoryClickUntil=0,dragState=null;
+const itemDetails=document.querySelector('#itemDetails');
+document.querySelector('#itemDetailsClose').addEventListener('click',()=>itemDetails.classList.remove('visible'));
+function formatItemDescription(item){
+ if(!item)return '';
+ const lines=[];
+ if(item.weaponClass||item.itemRole==='support'||item.itemCategory==='offhand'||item.itemCategory==='support'){
+  lines.push(`Nível: ${getRequiredEquipmentLevel(item)}`);
+  if(item.weaponClass)lines.push(`Força: ${item.damage||0}`);
+  else if(item.itemRole==='support')lines.push('Força: Suporte');
+  const skills=item.skills||{};
+  Object.keys(skills).sort((a,b)=>Number(a)-Number(b)).forEach(key=>{
+   const skill=skills[key];
+   lines.push(`Habilidade ${key}: ${skill.name}`);
+  });
+  return lines.join('\n');
+ }
+ if(item.potion)return item.description||'';
+ return item.description||'';
+}
+function getItemDisplayType(item){
+ if(!item)return '';
+ if(item.weaponClass==='melee')return 'Arma de corpo a corpo - Mão principal';
+ if(item.weaponClass==='projectile')return 'Arma de longo alcance - Mão principal';
+ if(item.itemRole==='support'||item.itemCategory==='offhand')return 'Item de suporte - Mão secundária';
+ return item.type||'';
+}
+function showItemDetails(item){
+ const useBtn=document.querySelector('#usePotionBtn'),equipBtn=document.querySelector('#equipItemBtn');
+ if(!item){itemDetails.classList.remove('visible');useBtn.style.display='none';equipBtn.style.display='none';return;}
+ const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon';bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
+ document.querySelector('#itemDetailsNameText').textContent=item.name;
+ document.querySelector('#itemDetailsType').textContent=getItemDisplayType(item);
+ document.querySelector('#itemDetailsDescription').textContent=formatItemDescription(item);
+ useBtn.style.display=item.potion&&playerItems.includes(item)?'inline-block':'none';
+ equipBtn.style.display=!item.potion&&playerItems.includes(item)&&Object.keys(equipmentSlots).some(key=>itemFitsEquipmentSlot(item,key))?'inline-block':'none';
+ equipBtn.onclick=()=>equipItemFromInventory(playerItems.indexOf(item));
+ useBtn.onclick=()=>{const index=playerItems.indexOf(item);if(index<0||!item.potion)return;const key=item.resource;const before=currentResources[key];currentResources[key]=Math.min(attributeState[key],currentResources[key]+item.restore);const restored=currentResources[key]-before;if(restored<=0){say(`Seu atributo de ${key==='health'?'vida':key==='stamina'?'stamina':'mana'} já está cheio.`);return;}if((item.quantity||1)>1)item.quantity--;else playerItems[index]=null;updateAttributeHud();renderInventory();showItemDetails(null);say(`Poção usada: +${restored} de ${key==='health'?'vida':key==='stamina'?'stamina':'mana'}.`);};
+ itemDetails.classList.add('visible');
+}
+const MAX_STACK=999;
+function isStackable(item){return !!item&&(item.stackable===true||(!item.weaponClass&&!item.itemRole&&!item.itemCategory&&!item.potion?true:!!item.potion));}
+function stackKey(item){return item.potion?`potion:${item.resource}:${item.restore}:${item.name}`:`${item.stackKey||item.id||item.name}`;}
+function normalizeStack(item){if(item&&isStackable(item)){item.quantity=Math.max(1,Math.min(MAX_STACK,Math.floor(Number(item.quantity)||1)));}return item;}
+function transferOrMove(sourceItems,sourceIndex,targetItems,targetIndex){
+ const item=sourceItems[sourceIndex],target=targetItems[targetIndex];
+ if(!item||sourceItems===targetItems&&sourceIndex===targetIndex)return false;
+ if(target&&isStackable(item)&&isStackable(target)&&stackKey(item)===stackKey(target)){
+  const room=MAX_STACK-(target.quantity||1);if(room<=0)return false;
+  const moved=Math.min(room,item.quantity||1);target.quantity=(target.quantity||1)+moved;
+  if(moved>=(item.quantity||1))sourceItems[sourceIndex]=null;else item.quantity-=moved;
+  return true;
+ }
+ if(target)return false;
+ sourceItems[sourceIndex]=null;targetItems[targetIndex]=normalizeStack(item);return true;
+}
+const equipmentSlots={rightHand:{label:'Mão principal',accepts:item=>item.itemRole==='weapon'||!!item.weaponClass},leftHand:{label:'Mão secundária',accepts:item=>item.itemRole==='support'||item.itemCategory==='support'||item.itemCategory==='offhand'},amulet:{label:'Amuleto',accepts:item=>item.itemCategory==='amulet'||item.itemRole==='amulet'||item.id==='amulet'}};
+function itemFitsEquipmentSlot(item,key){const rule=equipmentSlots[key];return !!(item&&rule&&rule.accepts(item));}
+function equipItemFromInventory(index){
+ const item=playerItems[index];if(!item)return;
+ const key=itemFitsEquipmentSlot(item,'rightHand')?'rightHand':itemFitsEquipmentSlot(item,'leftHand')?'leftHand':itemFitsEquipmentSlot(item,'amulet')?'amulet':null;
+ if(!key){say('Esse item não pode ser equipado.');return;}
+ const requiredLevel=getRequiredEquipmentLevel(item);
+ if(experienceState.level<requiredLevel){say(`Você ainda não tem nível suficiente para usar ${item.name}. Requer nível ${requiredLevel}.`);return;}
+ if(key==='leftHand'&&item.id==='shield'&&equippedItems.rightHand?.id==='crossbow'){say('Não é possível equipar o escudo enquanto a balestra estiver equipada.');return;}
+ if(key==='rightHand'&&item.id==='crossbow'&&equippedItems.leftHand?.id==='shield'){
+  const free=playerItems.findIndex((it,i)=>it===null&&i!==index);if(free<0){say('Libere um espaço na mochila para guardar o escudo automaticamente.');return;}
+  playerItems[free]=equippedItems.leftHand;equippedItems.leftHand=null;
+ }
+ const displaced=equippedItems[key];equippedItems[key]=item;playerItems[index]=displaced||null;
+ renderInventory();showItemDetails(displaced||item);say(`${item.name} equipado.`);
+}
+
+function getRequiredEquipmentLevel(item){return item&&(item.id==='shield'||item.id==='crossbow')?2:1;}
+function getSkillSource(slotNumber){if(slotNumber===1||slotNumber===2)return equippedItems.rightHand;if(slotNumber===3)return equippedItems.leftHand;if(slotNumber===4)return equippedItems.amulet;return null;}
+function getSkillDefinition(slotNumber){const item=getSkillSource(slotNumber);return item&&item.skills?item.skills[slotNumber]||null:null;}
+function getSkillStaminaCost(slotNumber,skill=getSkillDefinition(slotNumber)){const item=getSkillSource(slotNumber);if(!skill||!item||!['sword','crossbow'].includes(item.id))return Number(skill?.staminaCost)||0;return Number(skill.staminaCost)||(slotNumber===1?5:slotNumber===2?10:0);}
+function renderSpecialSkills(){
+ document.querySelectorAll('.specialSkillSlot').forEach(slot=>{
+  const n=Number(slot.dataset.skillSlot),item=getSkillSource(n),skill=getSkillDefinition(n);
+  const nameEl=slot.querySelector('.specialSkillName'),sourceEl=slot.querySelector('.specialSkillSource');
+  const numberEl=slot.querySelector('.specialSkillNumber');
+  if(numberEl){numberEl.replaceChildren();if(item){appendItemIcon(numberEl,item, n===3?'🛡️':n===4?'📿':'🗡️');numberEl.setAttribute('aria-label',`Ícone do item ${item.name}`);numberEl.title=item.name;}else{numberEl.textContent=String(n);numberEl.setAttribute('aria-label',`Habilidade ${n}`);numberEl.removeAttribute('title');}}
+  slot.classList.toggle('available',!!item&&!!skill);
+  if(!item){nameEl.textContent=n<=2?'Habilidade da mão principal':n===3?'Habilidade da mão secundária':'Habilidade do amuleto';sourceEl.textContent='';sourceEl.style.display='none';}
+  else if(skill){
+   nameEl.textContent=skill.name||`Habilidade ${n}`;
+   const force=skill.effect==='defenseVeil'?`Bloqueio de projéteis por ${skill.duration||0} segundos`:skill.duration&&skill.damage?`${skill.damage} por segundo`:`${skill.damage||0} por contato`;
+   const mana=Number(skill.manaCost)||0,stamina=getSkillStaminaCost(n,skill),cooldown=Number(skill.cooldown)||0;
+   sourceEl.textContent=`Força: ${force}\nCusto: ${mana} de mana e ${stamina} de stamina\nRecarga: ${cooldown} segundos`;
+   sourceEl.style.display='';
+  }
+  else{nameEl.textContent=`Habilidade ${n} não configurada`;sourceEl.textContent='';sourceEl.style.display='none';}
+ });
+ updateSkillButtons();
+}
+let crossbowSkill1Cooldown=0,crossbowSkill2Cooldown=0;
+function getSkillCooldown(n){if((n===1||n===2)&&equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow')return n===1?crossbowSkill1Cooldown:crossbowSkill2Cooldown;if(equippedItems.rightHand?.id==='sword'){const skill=getSkillDefinition(n);if(skill?.effect==='windSlash')return windSlashCooldown;if(skill?.effect==='swordSpin')return swordSpinCooldown;}if(n===3)return defenseVeilCooldown;return 0;}
+function updateSkillButtons(){
+ document.querySelectorAll('[data-action^="skill"]').forEach(button=>{
+  const n=Number(button.dataset.action.replace('skill','')),item=getSkillSource(n),skill=getSkillDefinition(n),status=button.querySelector('.skill-status'),label=button.querySelector('.skill-label');
+  const equipped=!!(item&&skill),cost=Number(skill&&skill.manaCost)||0,staminaCost=getSkillStaminaCost(n,skill),cooldown=getSkillCooldown(n),enoughMana=currentResources.mana>=cost,enoughStamina=currentResources.stamina>=staminaCost,ready=equipped&&cooldown<=0&&enoughMana&&enoughStamina;
+  button.disabled=!equipped;button.classList.toggle('skill-unavailable',equipped&&!ready);button.classList.toggle('skill-locked',!equipped);
+  button.style.opacity=ready?'1':'.94';
+  if(label)label.textContent=skill?skill.name.toUpperCase():`HABILIDADE ${n}`;
+  if(status){if(!equipped)status.textContent='🔒 Bloqueada';else if(cooldown>0)status.textContent=`⏳ ${cooldown.toFixed(1)}s`;else if(!enoughMana)status.textContent='Mana baixa';else if(!enoughStamina)status.textContent='Estamina baixa';else status.textContent='PRONTA';}
+  button.title=!equipped?'Equipe o item correspondente para liberar esta habilidade':cooldown>0?`${skill.name}: recarga de ${cooldown.toFixed(1)} segundos`:!enoughMana?`Mana insuficiente para ${skill.name}`:!enoughStamina?`Estamina insuficiente para ${skill.name}`:`${skill.name} — habilidade pronta`;
+ });
+}
+const equippedItems={rightHand:null,leftHand:null,amulet:null};
+// Ícones ilustrados para que os itens da mochila se pareçam com os modelos equipados.
+function appendItemIcon(container,item,fallback=''){
+ const id=item?.id;
+ if(id==='sword'||id==='shield'||id==='crossbow'){
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
+  if(id==='sword'){
+   // Uma única espada diagonal, com lâmina, guarda, empunhadura e pomo claramente separados.
+   svg.innerHTML='<path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#e6f0f8" stroke="#596b7b" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#ffffff"/><path d="M20 28 L35 43" stroke="#e2bf70" stroke-width="6" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#6c4a28" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#9a6336" stroke-width="7" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#55351f" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#d6b16a" stroke="#68451f" stroke-width="1.5"/>';
+  }else if(id==='shield'){
+   svg.innerHTML='<path d="M32 4 L54 12 L52 34 Q49 49 32 59 Q15 49 12 34 L10 12 Z" fill="#2475d5" stroke="#b9d8ff" stroke-width="3" stroke-linejoin="round"/><path d="M32 9 L48 15 L46 33 Q43 44 32 51 Q21 44 18 33 L16 15 Z" fill="#1558a7" stroke="#438fe8" stroke-width="1.5"/><circle cx="32" cy="29" r="10" fill="#f4c542" stroke="#fff0a0" stroke-width="2.5"/><circle cx="32" cy="29" r="4" fill="#ffe88a"/>';
+  }else{
+   // Balestra: coronha, trilho central, arco transversal e corda — não um arco de mão.
+   svg.innerHTML='<path d="M26 27 L36 27 L40 57 L30 59 Z" fill="#8a542d" stroke="#4b2b18" stroke-width="2" stroke-linejoin="round"/><path d="M28 30 L34 30 L36 53 L32 54 Z" fill="#bd874c"/><rect x="28" y="19" width="8" height="25" rx="2" fill="#596775" stroke="#c3d0d8" stroke-width="1.5"/><path d="M32 23 L32 5" stroke="#dce7ed" stroke-width="3" stroke-linecap="round"/><path d="M32 7 Q17 2 7 13 Q14 25 29 25" fill="none" stroke="#8d5a34" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 7 Q47 2 57 13 Q50 25 35 25" fill="none" stroke="#8d5a34" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13 Q32 37 57 13" fill="none" stroke="#e5d9bd" stroke-width="1.8"/><path d="M32 6 L32 31" stroke="#f3d27b" stroke-width="1.5"/><path d="M28 20 L36 20" stroke="#d6b36a" stroke-width="3" stroke-linecap="round"/>';
+  }
+  container.appendChild(svg);
+ }else{container.textContent=item?.icon||fallback;}
+}
+function renderEquipment(){
+ // Armas e escudo só aparecem nas mãos quando estão equipados.
+ swordGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.id==='sword';
+ crossbowGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.id==='crossbow';
+ quiverGroup.visible=crossbowGroup.visible;
+ shieldGroup.visible=!!equippedItems.leftHand && equippedItems.leftHand.id==='shield';
+ document.querySelectorAll('.equipmentSlot').forEach(slot=>{
+  const key=slot.dataset.equipSlot,item=equippedItems[key];slot.replaceChildren();slot.classList.toggle('equipped',!!item);
+  slot.setAttribute('aria-label',item?`${equipmentSlots[key].label}: ${item.name}`:`Espaço de ${equipmentSlots[key].label}`);
+  const icon=document.createElement('span');icon.className='equipIcon';appendItemIcon(icon,item,key==='rightHand'?'🗡️':key==='leftHand'?'🛡️':'📿');slot.appendChild(icon);
+  const label=document.createElement('span');label.className='equipLabel';label.textContent=item?item.name:equipmentSlots[key].label;slot.appendChild(label);
+  slot.onclick=()=>{if(item)showItemDetails(item);};
+  slot.onpointerdown=e=>{if(!item||e.button!==0)return;dragState={source:'equipment',sourceIndex:key,item,startX:e.clientX,startY:e.clientY,active:false,slot};};
+ });
+ renderSpecialSkills();
+}
+function renderInventory(){
+ const renderSlots=(element,items,source)=>{
+  element.replaceChildren();
+  for(let i=0;i<items.length;i++){
+   const item=items[i],slot=document.createElement('button');
+   slot.type='button';slot.className='inventorySlot'+(item?' filled':'')+(item&&experienceState.level<getRequiredEquipmentLevel(item)?' level-locked':'');
+   slot.dataset.source=source;slot.dataset.index=String(i);
+   slot.setAttribute('aria-label',item?`${item.name}, toque para ver informações e arraste para mover`:`Espaço vazio ${i+1}`);
+   const number=document.createElement('span');number.className='slotNumber';number.textContent=String(i+1);slot.appendChild(number);
+   if(item){const icon=document.createElement('span');icon.className='itemIcon';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon';bottle.style.setProperty('--liquid',item.color);bottle.setAttribute('aria-label',item.name);icon.appendChild(bottle);}else appendItemIcon(icon,item);slot.appendChild(icon);if(isStackable(item)){const qty=document.createElement('span');qty.className='stackQuantity';qty.textContent=`×${item.quantity||1}`;qty.style.cssText='position:absolute;right:3px;bottom:2px;padding:1px 4px;border-radius:8px;background:#101710eF;color:#fff2bd;font-size:10px;font-weight:900';slot.appendChild(qty);}}
+   slot.addEventListener('click',()=>{if(Date.now()<suppressInventoryClickUntil)return;showItemDetails(item);});
+   slot.addEventListener('pointerdown',e=>{if(!item||e.button!==0)return;dragState={source,sourceIndex:i,item,startX:e.clientX,startY:e.clientY,active:false,slot};});
+   element.appendChild(slot);
+  }
+ };
+ renderSlots(playerInventoryEl,playerItems,'player');renderSlots(chestInventoryEl,chestItems,'chest');renderEquipment();
+}
+document.addEventListener('pointermove',e=>{
+ if(!dragState)return;
+ const distance=Math.hypot(e.clientX-dragState.startX,e.clientY-dragState.startY);
+ if(!dragState.active&&distance>8){dragState.active=true;dragState.slot.classList.add('dragging');}
+ if(dragState.active){const under=document.elementFromPoint(e.clientX,e.clientY)?.closest('.inventorySlot,.equipmentSlot');document.querySelectorAll('.inventorySlot.dropTarget,.equipmentSlot.dropTarget').forEach(el=>el.classList.remove('dropTarget'));if(under)under.classList.add('dropTarget');e.preventDefault();}
+},{passive:false});
+document.addEventListener('pointerup',e=>{
+ if(!dragState)return;
+ const drag=dragState;dragState=null;drag.slot.classList.remove('dragging');document.querySelectorAll('.inventorySlot.dropTarget,.equipmentSlot.dropTarget').forEach(el=>el.classList.remove('dropTarget'));
+ if(!drag.active)return;
+ suppressInventoryClickUntil=Date.now()+450;
+ const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.inventorySlot,.equipmentSlot');if(!target)return;
+ const sourceItems=drag.source==='player'?playerItems:drag.source==='chest'?chestItems:null;
+ if(target.classList.contains('equipmentSlot')){
+  const key=target.dataset.equipSlot,definition=equipmentSlots[key];
+  if(!definition||!itemFitsEquipmentSlot(drag.item,key))return;
+  const requiredLevel=getRequiredEquipmentLevel(drag.item);
+  if(experienceState.level<requiredLevel){say(`Você ainda não tem nível suficiente para usar ${drag.item.name}. Requer nível ${requiredLevel}.`);return;}
+  // Regra de compatibilidade: a balestra ocupa as duas mãos; não pode coexistir com o escudo.
+  if(key==='leftHand'&&drag.item.id==='shield'&&equippedItems.rightHand?.id==='crossbow'){
+   say('Não é possível equipar o escudo enquanto a balestra estiver equipada.');return;
+  }
+  if(key==='rightHand'&&drag.item.id==='crossbow'&&equippedItems.leftHand?.id==='shield'){
+   // A troca automática guarda o escudo na mochila; verificar espaço antes de alterar qualquer item.
+   const free=playerItems.findIndex((it,i)=>it===null&&!(drag.source==='player'&&i===drag.sourceIndex));
+   if(free<0){say('Libere um espaço na mochila para guardar o escudo automaticamente.');return;}
+  }
+  if(drag.source==='equipment'){
+   const sourceKey=drag.sourceIndex;
+   if(sourceKey===key||!equippedItems[sourceKey])return;
+   const displaced=equippedItems[key];
+   if(displaced&&!itemFitsEquipmentSlot(displaced,sourceKey))return;
+   if(drag.item.id==='crossbow'&&equippedItems.leftHand&&key==='rightHand'){
+    const shield=equippedItems.leftHand;
+    const free=playerItems.findIndex((it,i)=>it===null&&i!==-1);
+    if(free<0){say('Libere um espaço na mochila para guardar o escudo automaticamente.');return;}
+    playerItems[free]=shield;equippedItems.leftHand=null;
+   }
+   equippedItems[key]=drag.item;equippedItems[sourceKey]=displaced||null;renderInventory();return;
+  }
+  if(!sourceItems||!sourceItems[drag.sourceIndex])return;
+  const isCrossbowSwap=key==='rightHand'&&drag.item.id==='crossbow'&&equippedItems.leftHand;
+  const displaced=equippedItems[key];
+  if(drag.source==='player'){
+   let shieldFree=-1;
+   if(isCrossbowSwap){shieldFree=playerItems.findIndex((it,i)=>it===null&&i!==drag.sourceIndex);if(shieldFree<0){say('Libere um espaço na mochila para guardar o escudo automaticamente.');return;}}
+   // O item equipado substituído ocupa o espaço de onde veio o novo item.
+   sourceItems[drag.sourceIndex]=displaced||null;
+   equippedItems[key]=drag.item;
+   if(isCrossbowSwap){playerItems[shieldFree]=equippedItems.leftHand;equippedItems.leftHand=null;say('Balestra equipada. O escudo foi guardado automaticamente na mochila.');}
+  }else{
+   // Itens que vêm do baú nunca mandam o equipamento antigo de volta para o baú.
+   const freeSlots=[];for(let i=0;i<playerItems.length;i++)if(playerItems[i]===null)freeSlots.push(i);
+   const needed=(displaced?1:0)+(isCrossbowSwap?1:0);
+   if(freeSlots.length<needed){say('Libere espaço na mochila para guardar o equipamento substituído.');return;}
+   sourceItems[drag.sourceIndex]=null;let freeIndex=0;
+   if(displaced)playerItems[freeSlots[freeIndex++]]=displaced;
+   equippedItems[key]=drag.item;
+   if(isCrossbowSwap){playerItems[freeSlots[freeIndex]]=equippedItems.leftHand;equippedItems.leftHand=null;say('Balestra equipada. O escudo foi guardado automaticamente na mochila.');}
+  }
+  renderInventory();return;
+ }
+ const targetSource=target.dataset.source,targetIndex=Number(target.dataset.index),targetItems=targetSource==='player'?playerItems:chestItems;
+ if(!targetItems)return;
+ if(drag.source==='equipment'){
+  const key=drag.sourceIndex;
+  if(!equippedItems[key]||targetSource!=='player')return;
+  const targetItem=targetItems[targetIndex];
+  if(targetItem){say('Para desequipar, escolha um espaço vazio da mochila. Nenhum item foi movido.');return;}
+  targetItems[targetIndex]=equippedItems[key];
+  equippedItems[key]=null;
+  renderInventory();return;
+ }
+ if(!sourceItems||!sourceItems[drag.sourceIndex])return;
+ if(transferOrMove(sourceItems,drag.sourceIndex,targetItems,targetIndex)){renderInventory();}
+});
+function openInventory(mode='chest'){
+ attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryTitle').textContent=mode==='chest'?'📦 BAÚ E MOCHILA':'🎒 MOCHILA';document.querySelector('#tabBackpack').classList.toggle('active',mode!=='attributes');document.querySelector('#tabAttributes').classList.remove('active');
+ renderInventory();
+ const showChest=mode==='chest';
+ document.querySelector('#inventoryPanels').classList.toggle('chestMode',showChest);
+ chestInventoryPanel.style.display=showChest?'':'none';
+ document.querySelector('#characterEquipmentPanel').style.display=showChest?'none':'flex';
+ document.querySelector('#playerInventoryPanel').querySelector('h3').textContent=showChest?'🧍 INVENTÁRIO DO PERSONAGEM':'🎒 MOCHILA';
+ document.querySelector('#inventoryTitle').textContent=showChest?'🎒 INVENTÁRIOS':'🎒 MOCHILA';
+ document.querySelector('#inventoryHint').textContent='';
+ showItemDetails(null);
+ inventoryOverlay.classList.add('open');attributesOverlay.classList.remove('open');openChestBtn.classList.remove('visible');
+}
+function closeInventory(){inventoryOverlay.classList.remove('open');attributesOverlay.classList.remove('open');}
+openChestBtn.addEventListener('click',()=>{
+ chestOpened=true;
+ openChestBtn.classList.remove('visible');
+ openInventory('chest');
+});
+const useLeverBtn=document.querySelector('#useLeverBtn');
+const tutorialOverlay=document.querySelector('#tutorialOverlay');
+const spawnCountdownEl=document.querySelector('#spawnCountdown');
+let spawnCountdown=0,slimeSpawned=false,countdownWave=1,wave2Started=false,wave3Started=false;
+let currentWave=0;
+const waveHud=document.querySelector('#waveHud');
+function setWave(number){currentWave=number;const labels={1:'Orda 1: Slime rosa',2:'Orda 2: Slimes amarelos',3:'Orda 3: Slimes verdes',4:'Orda 4: Slimes azuis'};waveHud.textContent=labels[currentWave]||`Orda ${currentWave}`;}
+useLeverBtn.addEventListener('click',()=>{
+ if(leverActivated||leverPulling)return;
+ // Só permite iniciar o combate quando houver uma arma equipada na mão direita.
+ // A verificação é genérica: qualquer item cadastrado com weaponClass conta como arma.
+ if(!getWeaponData()){
+   say('Você precisa ter uma arma equipada para iniciar o combate!');
+   return;
+ }
+ leverPulling=true;leverPullTime=0;useLeverBtn.classList.remove('visible');
+});
+// O antigo painel de 'tutorial iniciado' foi removido do fluxo; a alavanca agora inicia uma contagem regressiva.
+document.querySelector('#closeInventoryBtn').addEventListener('click',closeInventory);
+renderAttributes();
+
+// Rounded 6x6 stone pedestal with beveled edges; avoids coplanar surfaces that caused flickering.
+const pedestal={x:0,z:-7,halfX:3,halfZ:3,top:.94};
+const pedestalStone=mat(0x777b79),pedestalTrim=mat(0xa4a69d),pedestalDark=mat(0x5e6665);
+const pedestalShape=new THREE.Shape();
+const pr=.38, px=3, pz=3;
+pedestalShape.moveTo(-px+pr,-pz);
+pedestalShape.lineTo(px-pr,-pz);pedestalShape.absarc(px-pr,-pz+pr,pr,-Math.PI/2,0,false);
+pedestalShape.lineTo(px,pz-pr);pedestalShape.absarc(px-pr,pz-pr,pr,0,Math.PI/2,false);
+pedestalShape.lineTo(-px+pr,pz);pedestalShape.absarc(-px+pr,pz-pr,pr,Math.PI/2,Math.PI,false);
+pedestalShape.lineTo(-px,-pz+pr);pedestalShape.absarc(-px+pr,-pz+pr,pr,Math.PI,Math.PI*1.5,false);
+const pedestalGeo=new THREE.ExtrudeGeometry(pedestalShape,{depth:.72,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.10,bevelThickness:.10,curveSegments:5});
+pedestalGeo.rotateX(-Math.PI/2);
+const pedestalMesh=new THREE.Mesh(pedestalGeo,pedestalStone);
+pedestalMesh.position.set(pedestal.x,.10,pedestal.z);pedestalMesh.castShadow=true;pedestalMesh.receiveShadow=true;scene.add(pedestalMesh);
+// Inset top cap slightly overlaps the base, avoiding coplanar faces and flicker.
+const capShape=new THREE.Shape();
+const cr=.34, cx=2.88, cz=2.88;
+capShape.moveTo(-cx+cr,-cz);capShape.lineTo(cx-cr,-cz);capShape.absarc(cx-cr,-cz+cr,cr,-Math.PI/2,0,false);
+capShape.lineTo(cx,cz-cr);capShape.absarc(cx-cr,cz-cr,cr,0,Math.PI/2,false);
+capShape.lineTo(-cx+cr,cz);capShape.absarc(-cx+cr,cz-cr,cr,Math.PI/2,Math.PI,false);
+capShape.lineTo(-cx,-cz+cr);capShape.absarc(-cx+cr,-cz+cr,cr,Math.PI,Math.PI*1.5,false);
+const capGeo=new THREE.ExtrudeGeometry(capShape,{depth:.035,bevelEnabled:false,steps:1,curveSegments:5});capGeo.rotateX(-Math.PI/2);
+const capMesh=new THREE.Mesh(capGeo,pedestalTrim);capMesh.position.set(pedestal.x,pedestal.top-.035,pedestal.z);capMesh.castShadow=true;capMesh.receiveShadow=true;scene.add(capMesh);
+platformColliders.push(pedestal);
+// Three continuous, walkable stair rings wrap the pedestal.
+// The previous thin trim slabs sat exactly coplanar with the stair tops and caused z-fighting.
+// Use a generated gray-brick texture directly on the stair blocks, with no overlapping top plates.
+const brickCanvas=document.createElement('canvas');brickCanvas.width=256;brickCanvas.height=256;
+const brickCtx=brickCanvas.getContext('2d');
+brickCtx.fillStyle='#777b7b';brickCtx.fillRect(0,0,256,256);
+const brickRows=6, brickH=256/brickRows, brickW=84;
+for(let row=0;row<brickRows;row++){
+ const offset=(row%2)*42;
+ for(let x=-brickW;x<256+brickW;x+=brickW){
+  const shade= row%2===0 ? ['#858989','#797e7e','#707575'] : ['#808585','#747979','#898d8d'];
+  brickCtx.fillStyle=shade[(Math.floor((x+brickW)/brickW)+row)%shade.length];
+  brickCtx.fillRect(x+offset+2,row*brickH+2,brickW-4,brickH-4);
+ }
+}
+brickCtx.strokeStyle='#555b5b';brickCtx.lineWidth=4;
+for(let y=0;y<=256;y+=brickH){brickCtx.beginPath();brickCtx.moveTo(0,y);brickCtx.lineTo(256,y);brickCtx.stroke();}
+for(let row=0;row<brickRows;row++){
+ const offset=(row%2)*42;
+ for(let x=-brickW;x<256+brickW;x+=brickW){brickCtx.beginPath();brickCtx.moveTo(x+offset,row*brickH);brickCtx.lineTo(x+offset,(row+1)*brickH);brickCtx.stroke();}
+}
+const brickTexture=new THREE.CanvasTexture(brickCanvas);brickTexture.colorSpace=THREE.SRGBColorSpace;
+brickTexture.wrapS=THREE.RepeatWrapping;brickTexture.wrapT=THREE.RepeatWrapping;
+brickTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();
+const stairBrickMat=new THREE.MeshStandardMaterial({map:brickTexture,roughness:1,metalness:0});
+const stairLevels=[
+ {outer:5.40,inner:4.60,top:.235},
+ {outer:4.60,inner:3.80,top:.470},
+ {outer:3.80,inner:3.00,top:.705}
+];
+for(const level of stairLevels){
+ const {outer,inner,top}=level, thickness=outer-inner, mid=(outer+inner)/2;
+ // Four non-overlapping solid blocks make each tier; no coplanar decorative plates.
+ for(const side of [-1,1]){
+  const z=pedestal.z+side*mid;
+  addBox(outer*2,top,thickness,stairBrickMat,pedestal.x,top/2,z);
+ }
+ for(const side of [-1,1]){
+  const x=pedestal.x+side*mid;
+  addBox(thickness,top,inner*2,stairBrickMat,x,top/2,pedestal.z);
+ }
+ platformColliders.push({x:pedestal.x,z:pedestal.z,inner,outer,top,isStep:true});
+}
+// Stone portal arch set on the pedestal: taller chunky pillars and a segmented curved crown.
+const archBaseY=pedestal.top, archHeight=2.85, postX=1.34, archZ=pedestal.z-.18;
+for(const x of [-postX,postX]){
+ addBox(.48,archHeight,.52,pedestalStone,x,archBaseY+archHeight/2,archZ);
+ addBox(.62,.18,.66,pedestalTrim,x,archBaseY+.18,archZ);
+ addBox(.58,.16,.62,pedestalDark,x,archBaseY+archHeight-.12,archZ);
+ archColliders.push({x,z:archZ,r:.38,top:archBaseY+archHeight});
+}
+// Angular voussoirs form a visible stone arch across the two pillars.
+for(let i=0;i<7;i++){
+ const a=Math.PI-(i/6)*Math.PI;
+ const x=Math.cos(a)*postX, y=archBaseY+archHeight-.10+Math.sin(a)*.48;
+ const block=addBox(.52,.34,.56,pedestalTrim,x,y,archZ);
+ block.rotation.z=-(a-Math.PI/2)*.72;
+}
+// Alavanca de pedra e bronze instalada no piso superior do pedestal, à frente do arco.
+const leverBase=new THREE.Group();leverBase.position.set(0,pedestal.top,-4.85);scene.add(leverBase);
+const leverBaseMat=mat(0x5a625f),leverBronze=mat(0x9a6b2f),leverSteel=mat(0x454d50),leverGripMat=mat(0x593b25);
+function leverPart(parent,geo,material,x,y,z){const mesh=new THREE.Mesh(geo,material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;}
+leverPart(leverBase,new THREE.CylinderGeometry(.34,.40,.12,10),leverBaseMat,0,.06,0);
+leverPart(leverBase,new THREE.CylinderGeometry(.22,.26,.10,10),leverBronze,0,.15,0);
+leverPart(leverBase,new THREE.BoxGeometry(.16,.18,.16),leverSteel,0,.25,0);
+const leverPivot=new THREE.Group();leverPivot.position.set(0,.30,0);leverBase.add(leverPivot);
+const leverShaft=leverPart(leverPivot,new THREE.CylinderGeometry(.075,.10,.92,8),leverSteel,0,.43,0);
+const leverGrip=leverPart(leverPivot,new THREE.CylinderGeometry(.105,.105,.32,8),leverGripMat,0,.83,0);leverGrip.rotation.z=Math.PI/2;
+leverPart(leverPivot,new THREE.TorusGeometry(.11,.025,6,12),leverBronze,0,.82,0).rotation.x=Math.PI/2;
+let leverActivated=false,leverPulling=false,leverPullTime=0;
+const leverStartAngle=0,leverEndAngle=1.05;
+
+// Sistema reutilizável de criaturas: cada criatura possui vida, velocidade, colisão,
+// temporizador de ataque e uma função de atualização. Novos tipos podem ser adicionados aqui.
+const creatures=[];
+const acidProjectiles=[];
+const lootDrops=[];
+function spawnSlimeDrops(creature){
+ const baseX=creature.root.position.x,baseZ=creature.root.position.z,groundY=creature.groundY??creature.root.position.y;
+ // A experiência já é concedida centralmente em damageCreature() ao confirmar a morte.
+ // Aura azul brilhante de mana, recolhida ao caminhar sobre ela.
+ const manaGroup=new THREE.Group();
+ const manaCore=new THREE.Mesh(new THREE.SphereGeometry(.17,12,10),new THREE.MeshBasicMaterial({color:0x42c8ff,transparent:true,opacity:1,toneMapped:false}));manaCore.position.y=.38;manaGroup.add(manaCore);
+ const manaGlow=new THREE.Mesh(new THREE.SphereGeometry(.34,14,12),new THREE.MeshBasicMaterial({color:0x168cff,transparent:true,opacity:.34,depthWrite:false,toneMapped:false}));manaGlow.position.y=.38;manaGroup.add(manaGlow);
+ const manaRing=new THREE.Mesh(new THREE.TorusGeometry(.32,.035,7,24),new THREE.MeshBasicMaterial({color:0x7de8ff,transparent:true,opacity:1,toneMapped:false}));manaRing.rotation.x=Math.PI/2;manaRing.position.y=.08;manaGroup.add(manaRing);
+ const manaRing2=new THREE.Mesh(new THREE.TorusGeometry(.21,.018,6,20),new THREE.MeshBasicMaterial({color:0x2c8fff,transparent:true,opacity:.95,toneMapped:false}));manaRing2.rotation.x=Math.PI/2;manaRing2.position.y=.12;manaGroup.add(manaRing2);
+ manaGroup.position.set(baseX+.38,groundY,baseZ);scene.add(manaGroup);lootDrops.push({type:'mana',amount:10,group:manaGroup,groundY,phase:Math.random()*Math.PI*2});
+}
+function updateLootDrops(dt){
+ for(let i=lootDrops.length-1;i>=0;i--){
+  const drop=lootDrops[i];drop.phase+=dt*3.2;
+  drop.group.position.y=drop.groundY+Math.sin(drop.phase)*.07;
+  drop.group.rotation.y+=dt*(drop.type==='experience'?1.5:-1.1);
+  const dx=hero.position.x-drop.group.position.x,dz=hero.position.z-drop.group.position.z;
+  const closeEnough=Math.hypot(dx,dz)<1.35&&Math.abs(hero.position.y-drop.groundY)<1.5;
+  // Mana orbs remain in the world while mana is full, so the player can collect them later.
+  const canCollect=drop.type!=='mana'||currentResources.mana<attributeState.mana;
+  if(closeEnough&&canCollect){
+   if(drop.type==='experience')awardExperience(drop.amount);else restoreMana(drop.amount);
+   scene.remove(drop.group);drop.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});lootDrops.splice(i,1);
+  }
+ }
+}
+const creatureShared={pink:mat(0xf05abf,.55),pinkLight:mat(0xff8cdb,.48),pinkDark:mat(0x9f236f,.72),eyeWhite:mat(0xfff4f5),eyeDark:mat(0x261421),mouth:mat(0x43152e),brow:mat(0x581735)};
+function createSlime(x,z,groundY=0,variant='pink',waveNumber=1){
+ const root=new THREE.Group();root.position.set(x,groundY,z);scene.add(root);
+ // Corpo em gota: base arredondada, topo estreito deslocado ligeiramente para trás.
+ const profile=[new THREE.Vector2(0,0),new THREE.Vector2(.24,.035),new THREE.Vector2(.43,.13),new THREE.Vector2(.52,.34),new THREE.Vector2(.49,.53),new THREE.Vector2(.37,.76),new THREE.Vector2(.22,.98),new THREE.Vector2(.075,1.13),new THREE.Vector2(0,1.16)];
+ const bodyGeo=new THREE.LatheGeometry(profile,18);
+ const pos=bodyGeo.attributes.position;
+ for(let i=0;i<pos.count;i++){const y=pos.getY(i);pos.setZ(i,pos.getZ(i)-Math.max(0,y)*.105);}
+ bodyGeo.computeVertexNormals();
+ const bodyMaterial=variant==='yellow'?mat(0xf4d52d,.52):creatureShared.pink.clone();
+ const body=new THREE.Mesh(bodyGeo,bodyMaterial);body.castShadow=true;body.receiveShadow=true;root.add(body);
+ const bodyBaseColor=body.material.color.clone();
+ const sheen=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),variant==='yellow'?mat(0xfff18a,.45):creatureShared.pinkLight);sheen.position.set(-.20,.69,.30);sheen.scale.set(.62,1.2,.35);root.add(sheen);
+ // Rosto cartunesco de slime: olhos escuros estreitos, sem branco nem pupilas humanas.
+ const eyeGeo=new THREE.SphereGeometry(.073,8,6);
+ const eyeL=new THREE.Mesh(eyeGeo,creatureShared.eyeDark);eyeL.position.set(-.17,.575,.414);eyeL.scale.set(1.25,.42,.42);eyeL.rotation.z=-.16;root.add(eyeL);
+ const eyeR=eyeL.clone();eyeR.position.x=.17;eyeR.rotation.z=.16;root.add(eyeR);
+ // Pequenos vincos angulares dão personalidade sem parecer sobrancelhas humanas realistas.
+ const browL=new THREE.Mesh(new THREE.BoxGeometry(.13,.035,.025),creatureShared.brow);browL.position.set(-.17,.655,.421);browL.rotation.z=-.28;root.add(browL);
+ const browR=browL.clone();browR.position.x=.17;browR.rotation.z=.28;root.add(browR);
+ const mouth=new THREE.Mesh(new THREE.BoxGeometry(.13,.027,.026),creatureShared.mouth);mouth.position.set(0,.415,.448);mouth.rotation.z=.04;root.add(mouth);
+ // Anel de perigo no chão: mostra a área atingida antes do impacto do salto.
+ const attackRing=new THREE.Mesh(new THREE.RingGeometry(2.24,2.64,32),new THREE.MeshBasicMaterial({color:variant==='yellow'?0xffe34d:0xff4c92,transparent:true,opacity:.58,side:THREE.DoubleSide}));
+ attackRing.rotation.x=-Math.PI/2;attackRing.position.y=.025;attackRing.visible=false;root.add(attackRing);
+ // Barra de vida simples, voltada para a câmera no loop de atualização.
+ const healthGroup=new THREE.Group();healthGroup.position.y=1.36;root.add(healthGroup);
+ const barBack=new THREE.Mesh(new THREE.PlaneGeometry(.72,.09),mat(0x29151f));healthGroup.add(barBack);
+ const barFill=new THREE.Mesh(new THREE.PlaneGeometry(.68,.055),mat(0x55e36b));barFill.position.z=.006;healthGroup.add(barFill);
+ const isYellow=variant==='yellow';
+ // Slimes amarelos da horda 2: 45 de vida, 2x a velocidade e 40% maiores.
+ if(isYellow)root.scale.setScalar(1.4);
+ const slime={type:'slime',variant,waveNumber,xpReward:isYellow?60:50,root,body,bodyBaseColor,health:isYellow?45:30,maxHealth:isYellow?45:30,radius:isYellow?.672:.48,height:isYellow?1.624:1.16,speed:isYellow?3.05:1.25,attackCooldown:isYellow?.65:1.1,attackState:'chase',attackTimer:0,attackTime:0,evadeCooldown:Math.random()*.35,alive:true,healthGroup,barFill,attackRing,phase:Math.random()*Math.PI*2,damage:10,attackRadius:2.6,groundY,leapStartX:x,leapStartZ:z,leapTargetX:x,leapTargetZ:z,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0};
+ creatures.push(slime);return slime;
+}
+function createAcidSlime(x,z,groundY=0,waveNumber=3){
+ const root=new THREE.Group();root.position.set(x,groundY,z);scene.add(root);
+ const green=mat(0x20c93c,.38),bright=mat(0x6dff62,.25),dark=mat(0x063b16,.7),eye=mat(0x07140a,.35);
+ const profile=[new THREE.Vector2(0,0),new THREE.Vector2(.42,.06),new THREE.Vector2(.78,.25),new THREE.Vector2(.94,.62),new THREE.Vector2(.84,1.08),new THREE.Vector2(.60,1.48),new THREE.Vector2(.34,1.78),new THREE.Vector2(.12,1.98),new THREE.Vector2(0,2.02)];
+ const geo=new THREE.LatheGeometry(profile,22);const body=new THREE.Mesh(geo,green);body.castShadow=true;root.add(body);
+ const sheen=new THREE.Mesh(new THREE.SphereGeometry(.24,12,10),bright);sheen.position.set(-.32,1.2,.57);sheen.scale.set(.8,1.5,.35);root.add(sheen);
+ const eyeGeo=new THREE.SphereGeometry(.12,10,8);
+ const eyeL=new THREE.Mesh(eyeGeo,eye);eyeL.position.set(-.29,1.18,.83);eyeL.scale.set(1.4,.48,.45);eyeL.rotation.z=-.2;root.add(eyeL);
+ const eyeR=eyeL.clone();eyeR.position.x=.29;eyeR.rotation.z=.2;root.add(eyeR);
+ const browMat=mat(0x08290d,.4);const browL=new THREE.Mesh(new THREE.BoxGeometry(.25,.075,.06),browMat);browL.position.set(-.29,1.34,.85);browL.rotation.z=-.35;root.add(browL);const browR=browL.clone();browR.position.x=.29;browR.rotation.z=.35;root.add(browR);
+ const mouth=new THREE.Mesh(new THREE.SphereGeometry(.20,14,10),dark);mouth.position.set(0,.77,.94);mouth.scale.set(.78,.18,.22);root.add(mouth);
+ const mouthGlow=new THREE.Mesh(new THREE.SphereGeometry(.24,12,10),new THREE.MeshBasicMaterial({color:0x7dff38,transparent:true,opacity:.0,depthWrite:false}));mouthGlow.position.copy(mouth.position);mouthGlow.scale.set(.85,.2,.3);root.add(mouthGlow);
+ const healthGroup=new THREE.Group();healthGroup.position.y=2.25;root.add(healthGroup);const back=new THREE.Mesh(new THREE.PlaneGeometry(1.25,.13),mat(0x102214));healthGroup.add(back);const barFill=new THREE.Mesh(new THREE.PlaneGeometry(1.19,.085),mat(0x58ff5a));barFill.position.z=.006;healthGroup.add(barFill);
+ root.scale.setScalar(1.8);
+ const slime={type:'slime',variant:'green',waveNumber,xpReward:90,root,body,bodyBaseColor:body.material.color.clone(),health:75,maxHealth:75,radius:1.35,height:3.636,speed:1.15,attackCooldown:1+Math.random()*2,attackState:'slide',attackTimer:0,alive:true,healthGroup,barFill,phase:Math.random()*Math.PI*2,damage:10,groundY,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0,mouth,mouthGlow,eyeL,eyeR,slideDir:Math.random()<.5?-1:1,slideCenterX:x,slideCenterZ:z,slidePhase:Math.random()*Math.PI*2};
+ creatures.push(slime);return slime;
+}
+function fireAcid(c){
+ const muzzleY=c.root.position.y+c.height*.43;
+ const direction=new THREE.Vector3(hero.position.x-c.root.position.x,Math.max(.15,hero.position.y+.55-muzzleY),hero.position.z-c.root.position.z).normalize();
+ const group=new THREE.Group();const core=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),new THREE.MeshBasicMaterial({color:0xb7ff36}));group.add(core);const glow=new THREE.Mesh(new THREE.SphereGeometry(.34,12,10),new THREE.MeshBasicMaterial({color:0x50ff18,transparent:true,opacity:.42,depthWrite:false}));group.add(glow);
+ const origin=new THREE.Vector3(c.root.position.x,muzzleY,c.root.position.z);origin.add(direction.clone().multiplyScalar(1.15));group.position.copy(origin);scene.add(group);acidProjectiles.push({group,direction,speed:12,life:4,damage:10,owner:c});
+}
+function updateAcidProjectiles(dt){
+ for(let i=acidProjectiles.length-1;i>=0;i--){const p=acidProjectiles[i];p.life-=dt;p.group.position.addScaledVector(p.direction,p.speed*dt);p.group.rotation.x+=dt*4;p.group.rotation.y+=dt*3;
+  const withinVeil=!!defenseVeil&&Math.hypot(p.group.position.x-hero.position.x,p.group.position.z-hero.position.z)<=defenseVeil.radius+.22&&p.group.position.y>=hero.position.y-.05&&p.group.position.y<=hero.position.y+2.05;
+  if(withinVeil){scene.remove(p.group);p.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});acidProjectiles.splice(i,1);continue;}
+  const hit=Math.hypot(p.group.position.x-hero.position.x,p.group.position.z-hero.position.z)<.72&&Math.abs(p.group.position.y-(hero.position.y+.8))<1.15;
+  if(hit){const defending=actions.defend&&equippedItems.leftHand&&equippedItems.leftHand.id==='shield';const dealt=defending?Math.ceil(p.damage*.35):p.damage;applyPlayerDamage(dealt,defending,'A esfera de ácido');if(currentResources.health<=0)triggerPlayerDeath();}
+  if(hit||p.life<=0||Math.abs(p.group.position.x)>36||Math.abs(p.group.position.z)>36){scene.remove(p.group);p.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});acidProjectiles.splice(i,1);}
+ }
+}
+function creatureCanOccupy(c,x,z){
+ // O herói é um corpo sólido: a criatura não pode atravessá-lo quando estão no mesmo nível.
+ if(Math.abs(c.root.position.y-hero.position.y)<.62 && Math.hypot(x-hero.position.x,z-hero.position.z)<c.radius+.34)return false;
+ if(x < -31.5+c.radius || x > 31.5-c.radius || z < -31.5+c.radius || z > 31.5-c.radius)return false;
+ for(const r of rockColliders){if(Math.hypot(x-r.x,z-r.z)<r.r+c.radius && c.root.position.y<r.top-.05)return false;}
+ for(const a of archColliders){if(Math.hypot(x-a.x,z-a.z)<a.r+c.radius && c.root.position.y<a.top-.05)return false;}
+ // Baú e alavanca são objetos sólidos para criaturas.
+ if(Math.hypot(x-chestX,z-chestZ)<.92+c.radius)return false;
+ if(Math.hypot(x,z-(-4.85))<.48+c.radius && c.root.position.y>pedestal.top-.1)return false;
+ // A borda vertical do pedestal bloqueia criaturas que ainda estão no chão.
+ if(c.root.position.y<.55 && Math.abs(x-pedestal.x)<pedestal.halfX+c.radius && Math.abs(z-pedestal.z)<pedestal.halfZ+c.radius)return false;
+ for(const other of creatures){if(other===c||!other.alive)continue;const separation=(c.variant==='yellow'&&other.variant==='yellow')?2.7:c.radius+other.radius;if(Math.hypot(x-other.root.position.x,z-other.root.position.z)<separation)return false;}
+ return true;
+}
+function triggerPlayerDeath(){
+ if(playerDead)return;
+ // Trava o jogo primeiro; a interface de derrota é mostrada antes de qualquer limpeza de efeitos.
+ playerDead=true;deathAnimationTime=0;
+ actions.attack=false;actions.defend=false;actions.run=false;
+ for(const key of Object.keys(keys))keys[key]=false;
+ const overlay=document.getElementById('deathOverlay');
+ if(!overlay){
+   console.error('Tela de morte: #deathOverlay não encontrado.');
+   // Fallback visível caso o HTML do painel tenha sido removido.
+   const fallback=document.createElement('div');
+   fallback.id='deathOverlayFallback';
+   fallback.textContent='VOCÊ MORREU';
+   Object.assign(fallback.style,{position:'fixed',inset:'0',zIndex:'2147483647',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,.88)',color:'#ff4141',font:'900 clamp(42px,12vw,82px) sans-serif',textAlign:'center'});
+   document.body.appendChild(fallback);
+   return;
+ }
+ if(overlay.parentElement!==document.body)document.body.appendChild(overlay);
+ // Sobrescreve estilos conflitantes com propriedades individuais.
+ Object.assign(overlay.style,{position:'fixed',left:'0',top:'0',right:'0',bottom:'0',width:'100vw',height:'100vh',display:'flex',visibility:'visible',opacity:'1',zIndex:'2147483647',transform:'none',background:'rgba(0,0,0,.82)',alignItems:'center',justifyContent:'center',boxSizing:'border-box',padding:'20px',pointerEvents:'none'});
+ overlay.classList.add('visible','announcing');
+ const announcement=document.getElementById('deathAnnouncement');
+ const card=document.getElementById('deathCard');
+ if(announcement)Object.assign(announcement.style,{display:'block',visibility:'visible',opacity:'1',color:'#ff4141',fontSize:'clamp(42px,12vw,82px)',fontWeight:'1000',textAlign:'center'});
+ if(card)card.style.display='none';
+ // Limpeza de efeitos depois que a tela já foi acionada; um erro aqui não impede o anúncio.
+ try{
+   heroKnockbackTimer=0;heroKnockbackPower=0;
+   if(swordSpin){scene.remove(swordSpin.effect);swordSpin=null;}
+   windSlashCastTime=0;arrowRainAim=null;multiShotAim=null;slimeAttackOwner=null;
+   pendingMultiShot=null;crossbowMultiChargeTime=0;crossbowAnimTime=0;pendingArrowRain=null;activeArrowRain=null;arrowRainChargeTime=0;
+   if(windSlashAim){scene.remove(windSlashAim.group);windSlashAim=null;}
+   if(defenseVeil)stopDefenseVeil();
+ }catch(err){console.error('Erro ao limpar habilidades após a morte:',err);}
+ if(deathScreenTimer)clearTimeout(deathScreenTimer);
+ deathScreenTimer=setTimeout(()=>{
+   if(!playerDead)return;
+   overlay.classList.remove('announcing');
+   Object.assign(overlay.style,{background:'#000',pointerEvents:'auto',display:'flex',visibility:'visible',opacity:'1'});
+   if(announcement)announcement.style.display='none';
+   if(card){card.style.display='block';card.style.visibility='visible';}
+ },2000);
+}
+
+function revivePlayer(restart=false){
+ if(restart){location.reload();return;}
+ if(deathScreenTimer){clearTimeout(deathScreenTimer);deathScreenTimer=null;}
+ playerDead=false;deathAnimationTime=0;hero.rotation.z=0;hero.rotation.x=0;hero.position.y=0;vy=0;jumping=false;jumpSquat=0;
+ heroKnockbackTimer=0;heroKnockbackPower=0;
+ currentResources.health=attributeState.health;currentResources.mana=attributeState.mana;currentResources.stamina=attributeState.stamina;updateAttributeHud();
+ const overlay=document.querySelector('#deathOverlay');overlay.classList.remove('visible','announcing');overlay.style.background='';overlay.style.display='none';overlay.style.pointerEvents='';
+ const announcement=document.querySelector('#deathAnnouncement');if(announcement)announcement.style.display='';const card=document.querySelector('#deathCard');if(card)card.style.display='';
+ for(const c of creatures){if(!c.alive)continue;c.attackState='chase';c.attackTimer=0;c.attackCooldown=Math.max(c.attackCooldown,1.2);c.attackRing.visible=false;}
+ slimeAttackOwner=null;actions.attack=false;actions.defend=false;actions.run=false;say('Você voltou à vida com todos os atributos restaurados!');
+}
+document.querySelector('#restoreBtn').addEventListener('click',()=>revivePlayer(false));
+document.querySelector('#restartBtn').addEventListener('click',()=>revivePlayer(true));
+function updateCreatures(dt){
+ for(const c of creatures){if(!c.alive)continue;
+  c.phase+=dt*3.2;
+  // Flash rouge court : l'intensité pulse e retorna à cor original sem piscar permanentemente.
+  if(c.damageFlashTimer>0){
+   c.damageFlashTimer=Math.max(0,c.damageFlashTimer-dt);
+   const pulse=.35+.65*Math.abs(Math.sin((.28-c.damageFlashTimer)*Math.PI*10));
+   c.body.material.color.copy(c.bodyBaseColor).lerp(new THREE.Color(0xff1717),pulse);
+  }else{c.body.material.color.copy(c.bodyBaseColor);}
+  // Recuo com desaceleração; respeita as colisões do cenário.
+  const beingKnockedBack=c.knockbackTimer>0;
+  if(beingKnockedBack){
+   const pushStep=c.knockbackPower*dt;
+   const kx=c.root.position.x+c.knockbackX*pushStep,kz=c.root.position.z+c.knockbackZ*pushStep;
+   if(creatureCanOccupy(c,kx,c.root.position.z))c.root.position.x=kx;
+   if(creatureCanOccupy(c,c.root.position.x,kz))c.root.position.z=kz;
+   c.knockbackTimer=Math.max(0,c.knockbackTimer-dt);
+   c.knockbackPower*=Math.exp(-8*dt);
+  }
+  const dx=hero.position.x-c.root.position.x,dz=hero.position.z-c.root.position.z,dist=Math.hypot(dx,dz);
+  if(c.variant==='green'){
+   c.attackCooldown-=dt; // recarga de ataque atualizada continuamente
+   c.root.position.y=c.groundY;
+   // Movimento evasivo em faixa: desliza lateralmente e também avança/recua para evitar ataques.
+   // Cada deslocamento passa pela mesma verificação de colisão de rochas, pedestal, herói e criaturas.
+   c.slidePhase+=dt*1.4;
+   if(!beingKnockedBack){
+    const targetX=THREE.MathUtils.clamp(c.slideCenterX+Math.sin(c.slidePhase)*3.1,-30,30);
+    const targetZ=THREE.MathUtils.clamp(c.slideCenterZ+Math.sin(c.slidePhase*.65)*2.0,-30,30);
+    const stepX=THREE.MathUtils.clamp(targetX-c.root.position.x,-c.speed*dt,c.speed*dt);
+    const stepZ=THREE.MathUtils.clamp(targetZ-c.root.position.z,-c.speed*dt,c.speed*dt);
+    if(creatureCanOccupy(c,c.root.position.x+stepX,c.root.position.z))c.root.position.x+=stepX;
+    if(creatureCanOccupy(c,c.root.position.x,c.root.position.z+stepZ))c.root.position.z+=stepZ;
+   }
+   c.root.rotation.y=Math.atan2(hero.position.x-c.root.position.x,hero.position.z-c.root.position.z);
+   const charging=c.attackState==='acidCharge';
+   if(charging){c.attackTimer-=dt;c.mouth.scale.y=.18+Math.sin((.42-c.attackTimer)*Math.PI/.42)*.65;c.mouth.scale.x=.78+Math.sin((.42-c.attackTimer)*Math.PI/.42)*.22;c.mouthGlow.material.opacity=.35+.45*Math.sin((.42-c.attackTimer)*Math.PI/.42);if(c.damageFlashTimer<=0)c.body.material.color.setHex(0x65ff36);
+    if(c.attackTimer<=0){fireAcid(c);c.attackState='slide';c.mouth.scale.set(.78,.18,.22);c.mouthGlow.material.opacity=0;c.attackCooldown=3;}
+   }else{c.mouth.scale.set(.78,.18,.22);c.mouthGlow.material.opacity=0;if(c.damageFlashTimer<=0)c.body.material.color.copy(c.bodyBaseColor);if(c.attackCooldown<=0){c.attackState='acidCharge';c.attackTimer=.42;}}
+   c.healthGroup.quaternion.copy(camera.quaternion);c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.595;continue;
+  }
+  // Define o piso sob a criatura (gramado, escadas ou topo do pedestal).
+  let supportY=0;
+  for(const platform of platformColliders){
+   const pdx=Math.abs(c.root.position.x-platform.x),pdz=Math.abs(c.root.position.z-platform.z),r=Math.max(pdx,pdz);
+   const within=platform.isStep?(r>=platform.inner-.04&&r<=platform.outer+.02):(pdx<=platform.halfX-.02&&pdz<=platform.halfZ-.02);
+   if(within&&platform.top>supportY)supportY=platform.top;
+  }
+  c.groundY=supportY;
+  c.attackCooldown-=dt;
+  if(c.evadeCooldown>0)c.evadeCooldown-=dt;
+  // Slimes amarelos recuam deslizando para trás ao perceber a Lâmina Giratória.
+  if(c.variant==='yellow'&&swordSpin&&dist<5.2&&c.attackState!=='evadeSlide'&&c.attackState!=='leap'&&c.evadeCooldown<=0&&!beingKnockedBack){
+   const awayX=(c.root.position.x-hero.position.x)/(dist||1),awayZ=(c.root.position.z-hero.position.z)/(dist||1);
+   c.attackState='evadeSlide';c.attackTimer=.48;c.knockbackX=awayX;c.knockbackZ=awayZ;c.evadeCooldown=1.0;c.attackRing.visible=false;
+  }
+  if(c.attackState==='evadeSlide'){
+   c.attackTimer-=dt;
+   if(!beingKnockedBack){const step=7.2*dt;const tx=c.root.position.x+c.knockbackX*step,tz=c.root.position.z+c.knockbackZ*step;
+    if(creatureCanOccupy(c,tx,c.root.position.z))c.root.position.x=tx;
+    if(creatureCanOccupy(c,c.root.position.x,tz))c.root.position.z=tz;}
+   c.body.scale.set(1.12,.78,1.12);
+   if(c.attackTimer<=0){c.attackState='chase';c.body.scale.set(1,1,1);}
+  }else if(c.attackState==='chase'){
+   // Slimes podem iniciar o salto de ataque a até 5 metros do herói.
+   if(dist<=5&&c.attackCooldown<=0&&!beingKnockedBack&&(!slimeAttackOwner||!slimeAttackOwner.alive||slimeAttackOwner===c)){
+    // Telegraph: mostra a área ampliada, fixa um alvo e prepara o salto.
+    c.attackState='windup';c.attackTimer=c.variant==='yellow'?.38:.58;c.attackCooldown=c.variant==='yellow'?1.65:2.65;slimeAttackOwner=c;
+    c.leapStartX=c.root.position.x;c.leapStartZ=c.root.position.z;
+    const sideX=Math.cos(hero.rotation.y)*nextSlimeAttackSide*1.15,sideZ=-Math.sin(hero.rotation.y)*nextSlimeAttackSide*1.15;
+    c.leapTargetX=THREE.MathUtils.clamp(hero.position.x+sideX,-30,30);c.leapTargetZ=THREE.MathUtils.clamp(hero.position.z+sideZ,-30,30);nextSlimeAttackSide*=-1;
+    c.attackRing.visible=true;c.attackRing.position.x=c.leapTargetX-c.root.position.x;c.attackRing.position.z=c.leapTargetZ-c.root.position.z;
+    say('O slime vai saltar! Afaste-se ou pule!');
+   }else if(dist>1.12&&!beingKnockedBack){
+    const baseAngle=Math.atan2(dx,dz),step=c.speed*dt;
+    // Procura rotas laterais quando pedras, altar ou outros slimes bloqueiam o caminho direto.
+    const steeringOffsets=[0,Math.PI/6,-Math.PI/6,Math.PI/3,-Math.PI/3,Math.PI/2,-Math.PI/2,Math.PI*.75,-Math.PI*.75,Math.PI];
+    let best=null,bestScore=Infinity;
+    for(const offset of steeringOffsets){
+     const a=baseAngle+offset,tx=THREE.MathUtils.clamp(c.root.position.x+Math.sin(a)*step,-31,31),tz=THREE.MathUtils.clamp(c.root.position.z+Math.cos(a)*step,-31,31);
+     if(!creatureCanOccupy(c,tx,tz))continue;
+     let score=Math.hypot(hero.position.x-tx,hero.position.z-tz)+Math.abs(offset)*.20;
+     // Evita aproximar-se demais dos companheiros e ficar preso no grupo.
+     for(const other of creatures){if(other===c||!other.alive)continue;const d=Math.hypot(tx-other.root.position.x,tz-other.root.position.z);if(d<2.2)score+=(2.2-d)*1.6;}
+     if(score<bestScore){bestScore=score;best={x:tx,z:tz,a};}
+    }
+    if(best){c.root.position.x=best.x;c.root.position.z=best.z;c.root.rotation.y=best.a;}
+   }
+  }else if(c.attackState==='windup'){
+   c.attackTimer-=dt;c.body.scale.set(1.15,.72,1.15);c.attackRing.material.opacity=.45+.22*Math.sin(c.phase*9);
+   if(c.attackTimer<=0){c.attackState='leap';c.attackTimer=.62;c.attackRing.visible=false;}
+  }else if(c.attackState==='leap'||c.attackState==='evadeLeap'){
+   const evading=c.attackState==='evadeLeap',duration=evading?.52:.62;
+   c.attackTimer-=dt;const t=THREE.MathUtils.clamp(1-c.attackTimer/duration,0,1);
+   // Salta até o alvo ou, ao detectar o giro da espada, escapa para longe do herói.
+   c.root.position.x=THREE.MathUtils.lerp(c.leapStartX,c.leapTargetX,t);
+   c.root.position.z=THREE.MathUtils.lerp(c.leapStartZ,c.leapTargetZ,t);
+   c.root.position.y=c.groundY+Math.sin(Math.PI*t)*(evading?1.65:1.35);
+   c.body.scale.set(1.05,.92,1.05);
+   if(c.attackTimer<=0){
+    c.root.position.y=c.groundY;
+    if(evading){c.attackState='chase';c.attackTimer=0;}else{c.attackState='impact';c.attackTimer=.18;c.attackTime=.25;
+    // Dano em área ao pousar. Pular alto ou sair do raio evita o golpe.
+    const impactDist=Math.hypot(hero.position.x-c.root.position.x,hero.position.z-c.root.position.z);
+    const heroJumping=hero.position.y>c.groundY+.48||jumping||vy>.8;
+    if(impactDist<=c.attackRadius&&!heroJumping){
+     const defending=actions.defend&&equippedItems.leftHand&&equippedItems.leftHand.id==='shield';
+     const damage=defending?Math.ceil(c.damage*.35):c.damage;
+     currentResources.health=Math.max(0,currentResources.health-damage);
+     const pushX=hero.position.x-c.root.position.x,pushZ=hero.position.z-c.root.position.z,pushLen=Math.hypot(pushX,pushZ)||1;
+     heroKnockbackX=pushX/pushLen;heroKnockbackZ=pushZ/pushLen;heroKnockbackPower=defending?4.2:7.2;heroKnockbackTimer=defending?.20:.34;
+     hero.rotation.y=Math.atan2(heroKnockbackX,heroKnockbackZ);
+     updateAttributeHud();
+     applyPlayerDamage(damage,defending,'Ataque do slime',true);
+     if(currentResources.health<=0)triggerPlayerDeath();
+    }else{say('Você desviou do salto do slime!');}
+    }
+   }
+  }else if(c.attackState==='impact'){
+   c.attackTimer-=dt;if(c.attackTimer<=0){c.attackState='chase';c.body.scale.set(1,1,1);if(slimeAttackOwner===c)slimeAttackOwner=null;}
+  }
+  if(c.attackState!=='leap'&&c.attackState!=='evadeLeap'&&c.attackState!=='evadeSlide')c.root.position.y=c.groundY;
+  const bob=c.attackState==='chase'?Math.sin(c.phase)*.035:0;
+  if(c.attackState==='chase'){c.body.position.y=bob;c.body.scale.y=1+Math.sin(c.phase*1.4)*.025;}
+  else if(c.attackState!=='windup'&&c.attackState!=='leap'&&c.attackState!=='evadeLeap'&&c.attackState!=='evadeSlide'){c.body.position.y=0;c.body.scale.lerp(new THREE.Vector3(1,1,1),1-Math.exp(-9*dt));}
+  c.healthGroup.quaternion.copy(camera.quaternion);
+  c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.34;
+ }
+}
+
+
+// Continuous stone perimeter walls keep the compact tutorial map enclosed.
+const wallStone=mat(0x777f7d),wallTrim=mat(0x9da39a),wallDark=mat(0x626b69);
+const MAP_HALF=35, WALL_H=3.25, WALL_T=1.15;
+addBox(70,WALL_H,WALL_T,wallStone,0,WALL_H/2,-MAP_HALF+.15);
+addBox(70,WALL_H,WALL_T,wallStone,0,WALL_H/2, MAP_HALF-.15);
+addBox(WALL_T,WALL_H,70,wallStone,-MAP_HALF+.15,WALL_H/2,0);
+addBox(WALL_T,WALL_H,70,wallStone, MAP_HALF-.15,WALL_H/2,0);
+// Broad stone coping and regularly spaced crenellations give the walls a finished silhouette.
+addBox(70.8,.22,1.42,wallTrim,0,WALL_H+.06,-MAP_HALF+.15);
+addBox(70.8,.22,1.42,wallTrim,0,WALL_H+.06, MAP_HALF-.15);
+addBox(1.42,.22,70.8,wallTrim,-MAP_HALF+.15,WALL_H+.06,0);
+addBox(1.42,.22,70.8,wallTrim, MAP_HALF-.15,WALL_H+.06,0);
+for(let i=-32;i<=32;i+=4){
+  for(const z of [-MAP_HALF+.15,MAP_HALF-.15]) addBox(1.15,.48,1.48,wallTrim,i,WALL_H+.37,z);
+  for(const x of [-MAP_HALF+.15,MAP_HALF-.15]) addBox(1.48,.48,1.15,x,WALL_H+.37,i);
+}
+// Corner pillars visually join the four sides.
+for(const x of [-MAP_HALF+.15,MAP_HALF-.15]) for(const z of [-MAP_HALF+.15,MAP_HALF-.15]){
+  addBox(1.8,WALL_H+.65,1.8,wallDark,x,(WALL_H+.65)/2,z);
+  addBox(2,.24,2,wallTrim,x,WALL_H+.65,z);
+}
+// O antigo arco de madeira e a placa de tutorial foram removidos.
+
+// UI/game actions
+const message=document.querySelector('#message');
+let messageTimer;
+function say(t){
+ // Durante a contagem da invocação, não exiba mensagens por trás dos números.
+ if(spawnCountdown>0){message.classList.remove('show','skill-message');clearTimeout(messageTimer);return;}
+ message.classList.remove('skill-message');message.textContent=t;message.classList.add('show');clearTimeout(messageTimer);messageTimer=setTimeout(()=>message.classList.remove('show'),2200)
+}
+function announceSkill(name){
+ // Ao ativar uma magia, mostra apenas o nome, com visual arcano; custo de mana fica fora do aviso.
+ if(spawnCountdown>0){message.classList.remove('show','skill-message');clearTimeout(messageTimer);return;}
+ clearTimeout(messageTimer);message.textContent=name;message.classList.add('skill-message','show');messageTimer=setTimeout(()=>message.classList.remove('show','skill-message'),2200);
+}
+let defenseVeilCooldown=0;
+let defenseVeil=null;
+function startDefenseVeil(skill){
+ if(!equippedItems.leftHand||equippedItems.leftHand.id!=='shield'||!skill||skill.effect!=='defenseVeil')return false;
+ if(defenseVeilCooldown>0){say(`Véu de Defesa: aguarde ${defenseVeilCooldown.toFixed(1)}s.`);return false;}
+ if(defenseVeil){say('O Véu de Defesa já está ativo!');return false;}
+ const group=new THREE.Group();
+ const gold=new THREE.MeshBasicMaterial({color:0xffd84a,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
+ const bright=new THREE.MeshBasicMaterial({color:0xfff2a0,transparent:true,opacity:.78,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
+ const wall=new THREE.Mesh(new THREE.CylinderGeometry(1.12,1.12,1.9,48,1,true),gold);wall.position.y=.98;group.add(wall);
+ const lower=new THREE.Mesh(new THREE.TorusGeometry(1.12,.035,8,48),bright);lower.rotation.x=Math.PI/2;lower.position.y=.12;group.add(lower);
+ const upper=new THREE.Mesh(new THREE.TorusGeometry(1.12,.035,8,48),bright);upper.rotation.x=Math.PI/2;upper.position.y=1.92;group.add(upper);
+ for(let i=0;i<12;i++){const a=i*Math.PI/6;const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(Math.cos(a)*1.12,.18,Math.sin(a)*1.12),new THREE.Vector3(Math.cos(a)*1.18,.95,Math.sin(a)*1.18),new THREE.Vector3(Math.cos(a)*1.12,1.82,Math.sin(a)*1.12)]);group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,12,.012,5,false),bright));}
+ scene.add(group);defenseVeil={group,elapsed:0,duration:Number(skill.duration)||6,materials:[gold,bright],radius:1.2};defenseVeilCooldown=Number(skill.cooldown)||20;
+ return true;
+}
+function stopDefenseVeil(){if(!defenseVeil)return;scene.remove(defenseVeil.group);defenseVeil.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});for(const m of defenseVeil.materials)m.dispose();defenseVeil=null;}
+let crossbowCooldown=0,crossbowAnimTime=0;
+const flyingArrows=[];
+const fallingSkillArrows=[];
+let arrowRainChargeTime=0;
+let crossbowMultiChargeTime=0;
+let pendingMultiShot=null;
+let pendingArrowRain=null;
+let activeArrowRain=null;
+let arrowRainAim=null;
+const flyingWindSlashes=[];
+let windSlashCooldown=0;
+let windSlashCastTime=0;
+let windSlashCastElapsed=0;
+let windSlashCastDirection=null;
+let windSlashAim=null;
+function startWindSlashAim(){
+ if(windSlashAim||windSlashCastTime>0||windSlashCooldown>0)return false;
+ // Pré-visualização como uma sombra vermelha translúcida no chão, cobrindo toda a faixa de impacto.
+ const laneWidth=3.6,half=laneWidth/2,range=16;
+ const materials=[],objects=[];
+ const group=new THREE.Group();
+ // Forma levemente afunilada na origem e mais larga na extremidade para deixar a área legível.
+ const shape=new THREE.Shape();
+ shape.moveTo(-half*.72,0.35);shape.lineTo(-half,range*.72);shape.quadraticCurveTo(-half*1.02,range,-half*.72,range);
+ shape.lineTo(half*.72,range);shape.quadraticCurveTo(half*1.02,range,half,range*.72);shape.lineTo(half*.72,0.35);shape.quadraticCurveTo(0,-.08,-half*.72,0.35);
+ const fillMat=new THREE.MeshBasicMaterial({color:0xff2020,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide});
+ const fill=new THREE.Mesh(new THREE.ShapeGeometry(shape,24),fillMat);fill.rotation.x=Math.PI/2;fill.position.y=.035;group.add(fill);materials.push(fillMat);objects.push(fill);
+ // Contorno suave para delimitar a área sem as antigas linhas tracejadas.
+ const outlinePts=[new THREE.Vector3(-half*.72,.045,.35),new THREE.Vector3(-half,.045,range*.72),new THREE.Vector3(-half*.72,.045,range),new THREE.Vector3(half*.72,.045,range),new THREE.Vector3(half,.045,range*.72),new THREE.Vector3(half*.72,.045,.35)];
+ const outlineGeo=new THREE.BufferGeometry().setFromPoints(outlinePts);
+ const outlineMat=new THREE.LineBasicMaterial({color:0xff4545,transparent:true,opacity:.78,depthWrite:false});
+ const outline=new THREE.Line(outlineGeo,outlineMat);group.add(outline);materials.push(outlineMat);objects.push(outline);
+ scene.add(group);
+ windSlashAim={group,materials,direction:new THREE.Vector3()};updateWindSlashAim();return true;
+}
+function updateWindSlashAim(){
+ if(!windSlashAim)return;const direction=new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();windSlashAim.direction.copy(direction);
+ windSlashAim.group.position.set(hero.position.x,0,hero.position.z);windSlashAim.group.rotation.y=hero.rotation.y;
+}
+function finishWindSlashAim(cancel=false){
+ if(!windSlashAim)return false;const aim=windSlashAim;windSlashAim=null;scene.remove(aim.group);aim.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});for(const m of aim.materials)m.dispose();
+ if(cancel)return false;const skill=getSkillDefinition(2);if(!skill||skill.effect!=='windSlash'||windSlashCooldown>0||currentResources.mana<(Number(skill.manaCost)||0)||currentResources.stamina<getSkillStaminaCost(2,skill))return false;
+ const started=beginWindSlash(skill,aim.direction);if(started){currentResources.mana=Math.max(0,currentResources.mana-(Number(skill.manaCost)||0));currentResources.stamina=Math.max(0,currentResources.stamina-getSkillStaminaCost(2,skill));updateAttributeHud();announceSkill(skill.name);updateSkillButtons();}return started;
+}
+let swordHitThisSwing=false;
+function shootWindSlash(skill){
+ const item=equippedItems.rightHand;
+ if(!item||item.id!=='sword'||!skill||skill.effect!=='windSlash')return false;
+ const slash=new THREE.Group();
+ // Nova silhueta: uma lâmina de vento larga e luminosa, com duas curvas de energia e partículas.
+ const shape=new THREE.Shape();
+ // Silhueta de corte contínua e lisa, sem ondulações.
+ shape.moveTo(-.92,-.24);
+ shape.bezierCurveTo(-.35,-.12,.18,.12,.86,.62);
+ shape.bezierCurveTo(.48,.12,.02,-.24,-.92,-.24);
+ shape.closePath();
+ const bladeMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.98,side:THREE.DoubleSide,depthWrite:false});
+ const blade=new THREE.Mesh(new THREE.ShapeGeometry(shape,24),bladeMat);slash.add(blade);
+ const glowMat=new THREE.MeshBasicMaterial({color:0x8ee8ff,transparent:true,opacity:.38,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending});
+ const glow=new THREE.Mesh(new THREE.ShapeGeometry(shape,24),glowMat);glow.scale.set(1.2,1.16,1);glow.position.z=-.035;slash.add(glow);
+ const streakMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.95,depthWrite:false,blending:THREE.AdditiveBlending});
+ // Um único filete fino e suave acompanha o fio do golpe.
+ const edgeCurve=new THREE.QuadraticBezierCurve3(new THREE.Vector3(-.72,-.17,.03),new THREE.Vector3(.12,.04,.03),new THREE.Vector3(.72,.49,.03));
+ slash.add(new THREE.Mesh(new THREE.TubeGeometry(edgeCurve,32,.012,6,false),streakMat));
+ const direction=(windSlashCastDirection||new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y))).clone().normalize();
+ windSlashCastDirection=null;
+ slash.position.set(hero.position.x+direction.x*.82,hero.position.y+1.02,hero.position.z+direction.z*.82);
+ slash.rotation.y=Math.atan2(direction.x,direction.z);
+ slash.scale.set(1.45,1.25,1.45);
+ scene.add(slash);
+ flyingWindSlashes.push({mesh:slash,direction,speed:15.5,life:1.15,age:0,damage:Number(skill.damage)||15,hitCreatures:new Set(),materials:[bladeMat,glowMat,streakMat]});
+ return true;
+}
+function beginWindSlash(skill,direction=null){
+ const item=equippedItems.rightHand;
+ if(!item||item.id!=='sword'||!skill||skill.effect!=='windSlash')return false;
+ if(windSlashCooldown>0||windSlashCastTime>0){say('O Disparo Cortante ainda está recarregando!');return false;}
+ windSlashCooldown=15;
+ windSlashCastTime=.08;
+ windSlashCastElapsed=0;
+ windSlashCastDirection=direction?direction.clone():new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();
+ return true;
+}
+function removeWindSlash(slash){
+ scene.remove(slash.mesh);
+ slash.mesh.traverse(o=>{if(o.geometry)o.geometry.dispose();});
+ for(const material of slash.materials)material.dispose();
+}
+let swordSpin=null;
+let swordSpinCooldown=0;
+function startSwordSpin(skill){
+ const item=equippedItems.rightHand;
+ if(!item||item.id!=='sword'||!skill||skill.effect!=='swordSpin')return false;
+ if(swordSpin){say('Você já está girando com a espada!');return false;}
+ if(swordSpinCooldown>0){say('O Giro da Espada ainda está recarregando!');return false;}
+ const effect=new THREE.Group();
+ const matWhite=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.96,depthWrite:false,blending:THREE.AdditiveBlending});
+ const matBlue=new THREE.MeshBasicMaterial({color:0x8feaff,transparent:true,opacity:.58,depthWrite:false,blending:THREE.AdditiveBlending});
+ const matGray=new THREE.MeshBasicMaterial({color:0x8a929c,transparent:true,opacity:.78,depthWrite:false,blending:THREE.AdditiveBlending});
+ const ring1=new THREE.Mesh(new THREE.TorusGeometry(2.35,.065,7,64,Math.PI*1.75),matWhite);ring1.rotation.x=Math.PI/2;ring1.position.y=.78;effect.add(ring1);
+ const ring2=new THREE.Mesh(new THREE.TorusGeometry(2.85,.05,6,72,Math.PI*1.55),matBlue);ring2.rotation.x=Math.PI/2;ring2.rotation.z=1.1;ring2.position.y=1.03;effect.add(ring2);
+ const ring3=new THREE.Mesh(new THREE.TorusGeometry(1.95,.04,5,56,Math.PI*1.65),matWhite);ring3.rotation.x=Math.PI/2;ring3.rotation.z=2.4;ring3.position.y=.48;effect.add(ring3);
+ // Duas espirais helicoidais orbitam em alturas diferentes para reforçar a sensação de alta velocidade.
+ function addSpinHelix(radius,height,turns,material,phase){
+  const points=[];const steps=100;
+  for(let i=0;i<=steps;i++){const t=i/steps,a=t*Math.PI*2*turns+phase;points.push(new THREE.Vector3(Math.cos(a)*radius,.16+t*height,Math.sin(a)*radius));}
+  const curve=new THREE.CatmullRomCurve3(points);
+  effect.add(new THREE.Mesh(new THREE.TubeGeometry(curve,160,.026,5,false),material));
+ }
+ addSpinHelix(2.25,1.55,2.4,matWhite,0);
+ addSpinHelix(2.75,1.4,2.1,matGray,Math.PI*.8);
+ scene.add(effect);
+ swordSpin={duration:Number(skill.duration)||5,elapsed:0,tick:0,damage:Number(skill.damage)||10,radius:Number(skill.radius)||3,baseRotation:hero.rotation.y,effect,materials:[matWhite,matBlue,matGray]};
+ swordSpinCooldown=Number(skill.cooldown)||15;
+ 
+ return true;
+}
+function stopSwordSpin(){
+ if(!swordSpin)return;
+ scene.remove(swordSpin.effect);
+ swordSpin.effect.traverse(o=>{if(o.geometry)o.geometry.dispose();});
+ for(const m of swordSpin.materials)m.dispose();
+ swordSpin=null;
+}
+function shootArrow(){
+ if(!(equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow')||crossbowCooldown>0)return false;
+ if(currentResources.stamina<1){spendStamina(1,'disparar a balestra');return false; }
+ currentResources.stamina=Math.max(0,currentResources.stamina-1);updateAttributeHud();
+ crossbowCooldown=1;
+ crossbowAnimTime=.88;
+ const arrow=new THREE.Group();
+ const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.72,6),mat(0x8a6038));shaft.rotation.x=Math.PI/2;arrow.add(shaft);
+ const head=new THREE.Mesh(new THREE.ConeGeometry(.055,.17,6),mat(0xb9c4cb));head.rotation.x=Math.PI/2;head.position.z=.43;arrow.add(head);
+ const finMat=mat(0xb9a47b);
+ for(const side of [-1,1]){const fin=new THREE.Mesh(new THREE.BoxGeometry(.075,.025,.10),finMat);fin.position.set(side*.025,0,-.28);arrow.add(fin);}
+ const direction=new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();
+ arrow.position.set(hero.position.x+direction.x*.55,hero.position.y+1.12,hero.position.z+direction.z*.55);
+ arrow.rotation.y=hero.rotation.y;scene.add(arrow);
+ flyingArrows.push({mesh:arrow,direction,speed:18,life:3.2,damage:itemCatalog.crossbow.damage,source:'crossbow'});
+ return true;
+}
+function makeSkillArrow(){
+ const arrow=new THREE.Group();
+ const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.72,6),mat(0x8a6038));shaft.rotation.x=Math.PI/2;arrow.add(shaft);
+ const head=new THREE.Mesh(new THREE.ConeGeometry(.055,.17,6),mat(0xb9c4cb));head.rotation.x=Math.PI/2;head.position.z=.43;arrow.add(head);
+ const finMat=mat(0xb9a47b);
+ for(const side of [-1,1]){const fin=new THREE.Mesh(new THREE.BoxGeometry(.075,.025,.10),finMat);fin.position.set(side*.025,0,-.28);arrow.add(fin);}
+ return arrow;
+}
+function makeArrowRainArea(radius){
+ const group=new THREE.Group();
+ const fillMat=new THREE.MeshBasicMaterial({color:0xff1717,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false});
+ const ringMat=new THREE.MeshBasicMaterial({color:0xff2525,transparent:true,opacity:.9,side:THREE.DoubleSide,depthWrite:false});
+ const fill=new THREE.Mesh(new THREE.CircleGeometry(radius,72),fillMat);fill.rotation.x=-Math.PI/2;fill.position.y=.025;group.add(fill);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,.055,8,96),ringMat);ring.rotation.x=Math.PI/2;ring.position.y=.045;group.add(ring);
+ // Segmentos discretos reforçam o limite da área sem esconder o terreno.
+ const inner=new THREE.Mesh(new THREE.RingGeometry(radius-.10,radius-.065,96),new THREE.MeshBasicMaterial({color:0xff5555,transparent:true,opacity:.38,side:THREE.DoubleSide,depthWrite:false}));inner.rotation.x=-Math.PI/2;inner.position.y=.03;group.add(inner);
+ scene.add(group);return {group,materials:[fillMat,ringMat,inner.material]};
+}
+function spawnRainArrow(center,radius){
+ const angle=Math.random()*Math.PI*2,dist=Math.sqrt(Math.random())*radius;
+ const target=new THREE.Vector3(center.x+Math.cos(angle)*dist,0,center.z+Math.sin(angle)*dist);
+ const start=new THREE.Vector3(target.x+(Math.random()-.5)*.65,center.y+6.5+Math.random()*2.2,target.z+(Math.random()-.5)*.65);
+ const arrow=makeSkillArrow();arrow.position.copy(start);arrow.rotation.x=-Math.PI/2;scene.add(arrow);
+ fallingSkillArrows.push({mesh:arrow,start,target,elapsed:0,duration:1.15+Math.random()*.45,damage:0,hit:false,marker:null,visualOnly:true});
+}
+function launchArrowRain(pending){
+ const radius=Number(pending.radius)||6;
+ const area=pending.area||makeArrowRainArea(radius);
+ const center=pending.center.clone();
+ area.group.position.set(center.x,0,center.z);
+ activeArrowRain={elapsed:0,duration:Number(pending.rainDuration)||4,tick:0,spawnTimer:0,radius,area,center,damage:Number(pending.damage)||7};
+ 
+}
+function getArrowRainAimPoint(){
+ const forward=new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();
+ const point=hero.position.clone().addScaledVector(forward,10);point.y=0;return point;
+}
+function beginArrowRainAim(skill){
+ if(!equippedItems.rightHand||equippedItems.rightHand.id!=='crossbow'||skill.effect!=='arrowRain')return false;
+ if(currentResources.stamina<getSkillStaminaCost(1,skill))return false;
+ if(arrowRainChargeTime>0||pendingArrowRain||activeArrowRain||arrowRainAim)return false;
+ if(crossbowSkill1Cooldown>0||currentResources.mana<(Number(skill.manaCost)||0))return false;
+ const radius=Number(skill.radius)||6,area=makeArrowRainArea(radius),center=getArrowRainAimPoint();
+ area.group.position.set(center.x,0,center.z);arrowRainAim={skill:{...skill},center,area,radius};return true;
+}
+function cancelArrowRainAim(){
+ if(!arrowRainAim)return;const aim=arrowRainAim;arrowRainAim=null;
+ scene.remove(aim.area.group);aim.area.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});for(const m of aim.area.materials)m.dispose();
+}
+function updateArrowRainAim(){
+ if(!arrowRainAim)return;const center=getArrowRainAimPoint();arrowRainAim.center.copy(center);arrowRainAim.area.group.position.set(center.x,0,center.z);
+ const pulse=.97+.03*Math.sin(clock.elapsedTime*7);arrowRainAim.area.group.scale.set(pulse,1,pulse);
+}
+function releaseArrowRainAim(){
+ if(!arrowRainAim)return false;const aim=arrowRainAim;arrowRainAim=null;
+ const skill=aim.skill,cost=Number(skill.manaCost)||0;
+ if(crossbowSkill1Cooldown>0||currentResources.mana<cost||currentResources.stamina<getSkillStaminaCost(1,skill)){scene.remove(aim.area.group);aim.area.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});for(const m of aim.area.materials)m.dispose();return false;}
+ crossbowSkill1Cooldown=Number(skill.cooldown)||20;crossbowAnimTime=0;
+ pendingArrowRain={elapsed:0,duration:3.6,damage:Number(skill.damage)||7,radius:aim.radius,rainDuration:Number(skill.duration)||4,center:aim.center.clone(),area:aim.area};
+ arrowRainChargeTime=3.6;currentResources.mana=Math.max(0,currentResources.mana-cost);currentResources.stamina=Math.max(0,currentResources.stamina-getSkillStaminaCost(1,skill));updateAttributeHud();announceSkill(skill.name);
+ updateSkillButtons();return true;
+}
+function makeManaImbuedArrow(){
+ const arrow=makeSkillArrow();
+ const blue=new THREE.MeshBasicMaterial({color:0x55d9ff,toneMapped:false});
+ const pale=new THREE.MeshBasicMaterial({color:0xd9f8ff,toneMapped:false});
+ arrow.traverse(o=>{if(o.isMesh){o.material=(o.geometry.type==='ConeGeometry')?pale:blue;}});
+ const aura=new THREE.Mesh(new THREE.CylinderGeometry(.052,.052,.88,8,1,true),new THREE.MeshBasicMaterial({color:0x168cff,transparent:true,opacity:.30,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));
+ aura.rotation.x=Math.PI/2;aura.position.z=.02;arrow.add(aura);
+ const tipGlow=new THREE.Mesh(new THREE.SphereGeometry(.09,8,8),new THREE.MeshBasicMaterial({color:0x75eaff,transparent:true,opacity:.78,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));tipGlow.position.z=.43;arrow.add(tipGlow);
+ return arrow;
+}
+function fireMultiShot(skill){
+ const count=Number(skill.arrows)||20,forward=new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();
+ for(let i=0;i<count;i++){
+  const t=count===1?0:i/(count-1)-.5,angle=t*.62;
+  const direction=forward.clone().applyAxisAngle(new THREE.Vector3(0,1,0),angle).normalize();
+  const arrow=makeManaImbuedArrow();arrow.position.set(hero.position.x+direction.x*.55,hero.position.y+1.12,hero.position.z+direction.z*.55);arrow.rotation.y=Math.atan2(direction.x,direction.z);scene.add(arrow);
+  flyingArrows.push({mesh:arrow,direction,speed:6.5,life:7.5,maxDistance:25,travelled:0,damage:Number(skill.damage)||7,source:'multiShot'});
+ }
+ // O nome da habilidade já aparece no início; evita outra mensagem sobre a ação durante a luta.
+}
+function startMultiShot(skill){
+ if(!equippedItems.rightHand||equippedItems.rightHand.id!=='crossbow'||skill.effect!=='multiShot')return false;
+ if(crossbowMultiChargeTime>0||pendingMultiShot)return false;
+ crossbowSkill2Cooldown=Number(skill.cooldown)||15;crossbowAnimTime=0;
+ pendingMultiShot={elapsed:0,duration:2.8,skill:{...skill}};crossbowMultiChargeTime=2.8;
+ return true;
+}
+const actions={attack:false,defend:false,jump:false,run:false,skill1:false,skill2:false,skill3:false,skill4:false};
+function beginBasicAttack(){
+ const weapon=getWeaponData();if(!weapon)return false;
+ if(weapon.weaponClass==='melee'&&!spendStamina(1,'atacar com a espada'))return false;
+ actions.attack=true;attackTime=weapon.weaponClass==='projectile'?.88:.48;swordHitThisSwing=false;
+ if(weapon.weaponClass==='projectile')shootArrow();
+ return true;
+}
+document.querySelectorAll('[data-action]').forEach(b=>{
+ const a=b.dataset.action;
+ const start=e=>{e.preventDefault();if(playerDead){actions[a]=false;b.classList.remove('active');return;}actions[a]=true;b.classList.add('active');
+  if(a==='skill1'&&equippedItems.rightHand?.id==='crossbow'&&getSkillDefinition(1)?.effect==='arrowRain'){
+   const item=getSkillSource(1),skill=getSkillDefinition(1);actions[a]=false;
+   if(!item||!skill){b.classList.remove('active');return;}
+   if(getSkillCooldown(1)>0){b.classList.remove('active');say(`${skill.name}: aguarde ${getSkillCooldown(1).toFixed(1)}s para usar novamente.`);return;}
+   if(currentResources.mana<(Number(skill.manaCost)||0)){b.classList.remove('active');say(`Mana insuficiente para ${skill.name}.`);return;}
+   if(currentResources.stamina<getSkillStaminaCost(1,skill)){b.classList.remove('active');say(`Estamina insuficiente para ${skill.name}.`);return;}
+   if(!beginArrowRainAim(skill)){b.classList.remove('active');return;}return;
+  }
+  if(a==='skill2'&&equippedItems.rightHand?.id==='sword'&&getSkillDefinition(2)?.effect==='windSlash'){
+   if(b.setPointerCapture&&e.pointerId!==undefined){try{b.setPointerCapture(e.pointerId);}catch(_){}}
+   actions[a]=false;const skill=getSkillDefinition(2);
+   if(!skill||getSkillCooldown(2)>0){b.classList.remove('active');if(skill)say(`${skill.name}: aguarde ${getSkillCooldown(2).toFixed(1)}s para usar novamente.`);return;}
+   if(currentResources.mana<(Number(skill.manaCost)||0)){b.classList.remove('active');say(`Mana insuficiente para ${skill.name}.`);return;}
+   if(currentResources.stamina<getSkillStaminaCost(2,skill)){b.classList.remove('active');say(`Estamina insuficiente para ${skill.name}.`);return;}
+   if(!startWindSlashAim())b.classList.remove('active');return;
+  }
+  if(a==='attack'){if(!beginBasicAttack()){actions.attack=false;b.classList.remove('active');return;}}
+  if(a==='defend'&&(!(equippedItems.leftHand&&equippedItems.leftHand.id==='shield')||currentResources.stamina<=0)){actions.defend=false;b.classList.remove('active');say('Você precisa de um escudo equipado e estamina para defender.');return;}
+  if(a==='jump'&&!jumping){if(!spendStamina(2,'pular')){actions.jump=false;b.classList.remove('active');return;}jumpSquat=.14;vy=0;jumping=true;}
+  if(a.startsWith('skill')){
+   const n=Number(a.replace('skill','')),item=getSkillSource(n),skill=getSkillDefinition(n);actions[a]=false;b.classList.remove('active');
+   if(!item||!skill){say(n<=2?'Equipe uma arma na mão direita para liberar esta habilidade.':n===3?'Equipe um item de suporte na mão esquerda para liberar esta habilidade.':'Equipe um amuleto para liberar esta habilidade.');updateSkillButtons();return;}
+   const cost=Number(skill.manaCost)||0,staminaCost=getSkillStaminaCost(n,skill),cooldown=getSkillCooldown(n);
+   if(cooldown>0){say(`${skill.name}: aguarde ${cooldown.toFixed(1)}s para usar novamente.`);updateSkillButtons();return;}
+   if(currentResources.mana<cost){say(`Mana insuficiente! ${skill.name} custa ${cost} de mana; você tem ${Math.floor(currentResources.mana)}.`);updateSkillButtons();return;}
+   if(currentResources.stamina<staminaCost){say(`Estamina insuficiente! ${skill.name} custa ${staminaCost} de estamina; você tem ${Math.floor(currentResources.stamina)}.`);updateSkillButtons();return;}
+   let started=false;
+   if(n===1&&skill.effect==='swordSpin')started=startSwordSpin(skill);
+   else if(n===2&&skill.effect==='windSlash')started=beginWindSlash(skill);
+   else if(n===1&&skill.effect==='arrowRain')started=startArrowRain(skill);
+   else if(n===2&&skill.effect==='multiShot')started=startMultiShot(skill);
+   else if(n===3&&skill.effect==='defenseVeil')started=startDefenseVeil(skill);
+   else say(`${skill.name}: efeito especial ainda precisa ser implementado.`);
+   if(started){currentResources.mana=Math.max(0,currentResources.mana-cost);currentResources.stamina=Math.max(0,currentResources.stamina-staminaCost);updateAttributeHud();announceSkill(skill.name);}
+   updateSkillButtons();
+  }
+ };
+ const end=e=>{e.preventDefault();actions[a]=false;b.classList.remove('active');if(playerDead)return;if(a==='skill1'&&arrowRainAim){if(e.type==='pointercancel'||e.type==='pointerleave')cancelArrowRainAim();else releaseArrowRainAim();}if(a==='skill2'&&windSlashAim){if(e.type==='pointercancel'||e.type==='pointerleave')finishWindSlashAim(true);else finishWindSlashAim(false);}};
+ b.addEventListener('pointerdown',start);b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end);b.addEventListener('pointerleave',end);
+});
+
+// Mantém os atalhos sincronizados com os equipamentos atuais.
+renderSpecialSkills();
+
+// Virtual joystick
+const area=document.querySelector('#stickArea'),knob=document.querySelector('#stick');
+let stick={x:0,y:0},pointerId=null;
+function updateStick(e){
+ const r=area.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+ let dx=e.clientX-cx,dy=e.clientY-cy,lim=r.width*.34,len=Math.hypot(dx,dy);
+ if(len>lim){dx=dx/len*lim;dy=dy/len*lim}
+ stick.x=dx/lim;stick.y=dy/lim;
+ knob.style.transform=`translate(${dx}px,${dy}px)`;
+}
+area.addEventListener('pointerdown',e=>{e.preventDefault();pointerId=e.pointerId;area.setPointerCapture(pointerId);updateStick(e)});
+area.addEventListener('pointermove',e=>{if(e.pointerId===pointerId)updateStick(e)});
+function resetStick(){pointerId=null;stick.x=0;stick.y=0;knob.style.transform='translate(0px,0px)'}
+area.addEventListener('pointerup',resetStick);area.addEventListener('pointercancel',resetStick);
+
+// Swipe on the open right-hand side of the screen to orbit the camera.
+let cameraYaw=0, cameraPitch=0.24, cameraPointer=null, lastCameraX=0, lastCameraY=0;
+stage.addEventListener('pointerdown',e=>{
+ enterImmersiveMode();
+ if(e.target.closest('#buttons') || e.target.closest('#stickArea') || e.target.closest('#openChestBtn') || e.target.closest('#useLeverBtn') || e.target.closest('#wizardInteractBtn') || e.target.closest('#wizardSpeech') || e.target.closest('#tutorialOverlay') || e.target.closest('#inventoryOverlay') || e.target.closest('#attributesOverlay') || e.target.closest('#hudQuickActions')) return;
+ if(e.clientX < innerWidth*0.38) return;
+ cameraPointer=e.pointerId;lastCameraX=e.clientX;lastCameraY=e.clientY;
+ stage.setPointerCapture(cameraPointer);
+});
+stage.addEventListener('pointermove',e=>{
+ if(e.pointerId!==cameraPointer)return;
+ const dx=e.clientX-lastCameraX,dy=e.clientY-lastCameraY;
+ lastCameraX=e.clientX;lastCameraY=e.clientY;
+ cameraYaw+=dx*.008;
+ cameraPitch=THREE.MathUtils.clamp(cameraPitch+dy*.003,-.05,.72);
+});
+function stopCameraTouch(e){if(e.pointerId===cameraPointer)cameraPointer=null;}
+stage.addEventListener('pointerup',stopCameraTouch);stage.addEventListener('pointercancel',stopCameraTouch);
+
+const keys={};
+addEventListener('keydown',e=>{if(playerDead){e.preventDefault();return;}keys[e.key.toLowerCase()]=true;if(e.code==='Space'&&!jumping){if(spendStamina(2,'pular')){jumpSquat=.14;vy=0;jumping=true}}if(e.key.toLowerCase()==='j'){if(!actions.attack)beginBasicAttack()}if(e.key.toLowerCase()==='k'){if(e.repeat)return;if(equippedItems.leftHand&&equippedItems.leftHand.id==='shield'&&currentResources.stamina>0)actions.defend=true;else{actions.defend=false;say('Você precisa de um escudo equipado e estamina para defender.');}}if(e.key==='Shift')actions.run=true});
+addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;if(e.key.toLowerCase()==='j')actions.attack=false;if(e.key.toLowerCase()==='k')actions.defend=false;if(e.key==='Shift')actions.run=false});
+let vy=0,jumping=false,jumpSquat=0,attackTime=0,walkTime=0,staminaHudTimer=0;
+const clock=new THREE.Clock();
+const camTarget=new THREE.Vector3();
+function animate(){
+ requestAnimationFrame(animate);
+ const dt=Math.min(clock.getDelta(),.035);
+ // Verificação central: qualquer caminho de dano que deixe a vida em zero aciona a morte.
+ if(!playerDead && currentResources.health<=0) triggerPlayerDeath();
+ if(playerDead){deathAnimationTime=Math.min(1,deathAnimationTime+dt);const t=Math.min(1,deathAnimationTime/.62);hero.rotation.z=1.42*t;hero.position.y=-.18*t;renderer.render(scene,camera);return;}
+ // Pausa universal: menus modais congelam combate, IA, projéteis, cooldowns e movimento.
+ // O relógio continua sendo lido acima, portanto não há salto de tempo ao fechar o menu.
+ const gameplayPaused = inventoryOverlay.classList.contains('open') || attributesOverlay.classList.contains('open') || tutorialOverlay.classList.contains('open');
+ if(gameplayPaused){renderer.render(scene,camera);return;}
+ crossbowCooldown=Math.max(0,crossbowCooldown-dt);
+ windSlashCooldown=Math.max(0,windSlashCooldown-dt);
+ swordSpinCooldown=Math.max(0,swordSpinCooldown-dt);
+ crossbowSkill1Cooldown=Math.max(0,crossbowSkill1Cooldown-dt);
+ crossbowSkill2Cooldown=Math.max(0,crossbowSkill2Cooldown-dt);
+ defenseVeilCooldown=Math.max(0,defenseVeilCooldown-dt);
+ if(levelUpAura){levelUpAuraTimer-=dt;levelUpAura.position.set(hero.position.x,hero.position.y+1.12,hero.position.z);const pulse=1+Math.sin((3.5-levelUpAuraTimer)*9)*.12;levelUpAura.scale.set(pulse,1,pulse);levelUpAura.material.opacity=.62*Math.max(0,levelUpAuraTimer/3.5);const inner=levelUpAura.children[0];if(inner)inner.material.opacity=.5*Math.max(0,levelUpAuraTimer/3.5);if(levelUpAuraTimer<=0){scene.remove(levelUpAura);levelUpAura.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});levelUpAura=null;}}
+ updateArrowRainAim();
+ updateWindSlashAim();
+ if(defenseVeil){defenseVeil.elapsed+=dt;defenseVeil.group.position.set(hero.position.x,hero.position.y,hero.position.z);defenseVeil.group.rotation.y=0;const pulse=.82+Math.sin(defenseVeil.elapsed*8)*.12;defenseVeil.group.scale.set(pulse,1+Math.sin(defenseVeil.elapsed*5)*.035,1);defenseVeil.materials[0].opacity=.38+Math.sin(defenseVeil.elapsed*7)*.09;if(defenseVeil.elapsed>=defenseVeil.duration){stopDefenseVeil();}}
+ updateSkillButtons();
+ if(windSlashCastTime>0){
+  windSlashCastTime=Math.max(0,windSlashCastTime-dt);windSlashCastElapsed+=dt;
+  if(windSlashCastTime<=0){const skill=getSkillDefinition(2);if(skill&&equippedItems.rightHand&&equippedItems.rightHand.id==='sword'){shootWindSlash(skill);}}
+ }
+ if(swordSpin){
+  swordSpin.elapsed+=dt;swordSpin.tick+=dt;
+  swordSpin.effect.position.set(hero.position.x,hero.position.y,hero.position.z);
+  swordSpin.effect.rotation.y-=dt*18;
+  swordSpin.effect.rotation.z=Math.sin(swordSpin.elapsed*22)*.08;
+  // Mantém a rotação rápida do personagem durante a habilidade.
+  hero.rotation.y=swordSpin.baseRotation+swordSpin.elapsed*18;
+  while(swordSpin&&swordSpin.tick>=1){
+   swordSpin.tick-=1;
+   for(const c of creatures){if(!c.alive)continue;const dx=c.root.position.x-hero.position.x,dz=c.root.position.z-hero.position.z;
+    if(Math.abs(c.root.position.y-hero.position.y)<1.15&&Math.hypot(dx,dz)<=swordSpin.radius+c.radius*.35)damageCreature(c,swordSpin.damage,'swordSpin');
+   }
+  }
+  if(swordSpin&&swordSpin.elapsed>=swordSpin.duration){stopSwordSpin();}
+ }
+ // Enquanto o botão de ataque estiver pressionado, encadeia novos golpes de espada ao terminar cada animação.
+ if(actions.attack&&equippedItems.rightHand?.weaponClass==='melee'&&attackTime<=0&&!playerDead){beginBasicAttack();}
+ if(actions.attack&&equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow'&&crossbowCooldown<=0&&currentResources.stamina>=1)shootArrow();
+ for(let i=flyingWindSlashes.length-1;i>=0;i--){
+  const slash=flyingWindSlashes[i],previous=slash.mesh.position.clone();
+  slash.mesh.position.addScaledVector(slash.direction,slash.speed*dt);
+  slash.life-=dt;slash.age+=dt;
+  const fade=Math.min(1,slash.life/.28);
+  for(const material of slash.materials)material.opacity=(material===slash.materials[1]?.52:.92)*fade;
+  slash.mesh.rotation.z=0;
+  const segment=slash.mesh.position.clone().sub(previous),lenSq=segment.lengthSq();
+  for(const c of creatures){
+   if(!c.alive||slash.hitCreatures.has(c))continue;
+   const center=new THREE.Vector3(c.root.position.x,c.root.position.y+.58,c.root.position.z);
+   const t=lenSq>0?THREE.MathUtils.clamp(center.clone().sub(previous).dot(segment)/lenSq,0,1):0;
+   const closest=previous.clone().addScaledVector(segment,t);
+   // A largura do corte permite acertar várias criaturas alinhadas no caminho.
+   if(Math.hypot(closest.x-center.x,closest.z-center.z)<c.radius+1.45 && Math.abs(closest.y-center.y)<1.05){
+    slash.hitCreatures.add(c);
+    damageCreature(c,slash.damage,'windSlash');
+   }
+  }
+  if(slash.life<=0){removeWindSlash(slash);flyingWindSlashes.splice(i,1);}
+ }
+ if(pendingMultiShot){
+  pendingMultiShot.elapsed+=dt;crossbowMultiChargeTime=Math.max(0,pendingMultiShot.duration-pendingMultiShot.elapsed);
+  if(pendingMultiShot.elapsed>=pendingMultiShot.duration){const pending=pendingMultiShot;pendingMultiShot=null;crossbowMultiChargeTime=0;crossbowAnimTime=.88;fireMultiShot(pending.skill);}
+ }
+ if(pendingArrowRain){
+  pendingArrowRain.elapsed+=dt;arrowRainChargeTime=Math.max(0,pendingArrowRain.duration-pendingArrowRain.elapsed);
+  if(pendingArrowRain.elapsed>=pendingArrowRain.duration){const pending=pendingArrowRain;pendingArrowRain=null;arrowRainChargeTime=0;launchArrowRain(pending);}
+ }
+ if(activeArrowRain){
+  const rain=activeArrowRain;rain.elapsed+=dt;rain.tick+=dt;rain.spawnTimer+=dt;
+  // A área da chuva é ancorada no ponto escolhido ao conjurar e não acompanha o herói.
+  const pulse=.96+.04*Math.sin(rain.elapsed*12);rain.area.group.scale.set(pulse,1,pulse);
+  rain.area.materials[0].opacity=.10+.035*Math.sin(rain.elapsed*10);rain.area.materials[1].opacity=.72+.2*Math.sin(rain.elapsed*13);
+  while(rain.spawnTimer>=.024&&rain.elapsed<rain.duration){rain.spawnTimer-=.024;spawnRainArrow(rain.center,rain.radius);}
+  while(rain.tick>=1){rain.tick-=1;for(const c of creatures){if(!c.alive)continue;const dx=c.root.position.x-rain.center.x,dz=c.root.position.z-rain.center.z;if(Math.hypot(dx,dz)<=rain.radius+c.radius*.25)damageCreature(c,rain.damage,'arrowRain');}}
+  if(rain.elapsed>=rain.duration){scene.remove(rain.area.group);rain.area.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});for(const m of rain.area.materials)m.dispose();activeArrowRain=null;}
+ }
+ for(let i=fallingSkillArrows.length-1;i>=0;i--){
+  const a=fallingSkillArrows[i];a.elapsed+=dt;const t=Math.min(1,a.elapsed/a.duration);
+  a.mesh.position.set(THREE.MathUtils.lerp(a.start.x,a.target.x,t),THREE.MathUtils.lerp(a.start.y,.42,t),THREE.MathUtils.lerp(a.start.z,a.target.z,t));
+  a.mesh.rotation.x=-Math.PI/2;
+  if(t>=1){
+   if(!a.visualOnly){for(const c of creatures){if(!c.alive)continue;const dx=c.root.position.x-a.target.x,dz=c.root.position.z-a.target.z;
+    if(Math.hypot(dx,dz)<c.radius+.48){damageCreature(c,a.damage,'arrowRain');break;}
+   }}
+   scene.remove(a.mesh);a.mesh.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});
+   if(a.marker){scene.remove(a.marker.group);a.marker.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});a.marker.ringMat.dispose();a.marker.coreMat.dispose();}
+   fallingSkillArrows.splice(i,1);
+  }
+ }
+ for(let i=flyingArrows.length-1;i>=0;i--){
+  const a=flyingArrows[i],previous=a.mesh.position.clone();
+  const step=a.speed*dt;a.mesh.position.addScaledVector(a.direction,step);a.life-=dt;if(a.source==='multiShot')a.travelled=(a.travelled||0)+step;let hit=false;
+  const weaponData=itemCatalog.crossbow;
+  for(const c of creatures){
+   if(!c.alive)continue;
+   // Segment-vs-sphere approximation prevents fast arrows skipping through a creature between frames.
+   const center=new THREE.Vector3(c.root.position.x,c.root.position.y+.58,c.root.position.z);
+   const segment=a.mesh.position.clone().sub(previous),lenSq=segment.lengthSq();
+   const t=lenSq>0?THREE.MathUtils.clamp(center.clone().sub(previous).dot(segment)/lenSq,0,1):0;
+   const closest=previous.clone().addScaledVector(segment,t);
+   if(closest.distanceTo(center)<c.radius+.16){damageCreature(c,Number(a.damage)||weaponData.damage,a.source||'crossbow');hit=true;break;}
+  }
+  if(a.life<=0||(a.source==='multiShot'&&a.travelled>=a.maxDistance)||hit){scene.remove(a.mesh);a.mesh.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});flyingArrows.splice(i,1);}
+ }
+ let mx=stick.x+(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0);
+ let mz=stick.y+(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+ const len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len}
+ const walkSpeed=4.4*1.6; // 160% da velocidade anterior
+ const canDefend=!!(equippedItems.leftHand&&equippedItems.leftHand.id==='shield');
+ const movingInput=len>.08;
+ if(actions.run&&movingInput&&currentResources.stamina>0)drainStaminaPerSecond(1,dt,'correr');
+ if(actions.defend&&canDefend&&currentResources.stamina>0)drainStaminaPerSecond(1,dt,'defender');
+ if(!(actions.run&&movingInput)&&!(actions.defend&&canDefend)&&currentResources.stamina<attributeState.stamina){currentResources.stamina=Math.min(attributeState.stamina,currentResources.stamina+0.4*dt);}
+ staminaHudTimer+=dt;if(staminaHudTimer>=.1){staminaHudTimer=0;updateAttributeHud();}
+ const running=actions.run&&movingInput&&currentResources.stamina>0;
+ const defending=actions.defend&&canDefend&&currentResources.stamina>0;
+ const speed=defending?walkSpeed*.48:walkSpeed*(running?2:1); // correr custa 1 de estamina por segundo enquanto se desloca
+ // Movement follows the camera's horizontal direction, like a third-person RPG.
+ const forward=-mz;
+ let vx=(mx*Math.cos(cameraYaw)-forward*Math.sin(cameraYaw))*speed;
+ let vz=(-mx*Math.sin(cameraYaw)-forward*Math.cos(cameraYaw))*speed;
+ if(heroKnockbackTimer>0){vx+=heroKnockbackX*heroKnockbackPower;vz+=heroKnockbackZ*heroKnockbackPower;heroKnockbackTimer=Math.max(0,heroKnockbackTimer-dt);heroKnockbackPower*=Math.exp(-7*dt);}
+ // Colisão horizontal com todas as pedras: bloqueia a lateral, mas permite passar por cima no salto.
+ const nextX=THREE.MathUtils.clamp(hero.position.x+vx*dt,-31.5,31.5);
+ const nextZ=THREE.MathUtils.clamp(hero.position.z+vz*dt,-31.5,31.5);
+ let resolvedX=nextX,resolvedZ=nextZ;
+ for(const rock of rockColliders){
+  if(hero.position.y>=rock.top-.10)continue; // já está sobre a pedra ou acima dela
+  let dx=resolvedX-rock.x,dz=resolvedZ-rock.z;
+  const dist=Math.hypot(dx,dz),minDist=rock.r+.29;
+  if(dist<minDist){
+   if(dist<.001){dx=hero.position.x-rock.x;dz=hero.position.z-rock.z;const d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;}
+   else {dx/=dist;dz/=dist;}
+   resolvedX=rock.x+dx*minDist;resolvedZ=rock.z+dz*minDist;
+  }
+ }
+ // Physical sides for the stone arch pillars.
+ for(const solid of archColliders){
+  if(hero.position.y>=solid.top-.10)continue;
+  let dx=resolvedX-solid.x,dz=resolvedZ-solid.z;
+  const dist=Math.hypot(dx,dz),minDist=solid.r+.29;
+  if(dist<minDist){if(dist<.001){dx=hero.position.x-solid.x;dz=hero.position.z-solid.z;const d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;}else{dx/=dist;dz/=dist;}resolvedX=solid.x+dx*minDist;resolvedZ=solid.z+dz*minDist;}
+ }
+ // Walk-up support: gently snap onto each stair when its top is within one step of the creature's feet.
+ for(const platform of platformColliders){
+  const dx=Math.abs(nextX-platform.x),dz=Math.abs(nextZ-platform.z);
+  const rise=platform.top-hero.position.y;
+  // Stair rings use a square-ring footprint: between their inner and outer edges.
+  const radius=Math.max(dx,dz);
+  const within=platform.isStep
+   ? radius>=platform.inner-.16 && radius<=platform.outer-.02
+   : dx<=platform.halfX-.10 && dz<=platform.halfZ-.10;
+  if(within && rise>.001 && rise<=.255 && !jumping && jumpSquat<=0){hero.position.y=platform.top;vy=0;}
+ }
+ // The main pedestal blocks movement through its sides; the stair blocks are walkable risers.
+ for(const platform of platformColliders){
+  if(platform.isStep)continue;
+  // Allow the character to step from the third stair onto the main deck (rise is under .255).
+  // Only block the pedestal side when the character is too low to climb onto its top.
+  if(hero.position.y>=platform.top-.255)continue;
+  const hx=platform.halfX+.29,hz=platform.halfZ+.29;
+  const dx=resolvedX-platform.x,dz=resolvedZ-platform.z;
+  if(Math.abs(dx)<hx && Math.abs(dz)<hz){
+   const pushX=hx-Math.abs(dx),pushZ=hz-Math.abs(dz);
+   if(pushX<pushZ)resolvedX=platform.x+Math.sign(dx|| (hero.position.x-platform.x)||1)*hx;
+   else resolvedZ=platform.z+Math.sign(dz|| (hero.position.z-platform.z)||1)*hz;
+  }
+ }
+ // Colisão física herói-criatura: não atravessa slimes no mesmo plano; saltar por cima permite passar.
+ for(const c of creatures){if(!c.alive)continue;
+  if(Math.abs(hero.position.y-c.root.position.y)>.62||jumping&&hero.position.y>c.root.position.y+.42)continue;
+  let dx=resolvedX-c.root.position.x,dz=resolvedZ-c.root.position.z;
+  const minDist=c.radius+.34,dist=Math.hypot(dx,dz);
+  if(dist<minDist){if(dist<.001){dx=hero.position.x-c.root.position.x;dz=hero.position.z-c.root.position.z;const d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;}else{dx/=dist;dz/=dist;}
+   resolvedX=c.root.position.x+dx*minDist;resolvedZ=c.root.position.z+dz*minDist;
+  }
+ }
+ hero.position.x=THREE.MathUtils.clamp(resolvedX,-31.5,31.5);
+ hero.position.z=THREE.MathUtils.clamp(resolvedZ,-31.5,31.5);
+ if(len>.08&&!swordSpin)hero.rotation.y=Math.atan2(vx,vz);
+ const previousY=hero.position.y;
+ if(jumpSquat>0){
+  jumpSquat=Math.max(0,jumpSquat-dt);
+  vy=0;
+  if(jumpSquat===0)vy=5.2;
+ }else{
+  vy-=13*dt;
+  hero.position.y+=vy*dt;
+ }
+ let landingHeight=0;
+ if(vy<=0 && jumpSquat===0){
+  for(const rock of rockColliders){
+   const dx=hero.position.x-rock.x,dz=hero.position.z-rock.z;
+   if(Math.hypot(dx,dz)<rock.platformR && previousY>=rock.top-.08 && hero.position.y<=rock.top && rock.top>landingHeight){landingHeight=rock.top;}
+  }
+  for(const platform of platformColliders){
+   const dx=Math.abs(hero.position.x-platform.x),dz=Math.abs(hero.position.z-platform.z);
+   const radius=Math.max(dx,dz);
+   const within=platform.isStep
+    ? radius>=platform.inner-.12 && radius<=platform.outer-.04
+    : dx<=platform.halfX-.12 && dz<=platform.halfZ-.12;
+   if(within && previousY>=platform.top-.08 && hero.position.y<=platform.top && platform.top>landingHeight){landingHeight=platform.top;}
+  }
+ }
+ if(hero.position.y<landingHeight){hero.position.y=landingHeight;vy=0;jumping=false}
+ const moving=len>.08;
+ if(moving&&!jumping)walkTime+=dt*10;
+ const stride=moving&&!jumping?Math.sin(walkTime)*.62:0;
+ if(jumpSquat>0){
+  // Impulsão: coxas inclinam para a frente e canelas dobram para trás nos joelhos.
+  legL.hip.rotation.x=-.48;legR.hip.rotation.x=-.48;
+  legL.knee.rotation.x=.92;legR.knee.rotation.x=.92;
+  torso.position.y=1.08;torso.rotation.x=.13;
+ }else if(jumping){
+  // No ar, joelhos articulados: coxa para a frente e parte inferior para trás.
+  legL.hip.rotation.x=-.42;legR.hip.rotation.x=-.24;
+  legL.knee.rotation.x=.95;legR.knee.rotation.x=.72;
+  torso.position.y=1.13;torso.rotation.x=-.08;
+ }else{
+  // Caminhada com flexão leve alternada dos joelhos.
+  legL.hip.rotation.x=stride;legR.hip.rotation.x=-stride;
+  legL.knee.rotation.x=moving?Math.max(0,Math.sin(walkTime))*.32:0;
+  legR.knee.rotation.x=moving?Math.max(0,-Math.sin(walkTime))*.32:0;
+  torso.position.y=1.17+(moving?Math.abs(Math.sin(walkTime*2))*.035:0);
+  torso.rotation.x=0;
+ }
+ // Defesa: o escudo fica avançado em relação à palma para evitar atravessamento.
+ const defendBlend=actions.defend&&equippedItems.leftHand&&equippedItems.leftHand.id==='shield'?1:0;
+ armL.rotation.x=THREE.MathUtils.lerp(armL.rotation.x,-1.05*defendBlend,1-Math.exp(-18*dt));
+ armL.rotation.z=THREE.MathUtils.lerp(armL.rotation.z,.18*defendBlend,1-Math.exp(-18*dt));
+ shieldGroup.rotation.x=THREE.MathUtils.lerp(shieldGroup.rotation.x,1.05*defendBlend,1-Math.exp(-18*dt));
+ shieldGroup.rotation.z=THREE.MathUtils.lerp(shieldGroup.rotation.z,-.18*defendBlend,1-Math.exp(-18*dt));
+ // Balestra: braço direito ergue e aponta; o esquerdo alcança a arma para inserir a próxima flecha.
+ const hasCrossbow=!!(equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow');
+ if(hasCrossbow&&(crossbowAnimTime>0||arrowRainChargeTime>0||crossbowMultiChargeTime>0)){
+   const isArrowRainCharging=arrowRainChargeTime>0;
+   const isMultiShotCharging=crossbowMultiChargeTime>0;
+   const isCharging=isArrowRainCharging||isMultiShotCharging;
+   const chargeDuration=isArrowRainCharging?3.6:2.8;
+   if(!isCharging)crossbowAnimTime=Math.max(0,crossbowAnimTime-dt);
+   const elapsed=isArrowRainCharging?3.6-arrowRainChargeTime:isMultiShotCharging?2.8-crossbowMultiChargeTime:.88-crossbowAnimTime;
+   const aimIn=THREE.MathUtils.clamp(elapsed/(isCharging?.32:.18),0,1);
+   const aimOut=isCharging?1:THREE.MathUtils.clamp(crossbowAnimTime/.20,0,1);
+   const aim=Math.min(aimIn,aimOut);
+   // No Disparo Aéreo, ergue a balestra acima da cabeça antes de soltar a salva.
+   const aimAngle=isArrowRainCharging?-2.55:isMultiShotCharging?-1.55:-1.42;
+   armR.rotation.x=THREE.MathUtils.lerp(armR.rotation.x,aimAngle*aim,1-Math.exp(-26*dt));
+   armR.rotation.z=THREE.MathUtils.lerp(armR.rotation.z,(isArrowRainCharging?-.12:-.04)*aim,1-Math.exp(-26*dt));
+   elbowR.rotation.x=THREE.MathUtils.lerp(elbowR.rotation.x,(isArrowRainCharging?-.28:-.16)*aim,1-Math.exp(-26*dt));
+   const reloadProgress=isArrowRainCharging?((elapsed/3.6*5)%1):isMultiShotCharging?((elapsed/2.8*4)%1):THREE.MathUtils.clamp((elapsed-.12)/.62,0,1);
+   const reloadPhase=isArrowRainCharging?(elapsed<3.45):isMultiShotCharging?(elapsed<2.7):elapsed>.12&&elapsed<.74;
+   // Três etapas: levanta o braço à frente, dobra o antebraço para trás do pescoço
+   // até a abertura superior da aljava e retorna a mão à balestra para inserir a flecha.
+   const smoothStep=t=>t*t*(3-2*t);
+   const targetRaised=isArrowRainCharging?new THREE.Vector3(-.30,2.02,.12):new THREE.Vector3(-.32,1.88,.16);
+   const targetQuiver=new THREE.Vector3(-.055,1.55,-.19);
+   const targetCrossbow=isArrowRainCharging?new THREE.Vector3(.015,1.65,.20):new THREE.Vector3(.015,1.38,.25);
+   let handTarget;
+   if(reloadProgress<.32){
+     handTarget=targetRaised.clone().lerp(targetQuiver,smoothStep(reloadProgress/.32));
+   }else if(reloadProgress<.70){
+     handTarget=targetQuiver.clone().lerp(targetCrossbow,smoothStep((reloadProgress-.32)/.38));
+   }else{
+     handTarget=targetCrossbow.clone();
+   }
+   // IK de dois segmentos com cotovelo explícito; o caminho da mão cria a elevação
+   // frontal seguida pela dobra para trás do pescoço, sem o gesto de alcançar por baixo.
+   const shoulderPoint=armL.position.clone();
+   const toTarget=handTarget.clone().sub(shoulderPoint);
+   const targetDistance=THREE.MathUtils.clamp(toTarget.length(),.001,.579);
+   const targetDir=toTarget.normalize();
+   const upperLength=.29,lowerLength=.29;
+   const cosShoulder=THREE.MathUtils.clamp((targetDistance*targetDistance+upperLength*upperLength-lowerLength*lowerLength)/(2*targetDistance*upperLength),-1,1);
+   const shoulderAlong=upperLength*cosShoulder;
+   const shoulderHeight=upperLength*Math.sqrt(Math.max(0,1-cosShoulder*cosShoulder));
+   let bendDirection=new THREE.Vector3(0,1,0).projectOnPlane(targetDir);
+   if(bendDirection.lengthSq()<.001)bendDirection.set(1,0,0).projectOnPlane(targetDir);
+   bendDirection.normalize();
+   const elbowPoint=shoulderPoint.clone().addScaledVector(targetDir,shoulderAlong).addScaledVector(bendDirection,shoulderHeight);
+   const upperDir=elbowPoint.clone().sub(shoulderPoint).normalize();
+   const lowerDir=handTarget.clone().sub(elbowPoint).normalize();
+   const desiredShoulderQuat=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,-1,0),upperDir);
+   const desiredElbowLocal=lowerDir.clone().applyQuaternion(desiredShoulderQuat.clone().invert()).normalize();
+   const desiredElbowQuat=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,-1,0),desiredElbowLocal);
+   armL.quaternion.slerp(desiredShoulderQuat,1-Math.exp(-24*dt));
+   elbowL.quaternion.slerp(desiredElbowQuat,1-Math.exp(-26*dt));
+   reloadArrow.visible=reloadPhase&&(isCharging?reloadProgress>.18:reloadProgress>.30);
+ }else{
+   reloadArrow.visible=false;
+   if(!actions.defend){
+     armR.rotation.x=THREE.MathUtils.lerp(armR.rotation.x,0,1-Math.exp(-14*dt));
+     armR.rotation.y=THREE.MathUtils.lerp(armR.rotation.y,0,1-Math.exp(-14*dt));
+     armR.rotation.z=THREE.MathUtils.lerp(armR.rotation.z,0,1-Math.exp(-14*dt));
+     elbowR.quaternion.slerp(elbowRestQuaternion,1-Math.exp(-14*dt));
+   }
+   if(!actions.defend){
+     armL.quaternion.slerp(armRestQuaternion,1-Math.exp(-14*dt));
+     elbowL.quaternion.slerp(elbowRestQuaternion,1-Math.exp(-14*dt));
+   }else{
+     elbowL.quaternion.slerp(elbowRestQuaternion,1-Math.exp(-18*dt));
+   }
+ }
+ // Ataque de espada com o braço direito; a balestra usa a animação de mira/recarga acima.
+ if(attackTime>0){
+   attackTime=Math.max(0,attackTime-dt);
+   if(!hasCrossbow&&getWeaponData()&&getWeaponData().weaponClass==='melee'){
+     const t=1-attackTime/.48;
+     const swing=THREE.MathUtils.clamp(t,0,1);
+     armR.rotation.x=THREE.MathUtils.lerp(.38,-1.35,swing);
+     armR.rotation.z=THREE.MathUtils.lerp(.42,-.82,swing);
+     elbowR.rotation.x=THREE.MathUtils.lerp(-.10,-.55,swing);
+     swordGroup.rotation.y=THREE.MathUtils.lerp(-.22,.48,swing);
+     if(!swordHitThisSwing&&swing>.55){
+      const weaponData=getWeaponData();
+      // A espada do iniciante tem um único ataque: cada golpe causa sempre o dano do catálogo.
+      const hitDamage=weaponData?weaponData.damage:0;
+      for(const c of creatures){
+       if(!c.alive||!hitDamage)continue;
+       const dx=c.root.position.x-hero.position.x,dz=c.root.position.z-hero.position.z,dist=Math.hypot(dx,dz);
+       const facing=(Math.sin(hero.rotation.y)*dx+Math.cos(hero.rotation.y)*dz)/(dist||1);
+       // A wider frontal arc plus weapon reach makes contact reliable without hitting behind the hero.
+       if(dist<c.radius+1.05&&facing>.0){damageCreature(c,hitDamage,'sword');swordHitThisSwing=true;break;}
+      }
+     }
+   }
+ }
+ // Durante a mira, espada erguida; ao soltar, a animação conclui em poucos frames.
+ if((windSlashAim||windSlashCastTime>0)&&equippedItems.rightHand&&equippedItems.rightHand.id==='sword'){
+  const aiming=!!windSlashAim;
+  const t=aiming?0:THREE.MathUtils.clamp(windSlashCastElapsed/.08,0,1);
+  const release=t*t*(3-2*t);
+  armR.rotation.x=-.62-release*.42;
+  armR.rotation.y=-.12+release*.08;
+  armR.rotation.z=.68-release*.12;
+  elbowR.rotation.x=-.42+release*.48;
+  // A lâmina usa o eixo local +Z: mais inclinada para a frente, com elevação suave para não cruzar o rosto.
+  // Como o grupo é filho da mão direita, esta rotação local mantém a empunhadura presa à palma.
+  swordGroup.rotation.x=-.24+release*.06;
+  swordGroup.rotation.y=0;
+  // A mão esquerda acompanha o cabo para dar suporte visual à espada erguida.
+  armL.rotation.x=THREE.MathUtils.lerp(armL.rotation.x,-.58,1-Math.exp(-20*dt));
+  armL.rotation.z=THREE.MathUtils.lerp(armL.rotation.z,.24,1-Math.exp(-20*dt));
+  elbowL.rotation.x=THREE.MathUtils.lerp(elbowL.rotation.x,-.48,1-Math.exp(-20*dt));
+  torso.rotation.x=-.06+release*.16;
+  const pulse=(Math.sin(performance.now()*.012)+1)*.5;
+  const glow=.18+.82*pulse;
+  const flash=release*.28;
+  // Aura azul mágica pulsante acompanha a lâmina durante toda a mira.
+  swordAuraBlade.visible=aiming;swordAuraTip.visible=aiming;
+  swordAuraMat.opacity=.16+.48*glow;swordAuraTipMat.opacity=.24+.62*glow;
+  swordAuraLight.intensity=aiming?1.2+4.2*glow:0;
+  blade.material.color.setRGB(.10+.12*glow,.48+.42*glow,.82+.18*glow);
+  tip.material.color.setRGB(.28+.32*glow,.72+.25*glow,1);
+ }else if(swordSpin&&equippedItems.rightHand&&equippedItems.rightHand.id==='sword'){
+  swordAuraBlade.visible=false;swordAuraTip.visible=false;swordAuraLight.intensity=0;
+  // Empunhadura de duas mãos: ambos os braços projetados à frente e a mão esquerda próxima ao punho.
+  armR.rotation.set(-1.02,0,-.10);
+  elbowR.rotation.set(-.18,0,0);
+  armL.rotation.set(-1.02,.18,.62);
+  elbowL.rotation.set(-.34,0,-.12);
+  handL.rotation.set(0,0,-.15);
+  // Compensa a inclinação do braço para a lâmina continuar nivelada e apontada para a frente.
+  swordGroup.rotation.set(1.02,0,0);
+  torso.rotation.x=-.04;
+ }else{
+  swordAuraBlade.visible=false;swordAuraTip.visible=false;swordAuraLight.intensity=0;
+  blade.material.color.setHex(0xcbd8df);tip.material.color.setHex(0xe4edf0);
+ }
+ // Puxar a alavanca: os dois braços avançam para o cabo e o personagem puxa para baixo.
+ if(leverPulling){
+   leverPullTime+=dt;
+   const pull=THREE.MathUtils.clamp(leverPullTime/.95,0,1);
+   const eased=pull*pull*(3-2*pull);
+   leverPivot.rotation.x=THREE.MathUtils.lerp(leverStartAngle,leverEndAngle,eased);
+   // Pose de alcance e puxada usando ambos os braços; retorna ao repouso após a ativação.
+   const pullShoulderR=new THREE.Quaternion().setFromEuler(new THREE.Euler(-.82,0,-.18));
+   const pullShoulderL=new THREE.Quaternion().setFromEuler(new THREE.Euler(-.82,0,.18));
+   const pullElbow=new THREE.Quaternion().setFromEuler(new THREE.Euler(-.62,0,0));
+   if(pull<.78){
+     armR.quaternion.slerp(pullShoulderR,1-Math.exp(-20*dt));
+     armL.quaternion.slerp(pullShoulderL,1-Math.exp(-20*dt));
+     elbowR.quaternion.slerp(pullElbow,1-Math.exp(-20*dt));
+     elbowL.quaternion.slerp(pullElbow,1-Math.exp(-20*dt));
+   }else{
+     armR.quaternion.slerp(armRestQuaternion,1-Math.exp(-10*dt));
+     armL.quaternion.slerp(armRestQuaternion,1-Math.exp(-10*dt));
+     elbowR.quaternion.slerp(elbowRestQuaternion,1-Math.exp(-10*dt));
+     elbowL.quaternion.slerp(elbowRestQuaternion,1-Math.exp(-10*dt));
+   }
+   if(pull>=1){
+     leverPulling=false;leverActivated=true;leverPivot.rotation.x=leverEndAngle;
+     if(countdownWave>=1&&countdownWave<=3){
+      spawnCountdown=5;spawnCountdownEl.textContent='5';spawnCountdownEl.classList.add('visible');
+      // Limpa qualquer mensagem anterior: durante a contagem aparecem somente os números.
+      message.classList.remove('show');clearTimeout(messageTimer);
+     }else{
+      say('Você já concluiu todas as ordas disponíveis.');
+     }
+   }
+ }else if(leverActivated){
+   leverPivot.rotation.x=leverEndAngle;
+ }
+ // Contagem regressiva: mostra somente 5, 4, 3, 2 e 1; nunca exibe o zero.
+ if(spawnCountdown>0){
+  spawnCountdown=Math.max(0,spawnCountdown-dt);
+  if(spawnCountdown>0){
+   const shown=Math.max(1,Math.ceil(spawnCountdown));
+   spawnCountdownEl.textContent=String(shown);
+  }
+  if(spawnCountdown===0){
+   spawnCountdownEl.classList.remove('visible');
+   if(countdownWave===1&&!slimeSpawned){
+    slimeSpawned=true;
+    // Surge sobre o piso do pedestal, perto da alavanca, com espaço para se mover.
+    setWave(1);
+    const pinkSlime=createSlime(0,8,0,'pink',1);
+    countdownWave=0;
+    say('Orda 1: Slime rosa');
+   }else if(countdownWave===2){
+    setWave(2);
+    createSlime(-15,-7,0,'yellow',2);
+    createSlime(15,-7,0,'yellow',2);
+    createSlime(0,8,0,'yellow',2);
+    say('Orda 2: Slimes amarelos');
+    countdownWave=0;
+   }
+   else if(countdownWave===3){
+    setWave(3);
+    createAcidSlime(-15,-7,0,3);createAcidSlime(15,-7,0,3);createAcidSlime(0,8,0,3);
+    say('Orda 3: Slimes verdes');countdownWave=0;
+   }
+  }
+ }
+ updateCreatures(dt);
+ if(hero.userData.damageFlashTimer>0){hero.userData.damageFlashTimer=Math.max(0,hero.userData.damageFlashTimer-dt);hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color){if(!o.userData.damageBaseColor)o.userData.damageBaseColor=o.material.color.clone();o.material.color.copy(o.userData.damageBaseColor).lerp(new THREE.Color(0xff1717),.55);}});}else{hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&o.userData.damageBaseColor)o.material.color.copy(o.userData.damageBaseColor);});}
+ updateAcidProjectiles(dt);
+ updateLootDrops(dt);
+ // Interação contextual com o mago guia; balão intencionalmente sem fala por enquanto.
+ const wizardDx=wizard.position.x-hero.position.x,wizardDz=wizard.position.z-hero.position.z;
+ const wizardDistance=Math.hypot(wizardDx,wizardDz);
+ const wizardFacingDot=wizardDistance>.001?(Math.sin(hero.rotation.y)*wizardDx+Math.cos(hero.rotation.y)*wizardDz)/wizardDistance:1;
+ const wizardCanInteract=wizardDistance<3.25&&wizardFacingDot>.2&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
+ wizardInteractBtn.classList.toggle('visible',wizardCanInteract);
+ if(!wizardCanInteract&&wizardSpeechOpen){wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');}
+
+ // Opção contextual para virar a alavanca quando o personagem se aproxima e olha para ela.
+ const leverWorld=new THREE.Vector3(0,pedestal.top,-4.85);
+ const leverDx=leverWorld.x-hero.position.x,leverDz=leverWorld.z-hero.position.z;
+ const leverDistance=Math.hypot(leverDx,leverDz);
+ const leverFacingDot=leverDistance>.001?(Math.sin(hero.rotation.y)*leverDx+Math.cos(hero.rotation.y)*leverDz)/leverDistance:1;
+ const leverInFront=leverDistance<2.25&&leverFacingDot>.35&&!leverActivated&&!leverPulling&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open');
+ useLeverBtn.classList.toggle('visible',leverInFront);
+
+ // Show the contextual chest action only when the creature is close and looking toward it.
+ const chestDx=chestX-hero.position.x, chestDz=chestZ-hero.position.z;
+ const chestDistance=Math.hypot(chestDx,chestDz);
+ const facingX=Math.sin(hero.rotation.y), facingZ=Math.cos(hero.rotation.y);
+ const facingDot=chestDistance>0.001?(facingX*chestDx+facingZ*chestDz)/chestDistance:1;
+ const chestInFront=chestDistance<3.7 && facingDot>.62 && !inventoryOverlay.classList.contains('open') && !attributesOverlay.classList.contains('open') && !tutorialOverlay.classList.contains('open');
+ openChestBtn.textContent=chestOpened?'📦 INVENTÁRIO DO BAÚ':'📦 ABRIR BAÚ';
+ openChestBtn.classList.toggle('visible',chestInFront);
+ chestLid.rotation.x=THREE.MathUtils.lerp(chestLid.rotation.x,chestOpened?-1.12:0,1-Math.exp(-7*dt));
+ camTarget.set(hero.position.x,1.1,hero.position.z);
+ const camDistance=8.5, camHorizontal=Math.cos(cameraPitch)*camDistance;
+ const desired=new THREE.Vector3(
+   hero.position.x+Math.sin(cameraYaw)*camHorizontal,
+   1.1+Math.sin(cameraPitch)*camDistance+1.0,
+   hero.position.z+Math.cos(cameraYaw)*camHorizontal
+ );
+ camera.position.lerp(desired,1-Math.exp(-5*dt));camera.lookAt(camTarget);
+ renderer.render(scene,camera);
+}
+animate();
+addEventListener('resize',()=>{const size=gameSize();camera.aspect=size.w/size.h;camera.updateProjectionMatrix();renderer.setSize(size.w,size.h,false);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6))});
+// Solicita tela cheia após o primeiro toque (exigência dos navegadores móveis).
+// A trava de orientação e a prevenção de suspensão são opcionais conforme suporte do aparelho.
+let wakeLockHandle=null;
+async function enterImmersiveMode(){
+ if(!document.fullscreenElement && document.documentElement.requestFullscreen){
+  try{await document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(e){}
+ }
+ if(screen.orientation&&screen.orientation.lock){try{await screen.orientation.lock('landscape');}catch(e){}}
+ if('wakeLock' in navigator && !wakeLockHandle){try{wakeLockHandle=await navigator.wakeLock.request('screen');}catch(e){}}
+}
+const fullscreenBtn=document.querySelector('#fullscreenBtn');
+fullscreenBtn.addEventListener('click',async()=>{
+ if(document.fullscreenElement){
+  try{await document.exitFullscreen();}catch(e){}
+ }else{
+  await enterImmersiveMode();
+ }
+});
+function syncFullscreenButton(){const overlayOpen=['inventoryOverlay','attributesOverlay','deathOverlay'].some(id=>{const el=document.getElementById(id);return el&&(el.classList.contains('open')||el.classList.contains('visible'));});fullscreenBtn.style.visibility=overlayOpen?'hidden':'visible';fullscreenBtn.style.pointerEvents=overlayOpen?'none':'auto';}
+const menuObserver=new MutationObserver(syncFullscreenButton);['inventoryOverlay','attributesOverlay','deathOverlay'].forEach(id=>{const el=document.getElementById(id);if(el)menuObserver.observe(el,{attributes:true,attributeFilter:['class','style']});});
+document.addEventListener('fullscreenchange',()=>{
+ // O ícone circular permanece visível nos dois estados; o mesmo botão alterna entrar/sair.
+ fullscreenBtn.textContent='⛶';
+ fullscreenBtn.setAttribute('aria-label',document.fullscreenElement?'Sair da tela cheia':'Ativar tela cheia');
+ fullscreenBtn.setAttribute('title',document.fullscreenElement?'Sair da tela cheia':'Ativar tela cheia');syncFullscreenButton();
+});
+syncFullscreenButton();
+document.addEventListener('pointerdown',e=>{if(e.target!==fullscreenBtn)enterImmersiveMode();},{once:true});
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('visibilitychange',async()=>{
+ if(document.visibilityState==='visible' && 'wakeLock' in navigator && !wakeLockHandle){try{wakeLockHandle=await navigator.wakeLock.request('screen');}catch(e){}}
+});
+</script>
+</body>
+</html>
