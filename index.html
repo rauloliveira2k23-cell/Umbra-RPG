@@ -3,14 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>RPG 3D — Campo de Treino v104</title>
+<title>Umbra: O Segredo da Torre — v143</title>
 <style>
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9bc8e8;font-family:system-ui,Arial;touch-action:none}
   #stage{position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;touch-action:none}
   #game{display:block;width:100%;height:100%}
   #hud{position:absolute;inset:0;pointer-events:none;color:white;text-shadow:0 2px 3px #18351e}
   #mapNameHud{position:absolute;top:10px;left:calc(50% + 55px);transform:translateX(calc(-100% - 8px));z-index:10;padding:5.5px 12.5px;max-width:calc(50% - 125px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg,#18352feF,#10251fe8);border:1px solid #e4d5a688;border-radius:10px;color:#fff2c6;font-size:clamp(9.4px,1.4vw,13.3px);font-weight:900;letter-spacing:.06em;text-align:center;box-shadow:0 3px 12px #0006;text-shadow:0 1px 3px #000}
-  #waveHud{position:absolute;top:10px;left:calc(50% + 55px);transform:translateX(8px);z-index:10;padding:5.5px 11.5px;min-width:81px;text-align:center;background:linear-gradient(180deg,#392044ed,#21142eea);border:1px solid #f3a5e488;border-radius:8px;color:#ffe1f5;font-size:clamp(9.4px,1.33vw,12.5px);font-weight:1000;letter-spacing:.04em;box-shadow:0 3px 12px #0006;text-shadow:0 1px 3px #000;pointer-events:none}
+  #waveHud{position:absolute;top:13px;left:calc(50% + 55px);transform:translateX(8px);z-index:10;padding:6px 9px;min-width:0;max-width:calc(50vw - 165px);display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:7px;white-space:nowrap;background:rgba(10,20,15,.82);border:1px solid #c9b080;border-radius:9px;color:#fff;font-size:clamp(9px,1.22vw,12px);font-weight:900;letter-spacing:.015em;box-shadow:0 2px 8px #0007;text-shadow:0 1px 3px #000;pointer-events:none}
+  #waveHud span{display:block;overflow:hidden;text-overflow:ellipsis}
+  #waveHud .wave-count{color:#ffe5a1;font-weight:800}
+  #waveSlimeMarkers{position:absolute;top:16px;left:calc(50% + 190px);z-index:10;display:flex;flex-direction:column;gap:3px;background:transparent;border:0;padding:0;color:#fff1cb;font-size:clamp(9px,1.15vw,12px);font-weight:850;text-shadow:0 1px 3px #000,0 0 4px #000;pointer-events:none;white-space:nowrap}
   @media (orientation:portrait){#stage{width:100vh;height:100vw;transform-origin:top left;transform:rotate(90deg) translateY(-100%);}}
   #statusHud{position:absolute;top:10px;left:10px;width:146px;padding:7px;background:#14251fd9;border:1px solid #ffffff55;border-radius:10px;box-sizing:border-box;display:grid;gap:4px;text-shadow:0 1px 2px #000;pointer-events:none}
   #hudQuickActions{position:absolute;top:10px;left:164px;display:flex;gap:7px;pointer-events:auto}
@@ -46,6 +49,10 @@
   #openChestBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:13px 20px;border:1px solid #ffffffcc;border-radius:14px;background:#684526f2;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px;box-shadow:0 4px 0 #2e1b0c,0 5px 16px #0008;text-shadow:0 1px 2px #000;touch-action:manipulation;white-space:nowrap}
   #openChestBtn.visible{display:block}
   #openChestBtn:active{transform:translate(-50%,-48%);filter:brightness(1.15)}
+  #openBagBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:13px 20px;border:1px solid #e5cda5;border-radius:14px;background:#58412cf2;color:#fff;font-size:14px;font-weight:900;box-shadow:0 4px 0 #2e1b0c,0 5px 16px #0008;touch-action:manipulation;white-space:nowrap}
+  #openBagBtn.visible{display:block}
+  #openBagBtn:active{transform:translate(-50%,-48%);filter:brightness(1.15)}
+  
   #useLeverBtn{position:absolute;left:50%;top:61%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:13px 20px;border:1px solid #fff2b8;border-radius:14px;background:#8a5b1ff2;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px;box-shadow:0 4px 0 #3d260c,0 5px 16px #0008;text-shadow:0 1px 2px #000;touch-action:manipulation;white-space:nowrap}
   #useLeverBtn.visible{display:block}
   #tutorialOverlay{display:none!important}
@@ -75,6 +82,15 @@
   #menuTabs{display:flex;gap:6px;align-items:center;flex:1;justify-content:center}.menuTab{border:1px solid #c9b080;border-radius:9px;padding:7px 10px;background:#26372b;color:#e8dfca;font-weight:900;font-size:12px;touch-action:manipulation}.menuTab.active{background:#98713a;color:#fff4d5;box-shadow:0 0 0 2px #f2d69b55 inset}
   #inventoryTitle{font-size:clamp(16px,2.4vw,24px);font-weight:950;letter-spacing:.5px;color:#f4d69b}
   #closeInventoryBtn,#closeAttributesBtn{flex:0 0 auto;border:1px solid #e5d3b4;border-radius:10px;padding:8px 12px;background:#6b392b;color:#fff;font-weight:900;font-size:12px;touch-action:manipulation}
+  #journalPanel{display:none;flex-direction:column;gap:14px;padding:clamp(12px,2vw,22px);border:1px solid #c9b08088;border-radius:12px;background:linear-gradient(145deg,#111d17,#0b1511);color:#f8f1df}
+  #journalPanel h3{margin:0;color:#f4d69b;font-size:clamp(17px,2.4vw,24px)}
+  #journalPanel p{margin:0;color:#d8d0bc;font-size:13px;line-height:1.5}
+  #journalActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .journalAction{min-height:48px;border:1px solid #d6b36c;border-radius:10px;padding:10px 14px;background:linear-gradient(#5b713c,#30482b);color:#fff4d5;font-weight:950;font-size:13px;touch-action:manipulation}
+  .journalAction.load{background:linear-gradient(#4b6176,#273b4c);border-color:#a8c9e0}
+  .journalAction:disabled{opacity:.45;filter:grayscale(.7)}
+  #journalStatus{padding:10px 12px;border:1px solid #c9b08055;border-radius:9px;background:#050b08aa;white-space:pre-line;font-size:12px;line-height:1.5;color:#e9dfc9}
+  #journalNotice{font-size:11px!important;color:#c9bda4!important}
   #inventoryPanels{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,.72fr) minmax(0,1fr);align-items:start;gap:clamp(8px,1.5vw,14px);min-height:0}
   #playerInventoryPanel{grid-column:1}
   #characterEquipmentPanel{grid-column:2;display:flex;flex-direction:column;gap:8px;align-items:stretch}
@@ -116,13 +132,13 @@
   #itemDetailsClose:active{filter:brightness(1.25);transform:scale(.96)}
   #itemDetails.visible{display:grid}
   #itemDetailsName{font-size:15px;font-weight:950;color:#f4d69b}
-  #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}
+  #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}#itemQualityLabel{font-size:12px;font-weight:900}
   #itemDetailsDescription{font-size:12px;line-height:1.45;color:#e6dfcf;white-space:pre-line}
   .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}
   .potionIcon:before{content:"";position:absolute;left:4px;top:-7px;width:6px;height:5px;border:1px solid #d7d9c8;border-bottom:0;border-radius:2px 2px 0 0;background:#a7aa9d}
   #usePotionBtn,#equipItemBtn{justify-self:start;border:1px solid #b6d9a0;border-radius:7px;background:#315b37;color:#fff5d8;font-weight:900;padding:7px 12px;touch-action:manipulation}#equipItemBtn{background:#765329;border-color:#f0d08a}#itemDetailsName{display:flex;align-items:center;gap:8px}#itemDetailsIcon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px}#itemDetailsIcon svg{width:30px;height:30px;display:block}
   .inventorySlot.filled{border-color:#d8b16b;background:linear-gradient(145deg,#655034,#382b1e);box-shadow:inset 0 0 0 1px #f1d49a22}
-  .inventorySlot .itemIcon{font-size:clamp(17px,3.1vw,29px);line-height:1.1}
+  .inventorySlot .itemIcon{position:relative;display:inline-flex;align-items:center;justify-content:center;font-size:clamp(17px,3.1vw,29px);line-height:1.1}
   .inventorySlot .itemIcon svg,.equipmentSlot .equipIcon svg{display:block;width:1.35em;height:1.35em;overflow:visible}
   .inventorySlot .itemIcon svg{width:1.65em;height:1.65em}
   .inventorySlot .slotNumber{position:absolute;top:2px;left:4px;font-size:8px;color:#d8d0bc99}
@@ -148,9 +164,9 @@
   @media (max-width:560px){#inventoryPanels.chestMode .inventoryGrid{gap:2px}#inventoryPanels.chestMode .inventorySlot{aspect-ratio:1.85/1}#inventoryPanels.chestMode .inventorySlot .itemIcon{font-size:17px}#inventoryOverlay{padding:5px}#inventoryWindow{gap:7px;padding:8px;max-height:96dvh}#inventoryPanels{grid-template-columns:minmax(0,1fr) minmax(112px,.72fr);gap:5px}#playerInventoryPanel{grid-column:1}#characterEquipmentPanel{grid-column:2}#specialSkillsPanel{grid-column:1 / -1}#specialSkillsList{grid-template-columns:repeat(2,minmax(0,1fr))}#chestInventoryPanel{grid-column:1 / -1}#characterFigure{height:clamp(100px,20vh,155px)}.inventoryPanel{padding:5px}.inventoryGrid{gap:3px}.inventorySlot{border-radius:5px}.inventorySlot .itemIcon{font-size:24px}.equipmentSlot{min-height:62px;font-size:9px}.equipmentSlot .equipIcon{font-size:19px}#itemDetails{padding:10px;min-height:82px}#itemDetailsDescription{font-size:12px;line-height:1.5}}
   @media (max-width:430px){#fullscreenBtn{top:8px;right:8px;width:42px;height:42px;font-size:26px}#buttons{grid-template-columns:repeat(2,58px);grid-template-rows:repeat(4,42px);gap:4px}.btn{height:40px;font-size:9px;border-radius:12px}.btn.skill{height:37px;font-size:8px}.btn.skill .skill-label{font-size:7px}.btn.skill .skill-status{font-size:7px}.controls{padding:0 10px;bottom:18px}#stickArea{width:108px;height:108px;flex-basis:108px;transform:translateY(-16px)}#stick{left:27px;top:27px}#statusHud{top:10px;left:10px;width:136px;padding:6px;gap:4px}#hudQuickActions{left:154px;gap:5px}.hudIconBtn{width:39px;height:39px;font-size:22px}.stat{font-size:9px}.stat-value{font-size:9px}}
   #stickArea{transform:translateY(-26px)}
-  #wizardInteractBtn{position:absolute;z-index:18;left:50%;bottom:clamp(112px,18vh,170px);transform:translateX(-50%);display:none;padding:12px 22px;border:1px solid #b8d9ff;border-radius:14px;background:linear-gradient(180deg,#285fa6,#173768);color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 18px #07152c99;touch-action:manipulation}
+  #wizardInteractBtn{position:absolute;z-index:26;pointer-events:auto;left:50%;bottom:clamp(112px,18vh,170px);transform:translateX(-50%);display:none;padding:12px 22px;border:1px solid #b8d9ff;border-radius:14px;background:linear-gradient(180deg,#285fa6,#173768);color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 18px #07152c99;touch-action:manipulation}
   #wizardInteractBtn.visible{display:block}
-  #wizardSpeech{position:absolute;z-index:25;left:50%;top:18%;transform:translateX(-50%);display:none;min-width:180px;max-width:min(86vw,420px);min-height:44px;padding:14px 18px;border:2px solid #b9d9ff;border-radius:16px;background:rgba(10,25,53,.96);color:#fff;box-shadow:0 8px 24px #0008;text-align:center}
+  #wizardSpeech{position:absolute;z-index:25;left:50%;top:18%;transform:translateX(-50%);display:none;min-width:180px;max-width:min(86vw,420px);min-height:44px;padding:14px 18px;border:2px solid #b9d9ff;border-radius:16px;background:rgba(10,25,53,.96);color:#fff;box-shadow:0 8px 24px #0008;text-align:center;line-height:1.45;font-size:clamp(13px,2.1vw,16px);pointer-events:auto}
   #wizardSpeech.visible{display:block}
   #wizardSpeech:after{content:"";position:absolute;left:50%;bottom:-11px;width:18px;height:18px;background:#0a1935;border-right:2px solid #b9d9ff;border-bottom:2px solid #b9d9ff;transform:translateX(-50%) rotate(45deg)}
   :fullscreen{width:100%;height:100%;background:#000}
@@ -163,7 +179,7 @@
 <canvas id="game"></canvas>
 <div id="hud">
  <div id="mapNameHud" aria-label="Mapa atual">CAMPO DE TREINO</div>
- <div id="waveHud" aria-label="Orda atual">Orda - 0</div>
+ <div id="waveHud" aria-label="Orda atual"><span>Orda - 0</span></div><div id="waveSlimeMarkers" aria-label="Progresso dos slimes"><span>🟡 0/3 slimes amarelos</span><span>🔵 0/4 slimes azuis</span></div>
  <div id="statusHud" aria-label="Status do personagem">
   <div class="stat"><span>❤️ Vida</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="healthFill"></div></div></div>
   <div class="stat"><span>💧 Mana</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="manaFill"></div></div></div>
@@ -176,6 +192,7 @@
  </div>
  <button id="fullscreenBtn" type="button" aria-label="Ativar tela cheia" title="Tela cheia / sair da tela cheia">⛶</button>
  <button id="openChestBtn" type="button">📦 ABRIR BAÚ</button>
+ <button id="openBagBtn" type="button">🎒 ABRIR BOLSA</button>
  <button id="useLeverBtn" type="button">⚙️ VIRAR A ALAVANCA</button>
  <button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
  <div id="wizardSpeech" role="status" aria-live="polite"></div>
@@ -184,7 +201,7 @@
 
  <div id="inventoryOverlay" aria-label="Inventários" role="dialog" aria-modal="true">
   <div id="inventoryWindow">
-   <div id="inventoryTop"><div id="inventoryTitle">🎒 PERSONAGEM</div><div id="menuTabs"><button type="button" id="tabBackpack" class="menuTab active">🎒 Mochila</button><button type="button" id="tabAttributes" class="menuTab">🧬 Atributos</button></div><button id="closeInventoryBtn" type="button">✕ FECHAR</button></div>
+   <div id="inventoryTop"><div id="inventoryTitle">🎒 PERSONAGEM</div><div id="menuTabs"><button type="button" id="tabBackpack" class="menuTab active">🎒 Mochila</button><button type="button" id="tabAttributes" class="menuTab">🧬 Atributos</button><button type="button" id="tabJournal" class="menuTab">📖 Diário</button></div><button id="closeInventoryBtn" type="button">✕ FECHAR</button></div>
    <div id="inventoryPanels">
     <section id="playerInventoryPanel" class="inventoryPanel"><h3>🧍 MOCHILA</h3><div id="playerInventory" class="inventoryGrid"></div></section>
     <section id="characterEquipmentPanel" class="inventoryPanel">
@@ -224,7 +241,14 @@
     </section>
     <section id="chestInventoryPanel" class="inventoryPanel"><h3>📦 INVENTÁRIO DO BAÚ</h3><div id="chestInventory" class="inventoryGrid"></div></section>
    </div>
-   <div id="itemDetails" aria-live="polite"><button id="itemDetailsClose" type="button" aria-label="Fechar informações do item" title="Fechar">✕</button><div id="itemDetailsName"><span id="itemDetailsIcon"></span><span id="itemDetailsNameText"></span></div><div id="itemDetailsType"></div><div id="itemDetailsDescription"></div><button id="usePotionBtn" type="button" style="display:none">🧪 USAR POÇÃO</button><button id="equipItemBtn" type="button" style="display:none">🗡️ EQUIPAR ITEM</button></div>
+   <section id="journalPanel" aria-label="Diário e salvamento do jogo">
+    <h3>📖 DIÁRIO DE AVENTURA</h3>
+    <p>Registre manualmente sua jornada neste ponto. Carregar restaura o último salvamento feito neste navegador.</p>
+    <div id="journalActions"><button type="button" class="journalAction" id="saveGameBtn">💾 SALVAR JOGO</button><button type="button" class="journalAction load" id="loadGameBtn">📜 CARREGAR JOGO</button></div>
+    <div id="journalStatus" role="status" aria-live="polite">Nenhum salvamento encontrado neste navegador.</div>
+    <p id="journalNotice">Importante: esta primeira versão guarda o salvamento neste navegador e aparelho. Não é salvamento em nuvem nem sincroniza entre dispositivos. Não há salvamento automático.</p>
+   </section>
+   <div id="itemDetails" aria-live="polite"><button id="itemDetailsClose" type="button" aria-label="Fechar informações do item" title="Fechar">✕</button><div id="itemDetailsName"><span id="itemDetailsIcon"></span><span id="itemDetailsNameText"></span></div><div id="itemQualityLabel"></div><div id="itemDetailsType"></div><div id="itemDetailsDescription"></div><button id="usePotionBtn" type="button" style="display:none">🧪 USAR POÇÃO</button><button id="equipItemBtn" type="button" style="display:none">🗡️ EQUIPAR ITEM</button></div>
    <p id="inventoryHint">Toque em um item para ver suas informações. Arraste-o para outro espaço vazio para movê-lo.</p>
   </div>
  </div>
@@ -297,6 +321,10 @@ for(let i=0;i<150;i++){
 // Cada pedra visual também registra um volume físico aproximado para colisão e salto.
 const stoneMats=[mat(0x858b88),mat(0x737c7b),mat(0x9b9d91)];
 const rockColliders=[];
+const coverRockColliders=[];
+const treeColliders=[];
+// Posições reservadas para as três rochas grandes de cobertura.
+const coverRockLocations=[{x:-31,z:-30,scale:1.08},{x:14.5,z:-12.5,scale:1.0},{x:-14.5,z:12.5,scale:1.02}];
 const archColliders=[];
 const platformColliders=[];
 for(let i=0;i<19;i++){
@@ -305,6 +333,8 @@ for(let i=0;i<19;i++){
  // Mantém livre a área do pedestal e dos degraus: pedras sobrepostas podem causar z-fighting.
  const pedestalFootprint=5.65+s*1.6;
  if(Math.abs(x-0)<pedestalFootprint && Math.abs(z-(-7))<pedestalFootprint)continue;
+ // Não gerar pedras pequenas a menos de 2 metros das rochas grandes de cobertura.
+ if(coverRockLocations.some(r=>Math.hypot(x-r.x,z-r.z)<2.0+1.75*r.scale+s*1.2))continue;
  // Mantém uma área livre de 4 metros ao redor do baú, incluindo a margem da pedra.
  if(Math.hypot(x-3.0,z-10.5)<4+s*1.5)continue;
  const stone=new THREE.Mesh(new THREE.DodecahedronGeometry(s,0),stoneMats[i%stoneMats.length]);
@@ -460,11 +490,15 @@ const legL=makeLeg(-.16),legR=makeLeg(.16);
 hero.position.set(0,0,7.5); // Ponto inicial mais distante do pedestal, com espaço para explorar.
 
 // NPC guia: mago humano com túnica azul, chapéu pontudo, cajado e livro.
-const wizard=new THREE.Group();wizard.position.set(-3.2,0,3.0);wizard.rotation.y=Math.PI;scene.add(wizard);
-const wizardBlue=mat(0x183d91),wizardBlueLight=mat(0x3569c6),wizardTrim=mat(0xd6c8ff),wizardSkin=mat(0xe5b991),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x5d243c),bookPages=mat(0xf0e2bd);
+const wizard=new THREE.Group();wizard.position.set(-2.15,0,-3.15);wizard.rotation.y=Math.PI;scene.add(wizard);
+const wizardBlue=mat(0x123bba),wizardBlueLight=mat(0x285ce0),wizardTrim=mat(0xe2d6a6),wizardSkin=mat(0xe6bd98),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x633c28),bookPages=mat(0xf4e7c8),wizardBeard=mat(0xf0eee4);
 part(wizard,new THREE.CapsuleGeometry(.34,.62,4,8),wizardBlue,0,1.02,0,1.1,1.2,.82);
 part(wizard,new THREE.ConeGeometry(.22,.34,8),wizardBlue,0,.42,0,1.6,1,1.5); // base larga da túnica
 part(wizard,new THREE.SphereGeometry(.255,12,10),wizardSkin,0,1.78,0,.95,1,.9);
+// Barba branca comprida e bigode do mago.
+part(wizard,new THREE.ConeGeometry(.19,.48,8),wizardBeard,0,1.48,.12,1,1,1);
+part(wizard,new THREE.SphereGeometry(.13,8,7),wizardBeard,-.12,1.64,.16,1,.55,.7);
+part(wizard,new THREE.SphereGeometry(.13,8,7),wizardBeard,.12,1.64,.16,1,.55,.7);
 part(wizard,new THREE.ConeGeometry(.34,.62,10),wizardBlueLight,0,2.27,-.015,1,1,1);
 part(wizard,new THREE.TorusGeometry(.23,.035,6,12),wizardTrim,0,2.02,0,1,1,.9);
 part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,-.38,1.16,0,1,1,.9).rotation.z=-.42;
@@ -481,7 +515,25 @@ part(wizard,new THREE.BoxGeometry(.29,.37,.025),bookPages,.63,1.12,.082);
 part(wizard,new THREE.BoxGeometry(.025,.38,.02),wizardGold,.63,1.12,.1);
 const wizardInteractBtn=document.querySelector('#wizardInteractBtn'),wizardSpeech=document.querySelector('#wizardSpeech');
 let wizardSpeechOpen=false;
-wizardInteractBtn.addEventListener('click',()=>{wizardSpeechOpen=!wizardSpeechOpen;wizardSpeech.classList.toggle('visible',wizardSpeechOpen);});
+function getWizardDialogue(){
+ const aliveInWave=n=>creatures.some(c=>c.alive&&c.waveNumber===n);
+ if(!slimeSpawned&&currentWave===0)return 'Há um baú por aí com alguns itens. Pegue a espada e algumas poções; elas podem ser muito úteis para derrotar os slimes.';
+ if(currentWave===1&&wave2Started&&!aliveInWave(1))return 'Muito bem! Antes de começar o próximo combate, use poções para recuperar sua vida. E não se esqueça das suas habilidades especiais: elas podem facilitar bastante a luta.';
+ if(currentWave===2&&wave3Started&&!aliveInWave(2))return 'Parabéns por subir de nível! Recomendo pegar o escudo que está no baú. Ele pode ajudar bastante a sobreviver aos próximos combates.';
+ if(currentWave===3&&!aliveInWave(3))return 'Parabéns por subir de nível novamente! Agora, no nível 3, você já pode usar a balestra. Ela é uma arma poderosa e permite atacar de longa distância.';
+ if(currentWave===4&&!aliveInWave(4))return 'Meus parabéns por chegar tão longe! Mas não baixe a guarda: a próxima orda não será tão simples.';
+ if(currentWave===0)return 'Prepare-se para o desafio. Explore o campo e confira os itens do baú antes de começar.';
+ return 'Continue assim, aventureiro. Prepare seus equipamentos e fique atento aos próximos desafios.';
+}
+function openWizardDialogue(){
+ // Interagir sempre abre (ou atualiza) o balão. O botão não alterna para fechado por engano.
+ wizardSpeech.textContent=getWizardDialogue();
+ wizardSpeech.setAttribute('aria-label','Diálogo do mago');
+ wizardSpeechOpen=true;
+ wizardSpeech.classList.add('visible');
+}
+wizardInteractBtn.addEventListener('click',openWizardDialogue);
+wizardInteractBtn.addEventListener('pointerup',e=>{e.preventDefault();openWizardDialogue();});
 
 
 // Helper for solid architectural pieces.
@@ -510,8 +562,51 @@ for(const xoff of [-.36,.36]){
 addBox(.18,.22,.055,ironMat,chestX,.52,chestZ+.415);
 addBox(.07,.08,.035,woodDark,chestX,.49,chestZ+.45);
 rockColliders.push({x:chestX,z:chestZ,r:.66,top:.83,platformR:.42});
+// Três árvores robustas: os troncos têm colisão e bloqueiam projéteis inimigos.
+const treeTrunkMat=mat(0x5a3824),treeTrunkLight=mat(0x79502e),treeLeafMats=[mat(0x244d35),mat(0x2f6840),mat(0x39764a)];
+function addProtectiveTree(x,z,scale=1){
+ const trunkRadius=.72*scale,trunkHeight=3.8*scale;
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(trunkRadius*.78,trunkRadius,trunkHeight,9),treeTrunkMat);
+ trunk.position.set(x,trunkHeight/2,z);trunk.castShadow=true;trunk.receiveShadow=true;scene.add(trunk);
+ const branch=new THREE.Mesh(new THREE.CylinderGeometry(.18*scale,.28*scale,1.45*scale,7),treeTrunkLight);
+ branch.position.set(x+.28*scale,2.35*scale,z);branch.rotation.z=-.48;branch.castShadow=true;scene.add(branch);
+ for(let i=0;i<3;i++){
+  const canopy=new THREE.Mesh(new THREE.DodecahedronGeometry(1.55*scale-i*.13*scale,1),treeLeafMats[i]);
+  canopy.position.set(x+(i===1?.45*scale:0),trunkHeight+(i===0?.15*scale:i===1?-.35*scale:-.75*scale),z+(i===2?.38*scale:0));
+  canopy.scale.set(1.05,1.0,.95);canopy.castShadow=true;canopy.receiveShadow=true;scene.add(canopy);
+ }
+ treeColliders.push({x,z,r:trunkRadius+.12,top:trunkHeight+1.2*scale,projectileRadius:trunkRadius+.25});
+}
+addProtectiveTree(-14,-24,1.12);
+addProtectiveTree(14,-25,1.08);
+addProtectiveTree(7.4,10.6,1.0);
+// Três rochas grandes de cobertura: bloqueiam movimento e projéteis, como as árvores.
+function addCoverRock(x,z,scale=1){
+ const radius=1.82*scale,height=2.25*scale;
+ // Faces angulosas e volumes assimétricos para evitar a aparência de pedras redondas.
+ const body=new THREE.Mesh(new THREE.IcosahedronGeometry(1.55*scale,0),stoneMats[1]);
+ body.position.set(x,height*.43,z);body.scale.set(1.28,.83,.88);body.rotation.set(.18,.37,-.11);body.castShadow=true;body.receiveShadow=true;scene.add(body);
+ const shoulder=new THREE.Mesh(new THREE.DodecahedronGeometry(1.05*scale,0),stoneMats[0]);
+ shoulder.position.set(x+.48*scale,height*.56,z-.18*scale);shoulder.scale.set(.9,.72,1.12);shoulder.rotation.set(.22,.9,.12);shoulder.castShadow=true;shoulder.receiveShadow=true;scene.add(shoulder);
+ const lower=new THREE.Mesh(new THREE.IcosahedronGeometry(1.12*scale,0),stoneMats[2]);
+ lower.position.set(x-.24*scale,height*.22,z+.20*scale);lower.scale.set(1.18,.65,1.0);lower.rotation.set(.05,.8,.16);lower.castShadow=true;lower.receiveShadow=true;scene.add(lower);
+ const collider={x,z,r:radius,top:height,platformR:radius*.62,projectileRadius:radius+.18};
+ rockColliders.push(collider);coverRockColliders.push(collider);
+}
+for(const r of coverRockLocations)addCoverRock(r.x,r.z,r.scale);
+// Bolsa escondida atrás da rocha da quina traseira esquerda.
+const hiddenBagX=-32.45,hiddenBagZ=-32.25;
+const hiddenBag=new THREE.Group();hiddenBag.position.set(hiddenBagX,0,hiddenBagZ);scene.add(hiddenBag);
+const bagLeather=mat(0x6f4528),bagLeatherLight=mat(0x9a6738),bagCord=mat(0xd7b66b,.8);
+const bagBody=new THREE.Mesh(new THREE.SphereGeometry(.43,10,8),bagLeather);bagBody.scale.set(1,.78,.62);bagBody.position.y=.42;bagBody.castShadow=true;bagBody.receiveShadow=true;hiddenBag.add(bagBody);
+const bagFold=new THREE.Mesh(new THREE.SphereGeometry(.28,9,7),bagLeatherLight);bagFold.scale.set(1,.48,.72);bagFold.position.set(0,.67,0);bagFold.castShadow=true;hiddenBag.add(bagFold);
+const bagTie=new THREE.Mesh(new THREE.TorusGeometry(.18,.035,6,12),bagCord);bagTie.rotation.x=Math.PI/2;bagTie.position.set(0,.64,.02);hiddenBag.add(bagTie);
+const bagToken=new THREE.Mesh(new THREE.OctahedronGeometry(.09),bagCord);bagToken.position.set(0,.38,.25);hiddenBag.add(bagToken);
+rockColliders.push({x:hiddenBagX,z:hiddenBagZ,r:.48,top:.85,platformR:.3});
+
 let chestOpened=false;
 const openChestBtn=document.querySelector('#openChestBtn');
+const openBagBtn=document.querySelector('#openBagBtn');
 const inventoryOverlay=document.querySelector('#inventoryOverlay');
 const attributesOverlay=document.querySelector('#attributesOverlay');
 document.querySelector('#inventoryWindow').appendChild(attributesOverlay);
@@ -610,23 +705,24 @@ function renderAttributes(){
 }
 // Call this from the level-up reward when the experience/level system is connected.
 function awardLevelUpPoints(points=10){skillPoints+=points;renderAttributes();}
-function openAttributes(){renderAttributes();inventoryOverlay.classList.add('open');attributesOverlay.classList.add('open');document.querySelector('#inventoryPanels').style.display='none';document.querySelector('#itemDetails').style.display='none';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#inventoryTitle').textContent='🧬 PERSONAGEM';document.querySelector('#tabAttributes').classList.add('active');document.querySelector('#tabBackpack').classList.remove('active');openChestBtn.classList.remove('visible');}
+function openAttributes(){document.querySelector('#journalPanel').style.display='none';document.querySelector('#inventoryPanels').style.display='none';document.querySelector('#itemDetails').style.display='none';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#tabJournal').classList.remove('active');renderAttributes();inventoryOverlay.classList.add('open');attributesOverlay.classList.add('open');document.querySelector('#inventoryPanels').style.display='none';document.querySelector('#itemDetails').style.display='none';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#inventoryTitle').textContent='🧬 PERSONAGEM';document.querySelector('#tabAttributes').classList.add('active');document.querySelector('#tabBackpack').classList.remove('active');openChestBtn.classList.remove('visible');}
 function closeAttributes(){attributesOverlay.classList.remove('open');}
 document.querySelector('#tabAttributes').addEventListener('click',openAttributes);
-document.querySelector('#tabBackpack').addEventListener('click',()=>{attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#inventoryTitle').textContent='🎒 PERSONAGEM';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');});
+document.querySelector('#tabBackpack').addEventListener('click',()=>{document.querySelector('#journalPanel').style.display='none';document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#tabJournal').classList.remove('active');attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryHint').style.display='none';document.querySelector('#inventoryTitle').textContent='🎒 PERSONAGEM';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');});
 document.querySelector('#closeAttributesBtn').addEventListener('click',closeAttributes);
 document.querySelectorAll('.upgradeBtn').forEach(button=>button.addEventListener('click',()=>{
  const key=button.dataset.attribute;
  if(skillPoints<10)return;
  skillPoints-=10;attributeState[key]+=10;currentResources[key]+=10;renderAttributes();
 }));
-document.querySelector('#backpackBtn').addEventListener('click',()=>{if(inventoryOverlay.classList.contains('open')){closeInventory();return;}attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryTitle').textContent='🎒 MOCHILA';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');openInventory('player');});
+document.querySelector('#backpackBtn').addEventListener('click',()=>{if(inventoryOverlay.classList.contains('open')){closeInventory();return;}document.querySelector('#journalPanel').style.display='none';document.querySelector('#tabJournal').classList.remove('active');attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryTitle').textContent='🎒 MOCHILA';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');openInventory('player');});
 const playerInventoryEl=document.querySelector('#playerInventory');
 const chestInventoryEl=document.querySelector('#chestInventory');
 const itemCatalog={
  shield:{id:'shield',name:'Escudo do aprendiz',icon:'🛡️',type:'Item de suporte — mão esquerda',itemRole:'support',itemCategory:'offhand',skills:{3:{name:'Véu de Defesa',description:'Cria uma barreira circular de luz amarela ao redor do personagem por 6 segundos. A barreira acompanha seus movimentos e bloqueia projéteis em 360°.',effect:'defenseVeil',duration:6,manaCost:20,cooldown:20}},description:'Enquanto estiver equipado, segure o botão DEFENDER para bloquear e reduzir o dano recebido. Habilidade 3: Véu de Defesa — barreira circular de 360° por 6 segundos, custo de 20 de mana e recarga de 20 segundos.'},
  sword:{id:'sword',name:'Espada do aprendiz',icon:'🗡️',type:'Arma corpo a corpo — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:7,skills:{1:{name:'Lâmina Giratória',description:'Aponta a espada à frente com as duas mãos e gira por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Disparo Cortante',description:'Segure para mirar a trajetória do disparo cortante; a espada se ergue durante a mira e, ao soltar, dispara quase instantaneamente, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Use o botão ATACAR para executar um corte para a frente que causa 7 de dano por acerto. Habilidade 1: Lâmina Giratória (5 segundos, área circular de 6 metros de diâmetro). Habilidade 2: Disparo Cortante (golpe em linha reta).'},
- crossbow:{id:'crossbow',name:'Balestra do aprendiz',icon:'⌁',type:'Arma de longo alcance — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'projectile',damage:12,skills:{1:{name:'Chuva de Flechas',description:'Invoca por 4 segundos uma chuva de flechas numa área circular de 6 metros, posicionada cerca de 4 metros à frente do personagem no momento da conjuração. A área fica fixa no local escolhido. Causa 11 de dano por segundo dentro da área.',effect:'arrowRain',damage:11,duration:4,radius:6,manaCost:25,staminaCost:5,cooldown:20},2:{name:'Disparo Múltiplo',description:'Após uma animação de recarga, dispara 20 flechas imbuídas em mana em um leque mais fechado para a frente, causando 7 de dano por flecha que acertar.',effect:'multiShot',damage:7,arrows:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Dispara uma flecha para a frente ao atacar. Cada flecha causa 12 de dano ao atingir uma criatura. Habilidade 1: Chuva de Flechas (4 segundos, raio de 6 metros, área fixa a cerca de 4 metros à frente, 11 de dano por segundo). Habilidade 2: Disparo Múltiplo (20 flechas azuis em leque fechado, 7 de dano cada). Enquanto estiver equipada, não é possível usar item na mão esquerda.'}
+ crossbow:{id:'crossbow',name:'Balestra do aprendiz',icon:'⌁',type:'Arma de longo alcance — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'projectile',damage:12,skills:{1:{name:'Chuva de Flechas',description:'Invoca por 4 segundos uma chuva de flechas numa área circular de 6 metros, posicionada cerca de 4 metros à frente do personagem no momento da conjuração. A área fica fixa no local escolhido. Causa 11 de dano por segundo dentro da área.',effect:'arrowRain',damage:11,duration:4,radius:6,manaCost:25,staminaCost:5,cooldown:20},2:{name:'Disparo Múltiplo',description:'Após uma animação de recarga, dispara 20 flechas imbuídas em mana em um leque mais fechado para a frente, causando 7 de dano por flecha que acertar.',effect:'multiShot',damage:7,arrows:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Dispara uma flecha para a frente ao atacar. Cada flecha causa 12 de dano ao atingir uma criatura. Habilidade 1: Chuva de Flechas (4 segundos, raio de 6 metros, área fixa a cerca de 4 metros à frente, 11 de dano por segundo). Habilidade 2: Disparo Múltiplo (20 flechas azuis em leque fechado, 7 de dano cada). Enquanto estiver equipada, não é possível usar item na mão esquerda.'},
+ knightSword:{id:'knight-sword',name:'Espada de cavaleiro',icon:'🗡️',type:'Arma de corpo a corpo - Mão principal',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:10,rarity:'green',skills:{1:{name:'Lâmina fatiadora',description:'Executa uma sequência giratória de cortes por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Espada esmagadora',description:'Ergue a espada e dispara um golpe cortante concentrado em linha reta, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Espada de qualidade média (categoria verde). Ataque básico causa 10 de dano por acerto. Habilidade 1: Lâmina fatiadora. Habilidade 2: Espada esmagadora.'}
 };
 // Sistema genérico de armas: o dano vem dos dados do próprio item na mochila.
 // Para criar uma arma nova, cadastre weaponClass ('melee' ou 'projectile') e damage.
@@ -655,7 +751,9 @@ function damageCreature(creature,amount,source='weapon'){
   // Finalização universal: qualquer criatura viva que chegue a zero concede XP uma única vez.
   // O valor fica registrado na própria criatura ao nascer, sem depender de onda ou drop visual.
   creature.alive=false;
+  updateWaveHudProgress();
   creature.root.visible=false;
+  updateWaveHudProgress();
   if(creature.attackRing)creature.attackRing.visible=false;
   if(!creature.xpAwarded){
    const variant=String(creature.variant||'').toLowerCase();
@@ -677,25 +775,35 @@ function damageCreature(creature,amount,source='weapon'){
   }
   if(creature.type==='slime' && creature.waveNumber===3 && currentWave===3 && !creatures.some(c=>c.alive&&c.waveNumber===3)){
    countdownWave=0;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
-   say('Todas as ordas foram concluídas!');
+   say('Todas as criaturas foram derrotadas!');
   }
  }
  return true;
 }
 const playerItems=Array(30).fill(null);
-const makePotion=(id,name,resource,color)=>({id,name,icon:'🧪',potion:true,stackable:true,quantity:1,resource,color,restore:10,type:'Poção consumível',description:`Restaura 10 pontos de ${resource==='health'?'vida':resource==='stamina'?'estamina':'mana'}.`});
+const makePotion=(id,name,resource,color,size='pequena')=>{const restore=size==='grande'?100:size==='média'||size==='media'?50:10;return {id,name,icon:'🧪',potion:true,stackable:true,quantity:1,resource,color,restore,size,type:'Poção consumível',description:`Restaura ${restore} pontos de ${resource==='health'?'vida':resource==='stamina'?'estamina':'mana'}.`};};
 const chestItems=Array(20).fill(null);
+const hiddenBagItems=Array(5).fill(null);
 const silverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:10,description:'10 moedas de prata.'};
 [chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,{...makePotion('health-potion','Poção pequena de vida','health','#e8343e'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
-let suppressInventoryClickUntil=0,dragState=null;
+itemCatalog.sword.rarity='white';itemCatalog.crossbow.rarity='white';itemCatalog.shield.rarity='white';
+const bagManaPotions=makePotion('mana-potion-small','Poção pequena de mana','mana','#258bff','pequena');bagManaPotions.quantity=3;
+const bagMediumHealth=makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média');bagMediumHealth.quantity=2;
+const bagSilverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:20,description:'20 moedas de prata.'};
+hiddenBagItems[0]=bagManaPotions;hiddenBagItems[1]=bagMediumHealth;hiddenBagItems[2]=bagSilverCoins;hiddenBagItems[3]=itemCatalog.knightSword;
+let suppressInventoryClickUntil=0,dragState=null;let activeStorageMode='chest';
 const itemDetails=document.querySelector('#itemDetails');
+const itemQualityColors={white:'#f1f1f1',green:'#62e879',blue:'#61a9ff',purple:'#d28aff',gold:'#ffd45c'};
+const itemQualityNames={white:'Qualidade baixa',green:'Qualidade média',blue:'Qualidade boa',purple:'Qualidade muito boa',gold:'Qualidade suprema'};
 document.querySelector('#itemDetailsClose').addEventListener('click',()=>itemDetails.classList.remove('visible'));
 function formatItemDescription(item){
  if(!item)return '';
  const lines=[];
+ const qualityNames={white:'Branca — baixa qualidade',green:'Verde — qualidade média',blue:'Azul — qualidade boa',purple:'Roxa — qualidade muito boa',gold:'Dourada — qualidade suprema'};
+ if(item.rarity&&qualityNames[item.rarity])lines.push(`Categoria: ${qualityNames[item.rarity]}`);
  if(item.weaponClass||item.itemRole==='support'||item.itemCategory==='offhand'||item.itemCategory==='support'){
-  lines.push(`Nível: ${getRequiredEquipmentLevel(item)}`);
-  if(item.weaponClass)lines.push(`Força: ${item.damage||0}`);
+  lines.push(`Nível mínimo: ${getRequiredEquipmentLevel(item)}`);
+  if(item.weaponClass)lines.push(`Força: ${item.id==='knight-sword'?10:(item.damage||0)}`);
   else if(item.itemRole==='support')lines.push('Força: Suporte');
   const skills=item.skills||{};
   Object.keys(skills).sort((a,b)=>Number(a)-Number(b)).forEach(key=>{
@@ -719,6 +827,9 @@ function showItemDetails(item){
  if(!item){itemDetails.classList.remove('visible');useBtn.style.display='none';equipBtn.style.display='none';return;}
  const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon';bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
  document.querySelector('#itemDetailsNameText').textContent=item.name;
+ const qualityLabel=document.querySelector('#itemQualityLabel');
+ qualityLabel.textContent=item.rarity?(itemQualityNames[item.rarity]||''):'';
+ qualityLabel.style.color=item.rarity?(itemQualityColors[item.rarity]||'#f1f1f1'):'';
  document.querySelector('#itemDetailsType').textContent=getItemDisplayType(item);
  document.querySelector('#itemDetailsDescription').textContent=formatItemDescription(item);
  useBtn.style.display=item.potion&&playerItems.includes(item)?'inline-block':'none';
@@ -760,7 +871,7 @@ function equipItemFromInventory(index){
  renderInventory();showItemDetails(displaced||item);say(`${item.name} equipado.`);
 }
 
-function getRequiredEquipmentLevel(item){return item&&(item.id==='shield'||item.id==='crossbow')?2:1;}
+function getRequiredEquipmentLevel(item){if(!item)return 1;if(item.id==='knight-sword')return 5;if(item.id==='crossbow')return 3;if(item.id==='shield')return 2;return 1;}
 function getSkillSource(slotNumber){if(slotNumber===1||slotNumber===2)return equippedItems.rightHand;if(slotNumber===3)return equippedItems.leftHand;if(slotNumber===4)return equippedItems.amulet;return null;}
 function getSkillDefinition(slotNumber){const item=getSkillSource(slotNumber);return item&&item.skills?item.skills[slotNumber]||null:null;}
 function getSkillStaminaCost(slotNumber,skill=getSkillDefinition(slotNumber)){const item=getSkillSource(slotNumber);if(!skill||!item||!['sword','crossbow'].includes(item.id))return Number(skill?.staminaCost)||0;return Number(skill.staminaCost)||(slotNumber===1?5:slotNumber===2?10:0);}
@@ -784,7 +895,7 @@ function renderSpecialSkills(){
  updateSkillButtons();
 }
 let crossbowSkill1Cooldown=0,crossbowSkill2Cooldown=0;
-function getSkillCooldown(n){if((n===1||n===2)&&equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow')return n===1?crossbowSkill1Cooldown:crossbowSkill2Cooldown;if(equippedItems.rightHand?.id==='sword'){const skill=getSkillDefinition(n);if(skill?.effect==='windSlash')return windSlashCooldown;if(skill?.effect==='swordSpin')return swordSpinCooldown;}if(n===3)return defenseVeilCooldown;return 0;}
+function getSkillCooldown(n){if((n===1||n===2)&&equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow')return n===1?crossbowSkill1Cooldown:crossbowSkill2Cooldown;if(equippedItems.rightHand?.weaponClass==='melee'){const skill=getSkillDefinition(n);if(skill?.effect==='windSlash')return windSlashCooldown;if(skill?.effect==='swordSpin')return swordSpinCooldown;}if(n===3)return defenseVeilCooldown;return 0;}
 function updateSkillButtons(){
  document.querySelectorAll('[data-action^="skill"]').forEach(button=>{
   const n=Number(button.dataset.action.replace('skill','')),item=getSkillSource(n),skill=getSkillDefinition(n),status=button.querySelector('.skill-status'),label=button.querySelector('.skill-label');
@@ -800,10 +911,10 @@ const equippedItems={rightHand:null,leftHand:null,amulet:null};
 // Ícones ilustrados para que os itens da mochila se pareçam com os modelos equipados.
 function appendItemIcon(container,item,fallback=''){
  const id=item?.id;
- if(id==='sword'||id==='shield'||id==='crossbow'){
+ if(id==='sword'||id==='knight-sword'||id==='shield'||id==='crossbow'){
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
-  if(id==='sword'){
+  if(id==='sword'||id==='knight-sword'){
    // Uma única espada diagonal, com lâmina, guarda, empunhadura e pomo claramente separados.
    svg.innerHTML='<path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#e6f0f8" stroke="#596b7b" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#ffffff"/><path d="M20 28 L35 43" stroke="#e2bf70" stroke-width="6" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#6c4a28" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#9a6336" stroke-width="7" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#55351f" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#d6b16a" stroke="#68451f" stroke-width="1.5"/>';
   }else if(id==='shield'){
@@ -817,7 +928,7 @@ function appendItemIcon(container,item,fallback=''){
 }
 function renderEquipment(){
  // Armas e escudo só aparecem nas mãos quando estão equipados.
- swordGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.id==='sword';
+ swordGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.weaponClass==='melee';
  crossbowGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.id==='crossbow';
  quiverGroup.visible=crossbowGroup.visible;
  shieldGroup.visible=!!equippedItems.leftHand && equippedItems.leftHand.id==='shield';
@@ -846,7 +957,7 @@ function renderInventory(){
    element.appendChild(slot);
   }
  };
- renderSlots(playerInventoryEl,playerItems,'player');renderSlots(chestInventoryEl,chestItems,'chest');renderEquipment();
+ renderSlots(playerInventoryEl,playerItems,'player');renderSlots(chestInventoryEl,activeStorageMode==='bag'?hiddenBagItems:chestItems,activeStorageMode==='bag'?'bag':'chest');renderEquipment();
 }
 document.addEventListener('pointermove',e=>{
  if(!dragState)return;
@@ -860,7 +971,7 @@ document.addEventListener('pointerup',e=>{
  if(!drag.active)return;
  suppressInventoryClickUntil=Date.now()+450;
  const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.inventorySlot,.equipmentSlot');if(!target)return;
- const sourceItems=drag.source==='player'?playerItems:drag.source==='chest'?chestItems:null;
+ const sourceItems=drag.source==='player'?playerItems:drag.source==='chest'?chestItems:drag.source==='bag'?hiddenBagItems:null;
  if(target.classList.contains('equipmentSlot')){
   const key=target.dataset.equipSlot,definition=equipmentSlots[key];
   if(!definition||!itemFitsEquipmentSlot(drag.item,key))return;
@@ -910,7 +1021,7 @@ document.addEventListener('pointerup',e=>{
   }
   renderInventory();return;
  }
- const targetSource=target.dataset.source,targetIndex=Number(target.dataset.index),targetItems=targetSource==='player'?playerItems:chestItems;
+ const targetSource=target.dataset.source,targetIndex=Number(target.dataset.index),targetItems=targetSource==='player'?playerItems:targetSource==='bag'?hiddenBagItems:chestItems;
  if(!targetItems)return;
  if(drag.source==='equipment'){
   const key=drag.sourceIndex;
@@ -925,31 +1036,54 @@ document.addEventListener('pointerup',e=>{
  if(transferOrMove(sourceItems,drag.sourceIndex,targetItems,targetIndex)){renderInventory();}
 });
 function openInventory(mode='chest'){
- attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryTitle').textContent=mode==='chest'?'📦 BAÚ E MOCHILA':'🎒 MOCHILA';document.querySelector('#tabBackpack').classList.toggle('active',mode!=='attributes');document.querySelector('#tabAttributes').classList.remove('active');
+ activeStorageMode=mode==='bag'?'bag':'chest';
+ document.querySelector('#journalPanel').style.display='none';document.querySelector('#tabJournal').classList.remove('active');
+ attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#tabBackpack').classList.toggle('active',mode!=='attributes');document.querySelector('#tabAttributes').classList.remove('active');
  renderInventory();
- const showChest=mode==='chest';
- document.querySelector('#inventoryPanels').classList.toggle('chestMode',showChest);
- chestInventoryPanel.style.display=showChest?'':'none';
- document.querySelector('#characterEquipmentPanel').style.display=showChest?'none':'flex';
- document.querySelector('#playerInventoryPanel').querySelector('h3').textContent=showChest?'🧍 INVENTÁRIO DO PERSONAGEM':'🎒 MOCHILA';
- document.querySelector('#inventoryTitle').textContent=showChest?'🎒 INVENTÁRIOS':'🎒 MOCHILA';
+ const showStorage=mode==='chest'||mode==='bag';
+ document.querySelector('#inventoryPanels').classList.toggle('chestMode',showStorage);
+ chestInventoryPanel.style.display=showStorage?'':'none';
+ document.querySelector('#characterEquipmentPanel').style.display=showStorage?'none':'flex';
+ document.querySelector('#playerInventoryPanel').querySelector('h3').textContent=showStorage?'🧍 INVENTÁRIO DO PERSONAGEM':'🎒 MOCHILA';
+ chestInventoryPanel.querySelector('h3').textContent=mode==='bag'?'🎒 INVENTÁRIO DA BOLSA':'📦 INVENTÁRIO DO BAÚ';
+ document.querySelector('#inventoryTitle').textContent=mode==='bag'?'🎒 BOLSA E MOCHILA':showStorage?'🎒 BAÚ E MOCHILA':'🎒 MOCHILA';
  document.querySelector('#inventoryHint').textContent='';
  showItemDetails(null);
- inventoryOverlay.classList.add('open');attributesOverlay.classList.remove('open');openChestBtn.classList.remove('visible');
+ inventoryOverlay.classList.add('open');attributesOverlay.classList.remove('open');openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');
 }
 function closeInventory(){inventoryOverlay.classList.remove('open');attributesOverlay.classList.remove('open');}
 openChestBtn.addEventListener('click',()=>{
- chestOpened=true;
- openChestBtn.classList.remove('visible');
- openInventory('chest');
+ chestOpened=true;openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');openInventory('chest');
 });
+openBagBtn.addEventListener('click',()=>{openBagBtn.classList.remove('visible');openChestBtn.classList.remove('visible');openInventory('bag');});
 const useLeverBtn=document.querySelector('#useLeverBtn');
 const tutorialOverlay=document.querySelector('#tutorialOverlay');
 const spawnCountdownEl=document.querySelector('#spawnCountdown');
 let spawnCountdown=0,slimeSpawned=false,countdownWave=1,wave2Started=false,wave3Started=false;
 let currentWave=0;
 const waveHud=document.querySelector('#waveHud');
-function setWave(number){currentWave=number;const labels={1:'Orda 1: Slime rosa',2:'Orda 2: Slimes amarelos',3:'Orda 3: Slimes verdes',4:'Orda 4: Slimes azuis'};waveHud.textContent=labels[currentWave]||`Orda ${currentWave}`;}
+const waveInfo={1:{label:'Orda 1',name:'Slime rosa',total:1},2:{label:'Orda 2',name:'Slime amarelo',total:3},3:{label:'Orda 3',name:'Slime verde',total:3},4:{label:'Orda 4',name:'Slime azul',total:3},5:{label:'Orda 5',name:'Criaturas',total:0}};
+function updateWaveHudProgress(){
+ const markerEl=document.querySelector('#waveSlimeMarkers');
+ const speciesByWave={
+  1:{label:'Slime rosa',emoji:'🟣',variants:['pink']},
+  2:{label:'Slime amarelo',emoji:'🟡',variants:['yellow']},
+  3:{label:'Slime verde',emoji:'🟢',variants:['green','acid']},
+  4:{label:'Slime azul',emoji:'🔵',variants:['blue']}
+ };
+ // Conta somente criaturas reais criadas para a orda atual; derrotadas permanecem no array.
+ const spec=speciesByWave[currentWave];
+ if(spec){
+  const matching=creatures.filter(c=>c.waveNumber===currentWave && spec.variants.includes(String(c.variant||'').toLowerCase()));
+  const defeated=matching.filter(c=>!c.alive).length;
+  const total=matching.length;
+  markerEl.innerHTML=total?`<span>${spec.emoji} ${defeated}/${total} ${spec.label.toLowerCase()}</span>`:'';
+ }else{ markerEl.innerHTML=''; }
+ if(!currentWave){waveHud.innerHTML='<span>Orda 0</span>';return;}
+ const info=waveInfo[currentWave]||{label:`Orda ${currentWave}`,name:'Criaturas',total:0};
+ waveHud.innerHTML=`<span>${info.label}</span>`;
+}
+function setWave(number){currentWave=number;updateWaveHudProgress();}
 useLeverBtn.addEventListener('click',()=>{
  if(leverActivated||leverPulling)return;
  // Só permite iniciar o combate quando houver uma arma equipada na mão direita.
@@ -1047,7 +1181,7 @@ for(let i=0;i<7;i++){
  block.rotation.z=-(a-Math.PI/2)*.72;
 }
 // Alavanca de pedra e bronze instalada no piso superior do pedestal, à frente do arco.
-const leverBase=new THREE.Group();leverBase.position.set(0,pedestal.top,-4.85);scene.add(leverBase);
+const leverBase=new THREE.Group();leverBase.position.set(1.45,pedestal.top,-4.85);scene.add(leverBase);
 const leverBaseMat=mat(0x5a625f),leverBronze=mat(0x9a6b2f),leverSteel=mat(0x454d50),leverGripMat=mat(0x593b25);
 function leverPart(parent,geo,material,x,y,z){const mesh=new THREE.Mesh(geo,material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;}
 leverPart(leverBase,new THREE.CylinderGeometry(.34,.40,.12,10),leverBaseMat,0,.06,0);
@@ -1152,6 +1286,9 @@ function updateAcidProjectiles(dt){
  for(let i=acidProjectiles.length-1;i>=0;i--){const p=acidProjectiles[i];p.life-=dt;p.group.position.addScaledVector(p.direction,p.speed*dt);p.group.rotation.x+=dt*4;p.group.rotation.y+=dt*3;
   const withinVeil=!!defenseVeil&&Math.hypot(p.group.position.x-hero.position.x,p.group.position.z-hero.position.z)<=defenseVeil.radius+.22&&p.group.position.y>=hero.position.y-.05&&p.group.position.y<=hero.position.y+2.05;
   if(withinVeil){scene.remove(p.group);p.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});acidProjectiles.splice(i,1);continue;}
+  const blockedByTree=treeColliders.some(t=>Math.hypot(p.group.position.x-t.x,p.group.position.z-t.z)<t.projectileRadius&&p.group.position.y>=.15&&p.group.position.y<=t.top);
+  const blockedByRock=coverRockColliders.some(r=>Math.hypot(p.group.position.x-r.x,p.group.position.z-r.z)<r.projectileRadius&&p.group.position.y>=.12&&p.group.position.y<=r.top+.35);
+  if(blockedByTree||blockedByRock){scene.remove(p.group);p.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});acidProjectiles.splice(i,1);continue;}
   const hit=Math.hypot(p.group.position.x-hero.position.x,p.group.position.z-hero.position.z)<.72&&Math.abs(p.group.position.y-(hero.position.y+.8))<1.15;
   if(hit){const defending=actions.defend&&equippedItems.leftHand&&equippedItems.leftHand.id==='shield';const dealt=defending?Math.ceil(p.damage*.35):p.damage;applyPlayerDamage(dealt,defending,'A esfera de ácido');if(currentResources.health<=0)triggerPlayerDeath();}
   if(hit||p.life<=0||Math.abs(p.group.position.x)>36||Math.abs(p.group.position.z)>36){scene.remove(p.group);p.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});acidProjectiles.splice(i,1);}
@@ -1160,12 +1297,13 @@ function updateAcidProjectiles(dt){
 function creatureCanOccupy(c,x,z){
  // O herói é um corpo sólido: a criatura não pode atravessá-lo quando estão no mesmo nível.
  if(Math.abs(c.root.position.y-hero.position.y)<.62 && Math.hypot(x-hero.position.x,z-hero.position.z)<c.radius+.34)return false;
- if(x < -31.5+c.radius || x > 31.5-c.radius || z < -31.5+c.radius || z > 31.5-c.radius)return false;
+ if(x < -33.98+c.radius || x > 33.98-c.radius || z < -33.98+c.radius || z > 33.98-c.radius)return false;
  for(const r of rockColliders){if(Math.hypot(x-r.x,z-r.z)<r.r+c.radius && c.root.position.y<r.top-.05)return false;}
+ for(const t of treeColliders){if(Math.hypot(x-t.x,z-t.z)<t.r+c.radius && c.root.position.y<t.top-.05)return false;}
  for(const a of archColliders){if(Math.hypot(x-a.x,z-a.z)<a.r+c.radius && c.root.position.y<a.top-.05)return false;}
  // Baú e alavanca são objetos sólidos para criaturas.
  if(Math.hypot(x-chestX,z-chestZ)<.92+c.radius)return false;
- if(Math.hypot(x,z-(-4.85))<.48+c.radius && c.root.position.y>pedestal.top-.1)return false;
+ if(Math.hypot(x-1.45,z-(-4.85))<.48+c.radius && c.root.position.y>pedestal.top-.1)return false;
  // A borda vertical do pedestal bloqueia criaturas que ainda estão no chão.
  if(c.root.position.y<.55 && Math.abs(x-pedestal.x)<pedestal.halfX+c.radius && Math.abs(z-pedestal.z)<pedestal.halfZ+c.radius)return false;
  for(const other of creatures){if(other===c||!other.alive)continue;const separation=(c.variant==='yellow'&&other.variant==='yellow')?2.7:c.radius+other.radius;if(Math.hypot(x-other.root.position.x,z-other.root.position.z)<separation)return false;}
@@ -1267,7 +1405,7 @@ function updateCreatures(dt){
    if(charging){c.attackTimer-=dt;c.mouth.scale.y=.18+Math.sin((.42-c.attackTimer)*Math.PI/.42)*.65;c.mouth.scale.x=.78+Math.sin((.42-c.attackTimer)*Math.PI/.42)*.22;c.mouthGlow.material.opacity=.35+.45*Math.sin((.42-c.attackTimer)*Math.PI/.42);if(c.damageFlashTimer<=0)c.body.material.color.setHex(0x65ff36);
     if(c.attackTimer<=0){fireAcid(c);c.attackState='slide';c.mouth.scale.set(.78,.18,.22);c.mouthGlow.material.opacity=0;c.attackCooldown=3;}
    }else{c.mouth.scale.set(.78,.18,.22);c.mouthGlow.material.opacity=0;if(c.damageFlashTimer<=0)c.body.material.color.copy(c.bodyBaseColor);if(c.attackCooldown<=0){c.attackState='acidCharge';c.attackTimer=.42;}}
-   c.healthGroup.quaternion.copy(camera.quaternion);c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.595;continue;
+   c.healthGroup.quaternion.copy(c.root.quaternion).invert().multiply(camera.quaternion);c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.595;continue;
   }
   // Define o piso sob a criatura (gramado, escadas ou topo do pedestal).
   let supportY=0;
@@ -1353,7 +1491,7 @@ function updateCreatures(dt){
   const bob=c.attackState==='chase'?Math.sin(c.phase)*.035:0;
   if(c.attackState==='chase'){c.body.position.y=bob;c.body.scale.y=1+Math.sin(c.phase*1.4)*.025;}
   else if(c.attackState!=='windup'&&c.attackState!=='leap'&&c.attackState!=='evadeLeap'&&c.attackState!=='evadeSlide'){c.body.position.y=0;c.body.scale.lerp(new THREE.Vector3(1,1,1),1-Math.exp(-9*dt));}
-  c.healthGroup.quaternion.copy(camera.quaternion);
+  c.healthGroup.quaternion.copy(c.root.quaternion).invert().multiply(camera.quaternion);
   c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.34;
  }
 }
@@ -1459,7 +1597,7 @@ function finishWindSlashAim(cancel=false){
 let swordHitThisSwing=false;
 function shootWindSlash(skill){
  const item=equippedItems.rightHand;
- if(!item||item.id!=='sword'||!skill||skill.effect!=='windSlash')return false;
+ if(!item||item.weaponClass!=='melee'||!skill||skill.effect!=='windSlash')return false;
  const slash=new THREE.Group();
  // Nova silhueta: uma lâmina de vento larga e luminosa, com duas curvas de energia e partículas.
  const shape=new THREE.Shape();
@@ -1487,7 +1625,7 @@ function shootWindSlash(skill){
 }
 function beginWindSlash(skill,direction=null){
  const item=equippedItems.rightHand;
- if(!item||item.id!=='sword'||!skill||skill.effect!=='windSlash')return false;
+ if(!item||item.weaponClass!=='melee'||!skill||skill.effect!=='windSlash')return false;
  if(windSlashCooldown>0||windSlashCastTime>0){say('O Disparo Cortante ainda está recarregando!');return false;}
  windSlashCooldown=15;
  windSlashCastTime=.08;
@@ -1504,7 +1642,7 @@ let swordSpin=null;
 let swordSpinCooldown=0;
 function startSwordSpin(skill){
  const item=equippedItems.rightHand;
- if(!item||item.id!=='sword'||!skill||skill.effect!=='swordSpin')return false;
+ if(!item||item.weaponClass!=='melee'||!skill||skill.effect!=='swordSpin')return false;
  if(swordSpin){say('Você já está girando com a espada!');return false;}
  if(swordSpinCooldown>0){say('O Giro da Espada ainda está recarregando!');return false;}
  const effect=new THREE.Group();
@@ -1661,7 +1799,7 @@ document.querySelectorAll('[data-action]').forEach(b=>{
    if(currentResources.stamina<getSkillStaminaCost(1,skill)){b.classList.remove('active');say(`Estamina insuficiente para ${skill.name}.`);return;}
    if(!beginArrowRainAim(skill)){b.classList.remove('active');return;}return;
   }
-  if(a==='skill2'&&equippedItems.rightHand?.id==='sword'&&getSkillDefinition(2)?.effect==='windSlash'){
+  if(a==='skill2'&&equippedItems.rightHand?.weaponClass==='melee'&&getSkillDefinition(2)?.effect==='windSlash'){
    if(b.setPointerCapture&&e.pointerId!==undefined){try{b.setPointerCapture(e.pointerId);}catch(_){}}
    actions[a]=false;const skill=getSkillDefinition(2);
    if(!skill||getSkillCooldown(2)>0){b.classList.remove('active');if(skill)say(`${skill.name}: aguarde ${getSkillCooldown(2).toFixed(1)}s para usar novamente.`);return;}
@@ -1760,7 +1898,7 @@ function animate(){
  updateSkillButtons();
  if(windSlashCastTime>0){
   windSlashCastTime=Math.max(0,windSlashCastTime-dt);windSlashCastElapsed+=dt;
-  if(windSlashCastTime<=0){const skill=getSkillDefinition(2);if(skill&&equippedItems.rightHand&&equippedItems.rightHand.id==='sword'){shootWindSlash(skill);}}
+  if(windSlashCastTime<=0){const skill=getSkillDefinition(2);if(skill&&equippedItems.rightHand&&equippedItems.rightHand.weaponClass==='melee'){shootWindSlash(skill);}}
  }
  if(swordSpin){
   swordSpin.elapsed+=dt;swordSpin.tick+=dt;
@@ -1865,8 +2003,8 @@ function animate(){
  let vz=(-mx*Math.sin(cameraYaw)-forward*Math.cos(cameraYaw))*speed;
  if(heroKnockbackTimer>0){vx+=heroKnockbackX*heroKnockbackPower;vz+=heroKnockbackZ*heroKnockbackPower;heroKnockbackTimer=Math.max(0,heroKnockbackTimer-dt);heroKnockbackPower*=Math.exp(-7*dt);}
  // Colisão horizontal com todas as pedras: bloqueia a lateral, mas permite passar por cima no salto.
- const nextX=THREE.MathUtils.clamp(hero.position.x+vx*dt,-31.5,31.5);
- const nextZ=THREE.MathUtils.clamp(hero.position.z+vz*dt,-31.5,31.5);
+ const nextX=THREE.MathUtils.clamp(hero.position.x+vx*dt,-33.98,33.98);
+ const nextZ=THREE.MathUtils.clamp(hero.position.z+vz*dt,-33.98,33.98);
  let resolvedX=nextX,resolvedZ=nextZ;
  for(const rock of rockColliders){
   if(hero.position.y>=rock.top-.10)continue; // já está sobre a pedra ou acima dela
@@ -1877,6 +2015,12 @@ function animate(){
    else {dx/=dist;dz/=dist;}
    resolvedX=rock.x+dx*minDist;resolvedZ=rock.z+dz*minDist;
   }
+ }
+ // Troncos largos bloqueiam fisicamente o movimento do personagem.
+ for(const tree of treeColliders){
+  if(hero.position.y>=tree.top-.10)continue;
+  let dx=resolvedX-tree.x,dz=resolvedZ-tree.z;const dist=Math.hypot(dx,dz),minDist=tree.r+.29;
+  if(dist<minDist){if(dist<.001){dx=hero.position.x-tree.x;dz=hero.position.z-tree.z;const d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;}else{dx/=dist;dz/=dist;}resolvedX=tree.x+dx*minDist;resolvedZ=tree.z+dz*minDist;}
  }
  // Physical sides for the stone arch pillars.
  for(const solid of archColliders){
@@ -1919,8 +2063,8 @@ function animate(){
    resolvedX=c.root.position.x+dx*minDist;resolvedZ=c.root.position.z+dz*minDist;
   }
  }
- hero.position.x=THREE.MathUtils.clamp(resolvedX,-31.5,31.5);
- hero.position.z=THREE.MathUtils.clamp(resolvedZ,-31.5,31.5);
+ hero.position.x=THREE.MathUtils.clamp(resolvedX,-33.98,33.98);
+ hero.position.z=THREE.MathUtils.clamp(resolvedZ,-33.98,33.98);
  if(len>.08&&!swordSpin)hero.rotation.y=Math.atan2(vx,vz);
  const previousY=hero.position.y;
  if(jumpSquat>0){
@@ -2069,7 +2213,7 @@ function animate(){
    }
  }
  // Durante a mira, espada erguida; ao soltar, a animação conclui em poucos frames.
- if((windSlashAim||windSlashCastTime>0)&&equippedItems.rightHand&&equippedItems.rightHand.id==='sword'){
+ if((windSlashAim||windSlashCastTime>0)&&equippedItems.rightHand&&equippedItems.rightHand.weaponClass==='melee'){
   const aiming=!!windSlashAim;
   const t=aiming?0:THREE.MathUtils.clamp(windSlashCastElapsed/.08,0,1);
   const release=t*t*(3-2*t);
@@ -2095,7 +2239,7 @@ function animate(){
   swordAuraLight.intensity=aiming?1.2+4.2*glow:0;
   blade.material.color.setRGB(.10+.12*glow,.48+.42*glow,.82+.18*glow);
   tip.material.color.setRGB(.28+.32*glow,.72+.25*glow,1);
- }else if(swordSpin&&equippedItems.rightHand&&equippedItems.rightHand.id==='sword'){
+ }else if(swordSpin&&equippedItems.rightHand&&equippedItems.rightHand.weaponClass==='melee'){
   swordAuraBlade.visible=false;swordAuraTip.visible=false;swordAuraLight.intensity=0;
   // Empunhadura de duas mãos: ambos os braços projetados à frente e a mão esquerda próxima ao punho.
   armR.rotation.set(-1.02,0,-.10);
@@ -2158,6 +2302,7 @@ function animate(){
     // Surge sobre o piso do pedestal, perto da alavanca, com espaço para se mover.
     setWave(1);
     const pinkSlime=createSlime(0,8,0,'pink',1);
+    updateWaveHudProgress();
     countdownWave=0;
     say('Orda 1: Slime rosa');
    }else if(countdownWave===2){
@@ -2165,12 +2310,14 @@ function animate(){
     createSlime(-15,-7,0,'yellow',2);
     createSlime(15,-7,0,'yellow',2);
     createSlime(0,8,0,'yellow',2);
+    updateWaveHudProgress();
     say('Orda 2: Slimes amarelos');
     countdownWave=0;
    }
    else if(countdownWave===3){
     setWave(3);
     createAcidSlime(-15,-7,0,3);createAcidSlime(15,-7,0,3);createAcidSlime(0,8,0,3);
+    updateWaveHudProgress();
     say('Orda 3: Slimes verdes');countdownWave=0;
    }
   }
@@ -2179,16 +2326,16 @@ function animate(){
  if(hero.userData.damageFlashTimer>0){hero.userData.damageFlashTimer=Math.max(0,hero.userData.damageFlashTimer-dt);hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color){if(!o.userData.damageBaseColor)o.userData.damageBaseColor=o.material.color.clone();o.material.color.copy(o.userData.damageBaseColor).lerp(new THREE.Color(0xff1717),.55);}});}else{hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&o.userData.damageBaseColor)o.material.color.copy(o.userData.damageBaseColor);});}
  updateAcidProjectiles(dt);
  updateLootDrops(dt);
- // Interação contextual com o mago guia; balão intencionalmente sem fala por enquanto.
+ // Interação contextual com o mago guia e seu balão de diálogo.
  const wizardDx=wizard.position.x-hero.position.x,wizardDz=wizard.position.z-hero.position.z;
  const wizardDistance=Math.hypot(wizardDx,wizardDz);
  const wizardFacingDot=wizardDistance>.001?(Math.sin(hero.rotation.y)*wizardDx+Math.cos(hero.rotation.y)*wizardDz)/wizardDistance:1;
  const wizardCanInteract=wizardDistance<3.25&&wizardFacingDot>.2&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
  wizardInteractBtn.classList.toggle('visible',wizardCanInteract);
- if(!wizardCanInteract&&wizardSpeechOpen){wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');}
+ if(wizardSpeechOpen&&(wizardDistance>4.8||inventoryOverlay.classList.contains('open')||attributesOverlay.classList.contains('open')||tutorialOverlay.classList.contains('open')||playerDead)){wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');}
 
  // Opção contextual para virar a alavanca quando o personagem se aproxima e olha para ela.
- const leverWorld=new THREE.Vector3(0,pedestal.top,-4.85);
+ const leverWorld=new THREE.Vector3(1.45,pedestal.top,-4.85);
  const leverDx=leverWorld.x-hero.position.x,leverDz=leverWorld.z-hero.position.z;
  const leverDistance=Math.hypot(leverDx,leverDz);
  const leverFacingDot=leverDistance>.001?(Math.sin(hero.rotation.y)*leverDx+Math.cos(hero.rotation.y)*leverDz)/leverDistance:1;
@@ -2203,6 +2350,8 @@ function animate(){
  const chestInFront=chestDistance<3.7 && facingDot>.62 && !inventoryOverlay.classList.contains('open') && !attributesOverlay.classList.contains('open') && !tutorialOverlay.classList.contains('open');
  openChestBtn.textContent=chestOpened?'📦 INVENTÁRIO DO BAÚ':'📦 ABRIR BAÚ';
  openChestBtn.classList.toggle('visible',chestInFront);
+ const bagDx=hiddenBagX-hero.position.x,bagDz=hiddenBagZ-hero.position.z;const bagDistance=Math.hypot(bagDx,bagDz);const bagFacingDot=bagDistance>.001?(facingX*bagDx+facingZ*bagDz)/bagDistance:1;const bagInFront=bagDistance<2.9&&bagFacingDot>.05&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
+ openBagBtn.classList.toggle('visible',bagInFront);
  chestLid.rotation.x=THREE.MathUtils.lerp(chestLid.rotation.x,chestOpened?-1.12:0,1-Math.exp(-7*dt));
  camTarget.set(hero.position.x,1.1,hero.position.z);
  const camDistance=8.5, camHorizontal=Math.cos(cameraPitch)*camDistance;
@@ -2214,6 +2363,119 @@ function animate(){
  camera.position.lerp(desired,1-Math.exp(-5*dt));camera.lookAt(camTarget);
  renderer.render(scene,camera);
 }
+// Diário: salvamento MANUAL, sem gravar progresso automaticamente.
+const JOURNAL_SAVE_KEY='umbraRpg_manual_save_v1';
+const journalPanel=document.querySelector('#journalPanel');
+const journalStatus=document.querySelector('#journalStatus');
+const loadGameBtn=document.querySelector('#loadGameBtn');
+function openJournal(){
+ attributesOverlay.classList.remove('open');
+ document.querySelector('#inventoryPanels').style.display='none';
+ document.querySelector('#itemDetails').style.display='none';
+ document.querySelector('#inventoryHint').style.display='none';
+ journalPanel.style.display='flex';
+ document.querySelector('#inventoryTitle').textContent='📖 DIÁRIO';
+ document.querySelector('#tabBackpack').classList.remove('active');
+ document.querySelector('#tabAttributes').classList.remove('active');
+ document.querySelector('#tabJournal').classList.add('active');
+ inventoryOverlay.classList.add('open');openChestBtn.classList.remove('visible');
+ refreshJournalStatus();
+}
+function refreshJournalStatus(){
+ let saved=null;
+ try{saved=JSON.parse(localStorage.getItem(JOURNAL_SAVE_KEY)||'null')}catch(e){}
+ if(!saved){journalStatus.textContent='Nenhum salvamento encontrado neste navegador.\nUse “Salvar jogo” para registrar sua jornada.';loadGameBtn.disabled=true;return;}
+ const date=saved.savedAt?new Date(saved.savedAt).toLocaleString('pt-BR'):'Data desconhecida';
+ const level=saved.experienceState?.level??1;
+ const x=Number(saved.hero?.x||0),z=Number(saved.hero?.z||0);
+ journalStatus.textContent=`Último salvamento: ${date}\nNível ${level} · Posição: ${x.toFixed(1)}, ${z.toFixed(1)}\nO progresso salvo está pronto para carregar.`;
+ loadGameBtn.disabled=false;
+}
+function cloneSaveValue(value){return JSON.parse(JSON.stringify(value));}
+function saveGameManually(){
+ if(playerDead){say('Você não pode salvar durante a morte. Volte à vida e tente novamente.');return;}
+ try{
+  const data={
+   format:'UmbraRPGSave',version:1,savedAt:new Date().toISOString(),
+   hero:{x:hero.position.x,y:hero.position.y,z:hero.position.z,rotationX:hero.rotation.x,rotationY:hero.rotation.y,rotationZ:hero.rotation.z,vy,jumping,jumpSquat},
+   camera:{yaw:cameraYaw,pitch:cameraPitch},
+   attributeState:cloneSaveValue(attributeState),currentResources:cloneSaveValue(currentResources),experienceState:cloneSaveValue(experienceState),skillPoints,
+   playerItems:cloneSaveValue(playerItems),chestItems:cloneSaveValue(chestItems),hiddenBagItems:cloneSaveValue(hiddenBagItems),equippedItems:cloneSaveValue(equippedItems),
+   chestOpened,leverActivated,leverPivotAngle:leverPivot.rotation.x,slimeSpawned,countdownWave,wave2Started,wave3Started,currentWave,
+   creatures:creatures.map(c=>({type:c.type,variant:c.variant,waveNumber:c.waveNumber,x:c.root.position.x,y:c.root.position.y,z:c.root.position.z,rotationY:c.root.rotation.y,health:c.health,maxHealth:c.maxHealth,alive:c.alive,phase:c.phase,attackState:c.attackState,attackTimer:c.attackTimer,attackTime:c.attackTime,attackCooldown:c.attackCooldown,slideDir:c.slideDir,slideCenterX:c.slideCenterX,slideCenterZ:c.slideCenterZ,slidePhase:c.slidePhase,groundY:c.groundY})),
+   lootDrops:lootDrops.map(d=>({type:d.type,amount:d.amount,x:d.group.position.x,z:d.group.position.z,groundY:d.groundY}))
+  };
+  localStorage.setItem(JOURNAL_SAVE_KEY,JSON.stringify(data));
+  refreshJournalStatus();
+  journalStatus.textContent='✅ Jogo salvo manualmente!\n'+journalStatus.textContent;
+  say('📖 Jornada registrada no Diário.');
+ }catch(error){
+  console.error('Falha ao salvar Umbra:',error);
+  journalStatus.textContent='Não foi possível salvar. O armazenamento do navegador pode estar cheio ou bloqueado.';
+  say('Não foi possível salvar neste navegador.');
+ }
+}
+function loadGameManually(){
+ let data;
+ try{data=JSON.parse(localStorage.getItem(JOURNAL_SAVE_KEY)||'null')}catch(e){data=null;}
+ if(!data||data.format!=='UmbraRPGSave'||!data.hero){journalStatus.textContent='Nenhum salvamento válido foi encontrado.';return;}
+ try{
+  // Repor os dados do personagem, atributos, inventários e equipamentos.
+  hero.position.set(Number(data.hero.x)||0,Number(data.hero.y)||0,Number(data.hero.z)||0);
+  hero.rotation.set(Number(data.hero.rotationX)||0,Number(data.hero.rotationY)||0,Number(data.hero.rotationZ)||0);
+  vy=Number(data.hero.vy)||0;jumping=!!data.hero.jumping;jumpSquat=Number(data.hero.jumpSquat)||0;
+  if(data.camera){cameraYaw=Number(data.camera.yaw)||0;cameraPitch=THREE.MathUtils.clamp(Number(data.camera.pitch)||.24,-.05,.72);}
+  for(const key of ['health','mana','stamina']){
+   if(data.attributeState&&Number.isFinite(data.attributeState[key]))attributeState[key]=data.attributeState[key];
+   if(data.currentResources&&Number.isFinite(data.currentResources[key]))currentResources[key]=THREE.MathUtils.clamp(data.currentResources[key],0,attributeState[key]);
+  }
+  if(data.experienceState){experienceState.current=Number(data.experienceState.current)||0;experienceState.required=Math.max(100,Number(data.experienceState.required)||100);experienceState.level=Math.max(1,Number(data.experienceState.level)||1);}
+  skillPoints=Math.max(0,Number(data.skillPoints)||0);
+  if(Array.isArray(data.playerItems)){playerItems.fill(null);data.playerItems.slice(0,playerItems.length).forEach((item,i)=>playerItems[i]=item||null);}
+  if(Array.isArray(data.chestItems)){chestItems.fill(null);data.chestItems.slice(0,chestItems.length).forEach((item,i)=>chestItems[i]=item||null);}
+  if(Array.isArray(data.hiddenBagItems)){hiddenBagItems.fill(null);data.hiddenBagItems.slice(0,hiddenBagItems.length).forEach((item,i)=>hiddenBagItems[i]=item||null);}
+  if(data.equippedItems){for(const key of Object.keys(equippedItems))equippedItems[key]=data.equippedItems[key]||null;}
+  chestOpened=!!data.chestOpened;
+  leverActivated=!!data.leverActivated;leverPulling=false;leverPullTime=0;leverPivot.rotation.x=Number(data.leverPivotAngle)||0;
+  slimeSpawned=!!data.slimeSpawned;countdownWave=Number(data.countdownWave)||0;wave2Started=!!data.wave2Started;wave3Started=!!data.wave3Started;
+  currentWave=Number(data.currentWave)||0;if(currentWave>0)setWave(currentWave);else waveHud.innerHTML='<span>Orda - 0</span>';updateWaveHudProgress();
+  spawnCountdown=0;spawnCountdownEl.classList.remove('visible');
+  // Recriar criaturas com a mesma posição, vida e estado vivo/morto registrados.
+  for(const c of creatures){scene.remove(c.root);}
+  creatures.length=0;
+  for(const saved of (Array.isArray(data.creatures)?data.creatures:[])){
+   let c;
+   if(saved.variant==='green')c=createAcidSlime(Number(saved.x)||0,Number(saved.z)||0,Number(saved.groundY)||0,Number(saved.waveNumber)||3);
+   else c=createSlime(Number(saved.x)||0,Number(saved.z)||0,Number(saved.groundY)||0,saved.variant==='yellow'?'yellow':'pink',Number(saved.waveNumber)||1);
+   c.root.position.set(Number(saved.x)||0,Number(saved.y)||0,Number(saved.z)||0);c.root.rotation.y=Number(saved.rotationY)||0;
+   c.health=THREE.MathUtils.clamp(Number(saved.health)||0,0,Number(saved.maxHealth)||c.maxHealth);c.maxHealth=Number(saved.maxHealth)||c.maxHealth;c.alive=!!saved.alive;c.phase=Number(saved.phase)||0;
+   if(saved.attackState)c.attackState=saved.attackState;if(Number.isFinite(saved.attackTimer))c.attackTimer=saved.attackTimer;if(Number.isFinite(saved.attackTime))c.attackTime=saved.attackTime;if(Number.isFinite(saved.attackCooldown))c.attackCooldown=saved.attackCooldown;
+   if(Number.isFinite(saved.slideDir))c.slideDir=saved.slideDir;if(Number.isFinite(saved.slideCenterX))c.slideCenterX=saved.slideCenterX;if(Number.isFinite(saved.slideCenterZ))c.slideCenterZ=saved.slideCenterZ;if(Number.isFinite(saved.slidePhase))c.slidePhase=saved.slidePhase;
+   c.root.visible=c.alive;c.healthGroup.visible=c.alive;c.attackRing&&(c.attackRing.visible=false);if(c.barFill)c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);
+  }
+  // Recriar os orbes de mana que ainda estavam no chão quando o jogador salvou.
+  for(const d of lootDrops){scene.remove(d.group);d.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});}
+  lootDrops.length=0;
+  for(const d of (Array.isArray(data.lootDrops)?data.lootDrops:[])){
+   if(d.type==='mana'){
+    const fake={root:{position:new THREE.Vector3((Number(d.x)||0)-.38,Number(d.groundY)||0,Number(d.z)||0)},groundY:Number(d.groundY)||0};
+    spawnSlimeDrops(fake);const last=lootDrops[lootDrops.length-1];if(last){last.group.position.set(Number(d.x)||0,Number(d.groundY)||0,Number(d.z)||0);last.amount=Number(d.amount)||10;}
+   }
+  }
+  playerDead=false;deathAnimationTime=0;if(deathScreenTimer){clearTimeout(deathScreenTimer);deathScreenTimer=null;}
+  const deathOverlay=document.querySelector('#deathOverlay');if(deathOverlay){deathOverlay.classList.remove('visible','announcing');deathOverlay.style.display='none';deathOverlay.style.background='';deathOverlay.style.pointerEvents='';}
+  actions.attack=false;actions.defend=false;actions.run=false;actions.jump=false;for(const b of document.querySelectorAll('.btn.active'))b.classList.remove('active');
+  updateAttributeHud();renderAttributes();renderInventory();
+  openChestBtn.textContent=chestOpened?'📦 INVENTÁRIO DO BAÚ':'📦 ABRIR BAÚ';
+  journalPanel.style.display='flex';document.querySelector('#inventoryPanels').style.display='none';document.querySelector('#itemDetails').style.display='none';attributesOverlay.classList.remove('open');inventoryOverlay.classList.add('open');
+  refreshJournalStatus();journalStatus.textContent='✅ Salvamento carregado!\n'+journalStatus.textContent;say('📜 Jornada carregada do Diário.');
+ }catch(error){console.error('Falha ao carregar Umbra:',error);journalStatus.textContent='O salvamento existe, mas houve um erro ao restaurá-lo. Consulte o console do navegador.';say('Erro ao carregar o salvamento.');}
+}
+document.querySelector('#tabJournal').addEventListener('click',openJournal);
+document.querySelector('#saveGameBtn').addEventListener('click',saveGameManually);
+document.querySelector('#loadGameBtn').addEventListener('click',loadGameManually);
+refreshJournalStatus();
+
 animate();
 addEventListener('resize',()=>{const size=gameSize();camera.aspect=size.w/size.h;camera.updateProjectionMatrix();renderer.setSize(size.w,size.h,false);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6))});
 // Solicita tela cheia após o primeiro toque (exigência dos navegadores móveis).
