@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Umbra: O Segredo da Torre — v143</title>
+<title>Umbra: O Segredo da Torre — v153</title>
 <style>
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9bc8e8;font-family:system-ui,Arial;touch-action:none}
-  #stage{position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;touch-action:none}
-  #game{display:block;width:100%;height:100%}
-  #hud{position:absolute;inset:0;pointer-events:none;color:white;text-shadow:0 2px 3px #18351e}
+  #stage{position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;touch-action:none;z-index:0;background:#9bc8e8}
+  #game{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:0}
+  #hud{position:absolute;inset:0;z-index:10;pointer-events:none;color:white;text-shadow:0 2px 3px #18351e}
   #mapNameHud{position:absolute;top:10px;left:calc(50% + 55px);transform:translateX(calc(-100% - 8px));z-index:10;padding:5.5px 12.5px;max-width:calc(50% - 125px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(180deg,#18352feF,#10251fe8);border:1px solid #e4d5a688;border-radius:10px;color:#fff2c6;font-size:clamp(9.4px,1.4vw,13.3px);font-weight:900;letter-spacing:.06em;text-align:center;box-shadow:0 3px 12px #0006;text-shadow:0 1px 3px #000}
   #waveHud{position:absolute;top:13px;left:calc(50% + 55px);transform:translateX(8px);z-index:10;padding:6px 9px;min-width:0;max-width:calc(50vw - 165px);display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:7px;white-space:nowrap;background:rgba(10,20,15,.82);border:1px solid #c9b080;border-radius:9px;color:#fff;font-size:clamp(9px,1.22vw,12px);font-weight:900;letter-spacing:.015em;box-shadow:0 2px 8px #0007;text-shadow:0 1px 3px #000;pointer-events:none}
   #waveHud span{display:block;overflow:hidden;text-overflow:ellipsis}
@@ -19,14 +19,14 @@
   #hudQuickActions{position:absolute;top:10px;left:164px;display:flex;gap:7px;pointer-events:auto}
   .hudIconBtn{width:43px;height:43px;border:1px solid #ffffffa8;border-radius:11px;background:#263e34ed;color:#fff;font-size:24px;display:grid;place-items:center;box-shadow:0 3px 0 #07130eaa,0 3px 8px #0005;touch-action:manipulation;text-shadow:0 1px 2px #000}
   .hudIconBtn:active{transform:translateY(2px);filter:brightness(1.2)}
-  #fullscreenBtn{position:absolute;top:12px;right:12px;z-index:20;pointer-events:auto;visibility:visible;opacity:1;width:46px;height:46px;display:grid;place-items:center;border:2px solid #ffffff;border-radius:50%;padding:0;background:#263746f5;color:#fff;font-size:30px;line-height:1;font-weight:900;text-shadow:0 1px 3px #000;box-shadow:0 3px 12px #000c;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+  #fullscreenBtn{position:absolute;top:12px;right:12px;z-index:40;pointer-events:auto;visibility:visible;opacity:1;width:46px;height:46px;display:grid;place-items:center;border:2px solid #ffffff;border-radius:50%;padding:0;background:#263746f5;color:#fff;font-size:30px;line-height:1;font-weight:900;text-shadow:0 1px 3px #000;box-shadow:0 3px 12px #000c;touch-action:manipulation;user-select:none;-webkit-user-select:none}
   #fullscreenBtn:active{filter:brightness(1.2);transform:scale(.95)}
   .stat{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px;font-size:10px;font-weight:800}
   .stat-value{font-variant-numeric:tabular-nums;font-size:10px}
   .bar{grid-column:1 / -1;height:5px;border-radius:8px;background:#ffffff35;overflow:hidden;box-shadow:inset 0 1px 2px #0005}
   .bar-fill{height:100%;width:100%;border-radius:8px}
   #healthFill{background:#e74646}#manaFill{background:#3d9bff}#staminaFill{background:#4cdb72}#expFill{background:#e6b94f}
-  .controls{position:absolute;bottom:22px;left:0;right:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;gap:10px}
+  .controls{position:absolute;z-index:30;bottom:22px;left:0;right:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px;gap:10px}
   #stickArea{pointer-events:auto;position:relative;width:132px;height:132px;flex:0 0 132px;border-radius:50%;background:#132b2d55;border:2px solid #ffffff65;box-shadow:inset 0 0 0 8px #ffffff12}
   #stick{position:absolute;width:54px;height:54px;left:37px;top:37px;border-radius:50%;background:#f4f6f2d9;border:2px solid #fff;box-shadow:0 3px 8px #0005}
   #buttons{pointer-events:auto;display:grid;grid-template-columns:repeat(2, minmax(58px,76px));grid-template-rows:repeat(4,48px);gap:6px;align-items:center;justify-items:center}
@@ -41,7 +41,7 @@
   .btn.skill.skill-unavailable .skill-status{color:#d2d5d8}
   .btn.skill.skill-locked{background:#30343ad9!important;filter:grayscale(1);color:#aeb4bb}
   .btn.skill:active{background:#6e7fe9}
-  #message{position:absolute;left:50%;top:23%;transform:translateX(-50%);padding:10px 15px;border-radius:12px;background:#18351edb;font-weight:800;opacity:0;transition:opacity .2s;white-space:nowrap}
+  #message{position:absolute;left:50%;top:54px;transform:translateX(-50%);padding:4px 8px;border-radius:8px;background:#18351edb;font-size:clamp(9px,1.3vw,12px);font-weight:800;opacity:0;transition:opacity .2s;white-space:nowrap;max-width:70vw;z-index:24}
   #message.show{opacity:1}
   #message.skill-message{top:11%;padding:4px 10px;background:linear-gradient(100deg,#10142ba8,#35205bb8,#111b38a8);border:1px solid #a9eaff99;border-radius:10px;color:#f4fbff;font-family:Papyrus,"Copperplate Gothic Light",fantasy,cursive;font-size:clamp(14px,3vw,23px);font-weight:1000;font-style:italic;letter-spacing:1px;text-transform:uppercase;text-shadow:0 0 4px #fff,0 0 9px #6beaff,0 0 15px #7b4dff,1px 2px 2px #09051b;box-shadow:0 0 8px #6a54ff66,inset 0 0 8px #6beaff18;max-width:68vw;white-space:normal;text-align:center;pointer-events:none}
   #message.skill-message.show{animation:spellNamePop .32s ease-out}
@@ -75,7 +75,7 @@
   #tutorialCard h2{margin:0 0 10px;color:#f4d69b;font-size:22px}
   #tutorialCard p,#tutorialCard li{font-size:14px;line-height:1.5}
   #tutorialClose{display:block;margin:16px 0 0 auto;border:1px solid #f2d7a3;border-radius:10px;padding:10px 16px;background:#5a713a;color:white;font-weight:900;touch-action:manipulation}
-  #inventoryOverlay{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:clamp(8px,2.5vw,24px);box-sizing:border-box;background:#07110ee8;pointer-events:auto;text-shadow:none;color:#f8f1df}
+  #inventoryOverlay{position:absolute;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:clamp(8px,2.5vw,24px);box-sizing:border-box;background:#07110ee8;pointer-events:auto;text-shadow:none;color:#f8f1df}
   #inventoryOverlay.open{display:flex}
   #inventoryWindow{width:min(100%,1040px);max-height:94dvh;display:flex;flex-direction:column;gap:12px;padding:clamp(10px,2vw,18px);box-sizing:border-box;border:2px solid #b58a4d;border-radius:16px;background:linear-gradient(145deg,#27382c,#17231c 65%,#33271b);box-shadow:0 12px 45px #000b;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
   #inventoryTop{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto}
@@ -113,7 +113,7 @@
   #inventoryPanels.chestMode .inventorySlot .itemIcon{font-size:clamp(14px,2.2vw,21px)}
   #inventoryPanels.chestMode .inventorySlot .slotNumber{top:1px;left:2px;font-size:7px}
   #characterFigure{width:100%;height:clamp(125px,22vh,210px);display:block;border-radius:10px;background:radial-gradient(ellipse at 50% 40%,#52654d,#17251e 72%);border:1px solid #c9b08066}
-  #equipmentSlots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  #equipmentSlots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
   .equipmentSlot{min-width:0;min-height:74px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px dashed #d6b36c99;border-radius:8px;background:#0b1511a8;color:#f8f1df;font-size:10px;font-weight:800;text-align:center;touch-action:none;user-select:none;-webkit-user-select:none}
   .equipmentSlot .equipIcon{font-size:23px;line-height:1.1;filter:grayscale(1);opacity:.48}
   .equipmentSlot.equipped .equipIcon{filter:none;opacity:1}
@@ -127,12 +127,12 @@
   .inventorySlot.level-locked::after{content:"";position:absolute;inset:0;background:rgba(235,25,32,.48);pointer-events:none;z-index:3}.inventorySlot.level-locked::before{content:"🔒";position:absolute;right:3px;bottom:2px;font-size:12px;z-index:4;filter:drop-shadow(0 1px 2px #000)}
   .inventorySlot.dragging{opacity:.38;outline:2px dashed #f4d69b;outline-offset:-3px}
   .inventorySlot.dropTarget{border-color:#fff0a6;background:linear-gradient(145deg,#7b8746,#4c5d2d);box-shadow:inset 0 0 0 2px #fff0a655}
-  #itemDetails{display:none;flex:0 0 auto;min-height:78px;gap:6px;padding:12px 44px 12px 14px;border:1px solid #d6b36c88;border-radius:10px;background:#0b1511f5;color:#f8f1df;box-sizing:border-box;overflow-wrap:anywhere;position:relative;z-index:2}
+  #itemDetails{display:none;flex:0 0 auto;min-height:78px;gap:6px;padding:12px 44px 12px 14px;border:1px solid #d6b36c88;border-radius:10px;background:#07110ffb;color:#f8f1df;box-sizing:border-box;overflow-wrap:anywhere;position:relative;z-index:20;isolation:isolate}
   #itemDetailsClose{position:absolute;right:8px;top:8px;width:30px;height:30px;border:1px solid #e5d3b4;border-radius:8px;background:#6b392b;color:#fff;font-size:18px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
   #itemDetailsClose:active{filter:brightness(1.25);transform:scale(.96)}
   #itemDetails.visible{display:grid}
   #itemDetailsName{font-size:15px;font-weight:950;color:#f4d69b}
-  #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}#itemQualityLabel{font-size:12px;font-weight:900}
+  #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}#itemQualityLabel{display:none;font-size:12px;font-weight:900}
   #itemDetailsDescription{font-size:12px;line-height:1.45;color:#e6dfcf;white-space:pre-line}
   .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}
   .potionIcon:before{content:"";position:absolute;left:4px;top:-7px;width:6px;height:5px;border:1px solid #d7d9c8;border-bottom:0;border-radius:2px 2px 0 0;background:#a7aa9d}
@@ -166,8 +166,9 @@
   #stickArea{transform:translateY(-26px)}
   #wizardInteractBtn{position:absolute;z-index:26;pointer-events:auto;left:50%;bottom:clamp(112px,18vh,170px);transform:translateX(-50%);display:none;padding:12px 22px;border:1px solid #b8d9ff;border-radius:14px;background:linear-gradient(180deg,#285fa6,#173768);color:#fff;font-weight:900;letter-spacing:.5px;box-shadow:0 5px 18px #07152c99;touch-action:manipulation}
   #wizardInteractBtn.visible{display:block}
-  #wizardSpeech{position:absolute;z-index:25;left:50%;top:18%;transform:translateX(-50%);display:none;min-width:180px;max-width:min(86vw,420px);min-height:44px;padding:14px 18px;border:2px solid #b9d9ff;border-radius:16px;background:rgba(10,25,53,.96);color:#fff;box-shadow:0 8px 24px #0008;text-align:center;line-height:1.45;font-size:clamp(13px,2.1vw,16px);pointer-events:auto}
+  #wizardSpeech{position:absolute;z-index:25;left:50%;top:18%;transform:translateX(-50%);display:none;min-width:180px;max-width:min(86vw,420px);min-height:44px;padding:34px 18px 14px;border:2px solid #b9d9ff;border-radius:16px;background:rgba(10,25,53,.96);color:#fff;box-shadow:0 8px 24px #0008;text-align:center;line-height:1.45;font-size:clamp(13px,2.1vw,16px);pointer-events:auto}
   #wizardSpeech.visible{display:block}
+  #wizardSpeechClose{position:absolute;top:5px;right:6px;width:25px;height:25px;border:1px solid #ffffff77;border-radius:7px;background:#263e5d;color:#fff;font-weight:900;line-height:1;z-index:2}
   #wizardSpeech:after{content:"";position:absolute;left:50%;bottom:-11px;width:18px;height:18px;background:#0a1935;border-right:2px solid #b9d9ff;border-bottom:2px solid #b9d9ff;transform:translateX(-50%) rotate(45deg)}
   :fullscreen{width:100%;height:100%;background:#000}
   :fullscreen #stage{width:100vw;height:100dvh}
@@ -179,7 +180,7 @@
 <canvas id="game"></canvas>
 <div id="hud">
  <div id="mapNameHud" aria-label="Mapa atual">CAMPO DE TREINO</div>
- <div id="waveHud" aria-label="Orda atual"><span>Orda - 0</span></div><div id="waveSlimeMarkers" aria-label="Progresso dos slimes"><span>🟡 0/3 slimes amarelos</span><span>🔵 0/4 slimes azuis</span></div>
+ <div id="waveHud" aria-label="Horda atual"><span>Horda - 0</span></div><div id="waveSlimeMarkers" aria-label="Progresso dos slimes"></div>
  <div id="statusHud" aria-label="Status do personagem">
   <div class="stat"><span>❤️ Vida</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="healthFill"></div></div></div>
   <div class="stat"><span>💧 Mana</span><span class="stat-value">100 / 100</span><div class="bar"><div class="bar-fill" id="manaFill"></div></div></div>
@@ -195,7 +196,7 @@
  <button id="openBagBtn" type="button">🎒 ABRIR BOLSA</button>
  <button id="useLeverBtn" type="button">⚙️ VIRAR A ALAVANCA</button>
  <button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
- <div id="wizardSpeech" role="status" aria-live="polite"></div>
+ <div id="wizardSpeech" role="status" aria-live="polite"><button id="wizardSpeechClose" type="button" aria-label="Fechar balão de fala" title="Fechar diálogo">✕</button><span id="wizardSpeechText"></span></div>
  <div id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle"><div id="tutorialCard"><h2 id="tutorialTitle">📜 Tutorial ativado!</h2><p>A alavanca despertou o campo de treinamento. Use os controles para aprender os movimentos básicos.</p><ul><li><b>Joystick / WASD:</b> movimentar o personagem.</li><li><b>BATER / J:</b> atacar ou disparar com a balestra.</li><li><b>DEFENDER / K:</b> bloquear com o escudo equipado.</li><li><b>PULAR / Espaço:</b> saltar obstáculos.</li><li><b>CORRER / Shift:</b> correr mais rápido.</li></ul><button id="tutorialClose" type="button">ENTENDI</button></div></div>
  <div id="spawnCountdown" aria-live="assertive">5</div>
 
@@ -226,6 +227,7 @@
       <button type="button" class="equipmentSlot" data-equip-slot="rightHand"><span class="equipIcon">⚔️</span><span class="equipLabel">Mão principal</span></button>
       <button type="button" class="equipmentSlot" data-equip-slot="leftHand"><span class="equipIcon">🛡️</span><span class="equipLabel">Mão secundária</span></button>
       <button type="button" class="equipmentSlot" data-equip-slot="amulet"><span class="equipIcon">📿</span><span class="equipLabel">Amuleto</span></button>
+      <button type="button" class="equipmentSlot" data-equip-slot="vestment"><span class="equipIcon">🧥</span><span class="equipLabel">Vestimenta</span></button>
      </div>
      <p style="margin:0;font-size:10px;line-height:1.35;color:#cfc5ae;text-align:center">Arraste um item para um espaço compatível para equipar ou trocar.</p>
     </section>
@@ -248,7 +250,7 @@
     <div id="journalStatus" role="status" aria-live="polite">Nenhum salvamento encontrado neste navegador.</div>
     <p id="journalNotice">Importante: esta primeira versão guarda o salvamento neste navegador e aparelho. Não é salvamento em nuvem nem sincroniza entre dispositivos. Não há salvamento automático.</p>
    </section>
-   <div id="itemDetails" aria-live="polite"><button id="itemDetailsClose" type="button" aria-label="Fechar informações do item" title="Fechar">✕</button><div id="itemDetailsName"><span id="itemDetailsIcon"></span><span id="itemDetailsNameText"></span></div><div id="itemQualityLabel"></div><div id="itemDetailsType"></div><div id="itemDetailsDescription"></div><button id="usePotionBtn" type="button" style="display:none">🧪 USAR POÇÃO</button><button id="equipItemBtn" type="button" style="display:none">🗡️ EQUIPAR ITEM</button></div>
+   <div id="itemDetails" aria-live="polite"><button id="itemDetailsClose" type="button" aria-label="Fechar informações do item" title="Fechar">✕</button><div id="itemDetailsName"><span id="itemDetailsIcon"></span><span id="itemDetailsNameText"></span></div><div id="itemDetailsType"></div><div id="itemQualityLabel"></div><div id="itemDetailsDescription"></div><button id="usePotionBtn" type="button" style="display:none">🧪 USAR POÇÃO</button><button id="equipItemBtn" type="button" style="display:none">🗡️ EQUIPAR ITEM</button></div>
    <p id="inventoryHint">Toque em um item para ver suas informações. Arraste-o para outro espaço vazio para movê-lo.</p>
   </div>
  </div>
@@ -279,6 +281,17 @@
 </div>
 </div>
  <div id="deathOverlay" role="dialog" aria-modal="true" aria-labelledby="deathTitle"><div id="deathAnnouncement">VOCÊ MORREU</div><div id="deathCard"><h2 id="deathTitle">VOCÊ MORREU</h2><p>Seu personagem foi derrotado.</p><div class="deathActions"><button id="restoreBtn" type="button">✚ RESTAURAR</button><button id="restartBtn" type="button">↻ RECOMEÇAR</button></div></div></div>
+<script>
+(()=>{
+ const showStartupError=(message)=>{
+  let box=document.getElementById('startupErrorNotice');
+  if(!box){box=document.createElement('div');box.id='startupErrorNotice';box.style.cssText='position:absolute;z-index:9999;top:64px;left:50%;transform:translateX(-50%);max-width:88vw;padding:8px 12px;border-radius:8px;background:#651e1e;color:#fff;font:12px system-ui;box-shadow:0 2px 8px #0008;';document.body.appendChild(box);}
+  box.textContent='Falha ao iniciar o jogo: '+String(message||'erro desconhecido')+'. Verifique a conexão e recarregue a página.';
+ };
+ window.addEventListener('error',e=>{if(e.message)showStartupError(e.message);});
+ window.addEventListener('unhandledrejection',e=>showStartupError(e.reason?.message||e.reason));
+})();
+</script>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
@@ -379,7 +392,8 @@ for(let i=0;i<125;i++){
 
 // Character: young blond adventurer with shield, sword, and articulated limbs.
 const hero=new THREE.Group();scene.add(hero);
-const skin=mat(0xf1c49b),hair=mat(0xf0c62d),shirt=mat(0x2b9b50),pants=mat(0x765033),shoe=mat(0x171a20),eye=mat(0x262d30);
+const skin=mat(0xf1c49b),hair=mat(0xf0c62d),shirt=mat(0xf4f4ef),pants=mat(0x765033),shoe=mat(0x171a20),eye=mat(0x262d30);
+const vestmentShirtMat=mat(0x8fd47b),vestmentPantsMat=mat(0x174c2b);
 function part(parent,geo,material,x,y,z,sx=1,sy=1,sz=1){
  const m=new THREE.Mesh(geo,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
 }
@@ -393,18 +407,18 @@ part(hero,new THREE.SphereGeometry(.035,6,6),eye,.105,1.79,.252);
 
 // Braços articulados em ombro, cotovelo e mão para permitir gestos naturais.
 const armL=new THREE.Group();armL.position.set(-.36,1.38,0);hero.add(armL);
-part(armL,new THREE.CapsuleGeometry(.105,.20,3,6),shirt,0,-.14,0);
+part(armL,new THREE.CapsuleGeometry(.105,.20,3,6),skin,0,-.14,0);
 const elbowL=new THREE.Group();elbowL.position.set(0,-.29,0);armL.add(elbowL);
-part(elbowL,new THREE.SphereGeometry(.092,8,7),shirt,0,0,0);
+part(elbowL,new THREE.SphereGeometry(.092,8,7),skin,0,0,0);
 const handL=new THREE.Group();handL.position.set(0,-.035,0);elbowL.add(handL);
-part(handL,new THREE.CapsuleGeometry(.085,.20,3,6),shirt,0,-.12,0);
+part(handL,new THREE.CapsuleGeometry(.085,.20,3,6),skin,0,-.12,0);
 part(handL,new THREE.SphereGeometry(.105,7,6),skin,0,-.255,.035);
 const armR=new THREE.Group();armR.position.set(.36,1.38,0);hero.add(armR);
-part(armR,new THREE.CapsuleGeometry(.105,.20,3,6),shirt,0,-.14,0);
+part(armR,new THREE.CapsuleGeometry(.105,.20,3,6),skin,0,-.14,0);
 const elbowR=new THREE.Group();elbowR.position.set(0,-.29,0);armR.add(elbowR);
-part(elbowR,new THREE.SphereGeometry(.092,8,7),shirt,0,0,0);
+part(elbowR,new THREE.SphereGeometry(.092,8,7),skin,0,0,0);
 const handR=new THREE.Group();handR.position.set(0,-.035,0);elbowR.add(handR);
-part(handR,new THREE.CapsuleGeometry(.085,.20,3,6),shirt,0,-.12,0);
+part(handR,new THREE.CapsuleGeometry(.085,.20,3,6),skin,0,-.12,0);
 part(handR,new THREE.SphereGeometry(.105,7,6),skin,0,-.255,.045);
 
 // REGRA FIXA: escudo sempre na mão ESQUERDA (handL); nunca anexar ao braço direito.
@@ -428,6 +442,9 @@ const pommel=part(swordGroup,new THREE.SphereGeometry(.055,7,6),mat(0xe2c77d),0,
 const guard=part(swordGroup,new THREE.BoxGeometry(.27,.055,.075),mat(0xe2c77d),0,0,.075);
 const blade=part(swordGroup,new THREE.BoxGeometry(.105,.045,.58),mat(0xcbd8df,.35),0,0,.405);
 const tip=part(swordGroup,new THREE.ConeGeometry(.074,.17,4),mat(0xe4edf0,.3),0,0,.78);
+const knightGoldMat=new THREE.MeshStandardMaterial({color:0xffc928,metalness:.82,roughness:.22}),knightGoldLightMat=new THREE.MeshStandardMaterial({color:0xffe66a,metalness:.72,roughness:.2}),knightGripMat=new THREE.MeshStandardMaterial({color:0xe0aa18,metalness:.62,roughness:.26});
+const knightDarkMat=new THREE.MeshStandardMaterial({color:0x34373c,metalness:.78,roughness:.28}),knightDarkLightMat=new THREE.MeshStandardMaterial({color:0x62666d,metalness:.72,roughness:.24}),knightDarkGripMat=new THREE.MeshStandardMaterial({color:0x41444a,metalness:.55,roughness:.35});
+const defaultGripMat=grip.material,defaultPommelMat=pommel.material,defaultGuardMat=guard.material,defaultBladeMat=blade.material,defaultTipMat=tip.material;
 tip.rotation.x=Math.PI/2;
 // Aura azul mágica centrada no mesmo eixo reto da lâmina.
 const swordAuraMat=new THREE.MeshBasicMaterial({color:0x28aaff,transparent:true,opacity:.42,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
@@ -479,9 +496,9 @@ const elbowRestQuaternion=new THREE.Quaternion();
 // O pivô do joelho permite inclinar a coxa para a frente e a canela para trás no impulso.
 function makeLeg(x){
  const hip=new THREE.Group();hip.position.set(x,.72,0);hero.add(hip);
- part(hip,new THREE.CapsuleGeometry(.13,.23,3,6),pants,0,-.19,0);
+ part(hip,new THREE.CapsuleGeometry(.13,.16,3,6),pants,0,-.15,0,1,1,.98);
  const knee=new THREE.Group();knee.position.set(0,-.39,0);hip.add(knee);
- part(knee,new THREE.SphereGeometry(.115,8,7),pants,0,0,0);
+ part(knee,new THREE.SphereGeometry(.115,8,7),skin,0,0,0);
  part(knee,new THREE.CapsuleGeometry(.105,.16,3,6),pants,0,-.12,0);
  part(knee,new THREE.BoxGeometry(.22,.13,.34),shoe,0,-.19,.07);
  return {hip,knee};
@@ -490,17 +507,44 @@ const legL=makeLeg(-.16),legR=makeLeg(.16);
 hero.position.set(0,0,7.5); // Ponto inicial mais distante do pedestal, com espaço para explorar.
 
 // NPC guia: mago humano com túnica azul, chapéu pontudo, cajado e livro.
-const wizard=new THREE.Group();wizard.position.set(-2.15,0,-3.15);wizard.rotation.y=Math.PI;scene.add(wizard);
+const wizard=new THREE.Group();wizard.position.set(-1.45,.69,-4.85);wizard.rotation.y=0;scene.add(wizard); // No topo do pedestal, pés apoiados na mesma altura do jogador.
 const wizardBlue=mat(0x123bba),wizardBlueLight=mat(0x285ce0),wizardTrim=mat(0xe2d6a6),wizardSkin=mat(0xe6bd98),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x633c28),bookPages=mat(0xf4e7c8),wizardBeard=mat(0xf0eee4);
 part(wizard,new THREE.CapsuleGeometry(.34,.62,4,8),wizardBlue,0,1.02,0,1.1,1.2,.82);
 part(wizard,new THREE.ConeGeometry(.22,.34,8),wizardBlue,0,.42,0,1.6,1,1.5); // base larga da túnica
 part(wizard,new THREE.SphereGeometry(.255,12,10),wizardSkin,0,1.78,0,.95,1,.9);
-// Barba branca comprida e bigode do mago.
-part(wizard,new THREE.ConeGeometry(.19,.48,8),wizardBeard,0,1.48,.12,1,1,1);
-part(wizard,new THREE.SphereGeometry(.13,8,7),wizardBeard,-.12,1.64,.16,1,.55,.7);
-part(wizard,new THREE.SphereGeometry(.13,8,7),wizardBeard,.12,1.64,.16,1,.55,.7);
-part(wizard,new THREE.ConeGeometry(.34,.62,10),wizardBlueLight,0,2.27,-.015,1,1,1);
-part(wizard,new THREE.TorusGeometry(.23,.035,6,12),wizardTrim,0,2.02,0,1,1,.9);
+// Rosto detalhado voltado para a frente (+Z): olhos, sobrancelhas, nariz e orelhas.
+const wizardEyeWhite=mat(0xf7f4e9),wizardEye=mat(0x26364a),wizardBrow=mat(0x9b9a91),wizardNose=mat(0xd5a17d);
+part(wizard,new THREE.SphereGeometry(.052,10,8),wizardEyeWhite,-.105,1.82,.238,1,.82,.48);
+part(wizard,new THREE.SphereGeometry(.052,10,8),wizardEyeWhite,.105,1.82,.238,1,.82,.48);
+part(wizard,new THREE.SphereGeometry(.027,8,7),wizardEye,-.105,1.82,.263,1,1,.5);
+part(wizard,new THREE.SphereGeometry(.027,8,7),wizardEye,.105,1.82,.263,1,1,.5);
+part(wizard,new THREE.CapsuleGeometry(.025,.09,3,6),wizardBrow,-.105,1.90,.235,1,1,.7).rotation.z=.12;
+part(wizard,new THREE.CapsuleGeometry(.025,.09,3,6),wizardBrow,.105,1.90,.235,1,1,.7).rotation.z=-.12;
+part(wizard,new THREE.SphereGeometry(.045,8,8),wizardNose,0,1.72,.265,.72,1,.7);
+part(wizard,new THREE.SphereGeometry(.065,8,8),wizardSkin,-.245,1.76,0,.55,1,.8);
+part(wizard,new THREE.SphereGeometry(.065,8,8),wizardSkin,.245,1.76,0,.55,1,.8);
+// Barba branca em camadas, bigode e pontas para uma silhueta mais legível.
+part(wizard,new THREE.ConeGeometry(.19,.48,8),wizardBeard,0,1.48,.17,1,1,1);
+part(wizard,new THREE.ConeGeometry(.105,.32,8),wizardBeard,-.09,1.43,.205,1,.9,1);
+part(wizard,new THREE.ConeGeometry(.105,.32,8),wizardBeard,.09,1.43,.205,1,.9,1);
+part(wizard,new THREE.SphereGeometry(.13,8,7),wizardBeard,-.12,1.64,.205,1,.55,.7);
+part(wizard,new THREE.SphereGeometry(.13,8,7),wizardBeard,.12,1.64,.205,1,.55,.7);
+// Detalhes adicionais da túnica: gola, faixa, fivela, botões e bordados dourados.
+part(wizard,new THREE.TorusGeometry(.205,.045,7,12),wizardTrim,0,1.58,0,1,1,.82);
+part(wizard,new THREE.CylinderGeometry(.245,.28,.105,10),wizardBlueLight,0,.86,0,1,1,.9);
+part(wizard,new THREE.BoxGeometry(.13,.12,.045),wizardGold,0,.86,.27);
+for(const by of [1.12,.98])part(wizard,new THREE.SphereGeometry(.035,8,6),wizardGold,0,by,.285);
+for(const side of [-1,1]){
+ const seam=part(wizard,new THREE.CapsuleGeometry(.018,.42,3,5),wizardTrim,side*.235,1.02,.205,1,1,1);
+ seam.rotation.z=side*.12;
+}
+// Chapéu de mago clássico: copa pontuda + aba larga e circular ao redor da cabeça.
+part(wizard,new THREE.CylinderGeometry(.44,.44,.075,24),wizardBlue,0,2.015,0,1,1,.92);
+part(wizard,new THREE.TorusGeometry(.37,.035,8,24),wizardTrim,0,2.055,0,1,1,.92);
+part(wizard,new THREE.ConeGeometry(.25,.58,12),wizardBlueLight,0,2.32,-.015,1,1,1);
+part(wizard,new THREE.TorusGeometry(.245,.025,6,16),wizardGold,0,2.12,0,1,1,.92);
+// Pequenas runas decorativas na frente do chapéu.
+part(wizard,new THREE.OctahedronGeometry(.055),wizardGold,0,2.12,.22);
 part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,-.38,1.16,0,1,1,.9).rotation.z=-.42;
 part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,.38,1.16,0,1,1,.9).rotation.z=.42;
 part(wizard,new THREE.SphereGeometry(.105,8,8),wizardSkin,-.53,1.02,.015);
@@ -509,25 +553,41 @@ part(wizard,new THREE.SphereGeometry(.105,8,8),wizardSkin,.53,1.02,.015);
 part(wizard,new THREE.CylinderGeometry(.035,.05,1.55,8),wizardWood,-.67,1.15,.02);
 part(wizard,new THREE.SphereGeometry(.13,10,8),wizardBlueLight,-.67,1.98,.02);
 part(wizard,new THREE.OctahedronGeometry(.115),wizardTrim,-.67,2.0,.02);
-// Livro aberto/encadernado na mão direita.
-part(wizard,new THREE.BoxGeometry(.34,.43,.09),bookCover,.63,1.12,.03,1,1,1);
-part(wizard,new THREE.BoxGeometry(.29,.37,.025),bookPages,.63,1.12,.082);
-part(wizard,new THREE.BoxGeometry(.025,.38,.02),wizardGold,.63,1.12,.1);
+// Livro do mago: fechado por padrão, com emblema de slime na capa.
+const wizardBook=new THREE.Group();wizardBook.position.set(.63,1.12,.035);wizard.add(wizardBook);
+const wizardBookClosed=new THREE.Group();wizardBook.add(wizardBookClosed);
+part(wizardBookClosed,new THREE.BoxGeometry(.34,.43,.045),bookPages,0,0,0);
+part(wizardBookClosed,new THREE.BoxGeometry(.36,.45,.045),bookCover,0,0,.035);
+part(wizardBookClosed,new THREE.BoxGeometry(.045,.45,.085),wizardGold,-.155,0,.012);
+// Emblema azul-esverdeado: um pequeno slime com dois olhos na frente da capa.
+const bookSlimeMat=mat(0x54d9a0),bookSlimeEye=mat(0x18263a);
+part(wizardBookClosed,new THREE.SphereGeometry(.095,12,10),bookSlimeMat,0,.015,.067,1.12,.82,.32);
+part(wizardBookClosed,new THREE.SphereGeometry(.018,8,6),bookSlimeEye,-.035,.03,.095,.8,1,.35);
+part(wizardBookClosed,new THREE.SphereGeometry(.018,8,6),bookSlimeEye,.035,.03,.095,.8,1,.35);
+const wizardBookOpen=new THREE.Group();wizardBook.add(wizardBookOpen);wizardBookOpen.visible=false;
+part(wizardBookOpen,new THREE.BoxGeometry(.17,.43,.035),bookCover,-.085,0,.012,1,1,1).rotation.z=-.06;
+part(wizardBookOpen,new THREE.BoxGeometry(.17,.43,.035),bookCover,.085,0,.012,1,1,1).rotation.z=.06;
+part(wizardBookOpen,new THREE.BoxGeometry(.15,.37,.018),bookPages,-.085,0,.036);
+part(wizardBookOpen,new THREE.BoxGeometry(.15,.37,.018),bookPages,.085,0,.036);
+// Esta função fica disponível para a animação de conjuração do mago; fora dela, o livro permanece fechado.
+function setWizardBookOpen(open){wizardBookClosed.visible=!open;wizardBookOpen.visible=!!open;}
 const wizardInteractBtn=document.querySelector('#wizardInteractBtn'),wizardSpeech=document.querySelector('#wizardSpeech');
+const wizardSpeechText=document.querySelector('#wizardSpeechText');
+document.querySelector('#wizardSpeechClose').addEventListener('click',()=>{wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');});
 let wizardSpeechOpen=false;
 function getWizardDialogue(){
  const aliveInWave=n=>creatures.some(c=>c.alive&&c.waveNumber===n);
  if(!slimeSpawned&&currentWave===0)return 'Há um baú por aí com alguns itens. Pegue a espada e algumas poções; elas podem ser muito úteis para derrotar os slimes.';
  if(currentWave===1&&wave2Started&&!aliveInWave(1))return 'Muito bem! Antes de começar o próximo combate, use poções para recuperar sua vida. E não se esqueça das suas habilidades especiais: elas podem facilitar bastante a luta.';
  if(currentWave===2&&wave3Started&&!aliveInWave(2))return 'Parabéns por subir de nível! Recomendo pegar o escudo que está no baú. Ele pode ajudar bastante a sobreviver aos próximos combates.';
- if(currentWave===3&&!aliveInWave(3))return 'Parabéns por subir de nível novamente! Agora, no nível 3, você já pode usar a balestra. Ela é uma arma poderosa e permite atacar de longa distância.';
- if(currentWave===4&&!aliveInWave(4))return 'Meus parabéns por chegar tão longe! Mas não baixe a guarda: a próxima orda não será tão simples.';
+ if(currentWave===3&&!aliveInWave(3))return 'Você foi muito bem! Antes da próxima horda, abra o menu de Atributos e distribua seus pontos para aprimorar seu personagem. Se preferir, agora você também pode equipar a balestra como arma e atacar de longa distância. Quando tiver distribuído pontos pelo menos uma vez, puxe a alavanca para iniciar a quarta horda.';
+ if(currentWave===4&&!aliveInWave(4))return 'Meus parabéns por chegar tão longe! Mas não baixe a guarda: a próxima horda não será tão simples.';
  if(currentWave===0)return 'Prepare-se para o desafio. Explore o campo e confira os itens do baú antes de começar.';
  return 'Continue assim, aventureiro. Prepare seus equipamentos e fique atento aos próximos desafios.';
 }
 function openWizardDialogue(){
  // Interagir sempre abre (ou atualiza) o balão. O botão não alterna para fechado por engano.
- wizardSpeech.textContent=getWizardDialogue();
+ wizardSpeechText.textContent=getWizardDialogue();
  wizardSpeech.setAttribute('aria-label','Diálogo do mago');
  wizardSpeechOpen=true;
  wizardSpeech.classList.add('visible');
@@ -612,7 +672,7 @@ const attributesOverlay=document.querySelector('#attributesOverlay');
 document.querySelector('#inventoryWindow').appendChild(attributesOverlay);
 const chestInventoryPanel=document.querySelector('#chestInventoryPanel');
 const attributeState={health:100,mana:100,stamina:100};
-let skillPoints=0;
+let skillPoints=0,attributePointsDistributed=false;
 const currentResources={health:100,mana:100,stamina:100};
 let playerDead=false,deathAnimationTime=0,deathScreenTimer=null,slimeAttackOwner=null,nextSlimeAttackSide=1;
 let levelUpAura=null,levelUpAuraTimer=0;
@@ -713,16 +773,17 @@ document.querySelector('#closeAttributesBtn').addEventListener('click',closeAttr
 document.querySelectorAll('.upgradeBtn').forEach(button=>button.addEventListener('click',()=>{
  const key=button.dataset.attribute;
  if(skillPoints<10)return;
- skillPoints-=10;attributeState[key]+=10;currentResources[key]+=10;renderAttributes();
+ skillPoints-=10;attributeState[key]+=10;currentResources[key]+=10;attributePointsDistributed=true;renderAttributes();
 }));
 document.querySelector('#backpackBtn').addEventListener('click',()=>{if(inventoryOverlay.classList.contains('open')){closeInventory();return;}document.querySelector('#journalPanel').style.display='none';document.querySelector('#tabJournal').classList.remove('active');attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#inventoryTitle').textContent='🎒 MOCHILA';document.querySelector('#tabBackpack').classList.add('active');document.querySelector('#tabAttributes').classList.remove('active');openInventory('player');});
 const playerInventoryEl=document.querySelector('#playerInventory');
 const chestInventoryEl=document.querySelector('#chestInventory');
 const itemCatalog={
  shield:{id:'shield',name:'Escudo do aprendiz',icon:'🛡️',type:'Item de suporte — mão esquerda',itemRole:'support',itemCategory:'offhand',skills:{3:{name:'Véu de Defesa',description:'Cria uma barreira circular de luz amarela ao redor do personagem por 6 segundos. A barreira acompanha seus movimentos e bloqueia projéteis em 360°.',effect:'defenseVeil',duration:6,manaCost:20,cooldown:20}},description:'Enquanto estiver equipado, segure o botão DEFENDER para bloquear e reduzir o dano recebido. Habilidade 3: Véu de Defesa — barreira circular de 360° por 6 segundos, custo de 20 de mana e recarga de 20 segundos.'},
- sword:{id:'sword',name:'Espada do aprendiz',icon:'🗡️',type:'Arma corpo a corpo — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:7,skills:{1:{name:'Lâmina Giratória',description:'Aponta a espada à frente com as duas mãos e gira por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Disparo Cortante',description:'Segure para mirar a trajetória do disparo cortante; a espada se ergue durante a mira e, ao soltar, dispara quase instantaneamente, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Use o botão ATACAR para executar um corte para a frente que causa 7 de dano por acerto. Habilidade 1: Lâmina Giratória (5 segundos, área circular de 6 metros de diâmetro). Habilidade 2: Disparo Cortante (golpe em linha reta).'},
+ sword:{id:'sword',name:'Espada do aprendiz',icon:'🗡️',type:'Arma de corpo a corpo - Mão principal',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:7,skills:{1:{name:'Lâmina Giratória',description:'Aponta a espada à frente com as duas mãos e gira por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Disparo Cortante',description:'Segure para mirar a trajetória do disparo cortante; a espada se ergue durante a mira e, ao soltar, dispara quase instantaneamente, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Use o botão ATACAR para executar um corte para a frente que causa 7 de dano por acerto. Habilidade 1: Lâmina Giratória (5 segundos, área circular de 6 metros de diâmetro). Habilidade 2: Disparo Cortante (golpe em linha reta).'},
  crossbow:{id:'crossbow',name:'Balestra do aprendiz',icon:'⌁',type:'Arma de longo alcance — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'projectile',damage:12,skills:{1:{name:'Chuva de Flechas',description:'Invoca por 4 segundos uma chuva de flechas numa área circular de 6 metros, posicionada cerca de 4 metros à frente do personagem no momento da conjuração. A área fica fixa no local escolhido. Causa 11 de dano por segundo dentro da área.',effect:'arrowRain',damage:11,duration:4,radius:6,manaCost:25,staminaCost:5,cooldown:20},2:{name:'Disparo Múltiplo',description:'Após uma animação de recarga, dispara 20 flechas imbuídas em mana em um leque mais fechado para a frente, causando 7 de dano por flecha que acertar.',effect:'multiShot',damage:7,arrows:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Dispara uma flecha para a frente ao atacar. Cada flecha causa 12 de dano ao atingir uma criatura. Habilidade 1: Chuva de Flechas (4 segundos, raio de 6 metros, área fixa a cerca de 4 metros à frente, 11 de dano por segundo). Habilidade 2: Disparo Múltiplo (20 flechas azuis em leque fechado, 7 de dano cada). Enquanto estiver equipada, não é possível usar item na mão esquerda.'},
- knightSword:{id:'knight-sword',name:'Espada de cavaleiro',icon:'🗡️',type:'Arma de corpo a corpo - Mão principal',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:10,rarity:'green',skills:{1:{name:'Lâmina fatiadora',description:'Executa uma sequência giratória de cortes por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Espada esmagadora',description:'Ergue a espada e dispara um golpe cortante concentrado em linha reta, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Espada de qualidade média (categoria verde). Ataque básico causa 10 de dano por acerto. Habilidade 1: Lâmina fatiadora. Habilidade 2: Espada esmagadora.'}
+ simpleVestment:{id:'simple-vestment',name:'Vestes simples',icon:'👕',type:'Vestimenta - Visual',itemRole:'vestment',itemCategory:'vestment',rarity:'white',description:'Camisa regata branca, bermuda curta marrom e pés descalços. Este item altera apenas a aparência; não concede atributos, defesa ou efeitos encantados.'},
+ knightSword:{id:'knight-sword',name:'Espada de cavaleiro',icon:'🗡️',type:'Arma de corpo a corpo - Mão principal',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:10,rarity:'green',skills:{1:{name:'Investida Dourada',description:'Prepara a espada apontada para a frente e desliza até 10 metros, cortando todas as criaturas no caminho. Mira em linha reta e deixa um rastro luminoso de corte.',effect:'knightDash',damage:24,range:10,laneWidth:3,manaCost:25,staminaCost:10,cooldown:16},2:{name:'Impacto do Cavaleiro',description:'Salta alto e avança até 14 metros, caindo com força e causando dano numa área de 6 metros de diâmetro.',effect:'knightLeap',damage:30,range:14,radius:3,manaCost:30,staminaCost:15,cooldown:20}},description:'Espada de qualidade média (categoria verde). Ataque básico causa 10 de dano por acerto. Habilidade 1: Lâmina fatiadora. Habilidade 2: Espada esmagadora.'}
 };
 // Sistema genérico de armas: o dano vem dos dados do próprio item na mochila.
 // Para criar uma arma nova, cadastre weaponClass ('melee' ou 'projectile') e damage.
@@ -766,16 +827,20 @@ function damageCreature(creature,amount,source='weapon'){
   }
   if(creature.type==='slime') spawnSlimeDrops(creature);
   say(`Criatura derrotada! +${creature.xpReward||((String(creature.variant).toLowerCase()==='green'||creature.waveNumber===3)?90:((creature.waveNumber===2||creature.variant==='yellow')?60:50))} XP.`);
-  // A próxima orda só começa quando o jogador voltar a puxar a alavanca.
+  // A próxima horda só começa quando o jogador voltar a puxar a alavanca.
   if(creature.type==='slime' && creature.waveNumber===1 && currentWave===1 && !wave2Started && !creatures.some(c=>c.alive&&c.waveNumber===1)){
    wave2Started=true;countdownWave=2;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
   }
   if(creature.type==='slime' && creature.waveNumber===2 && currentWave===2 && !wave3Started && !creatures.some(c=>c.alive&&c.waveNumber===2)){
    wave3Started=true;countdownWave=3;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
   }
-  if(creature.type==='slime' && creature.waveNumber===3 && currentWave===3 && !creatures.some(c=>c.alive&&c.waveNumber===3)){
+  if(creature.type==='slime' && creature.waveNumber===3 && currentWave===3 && !wave4Started && !creatures.some(c=>c.alive&&c.waveNumber===3)){
+   wave4Started=true;countdownWave=4;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
+   say('A quarta horda está pronta! Puxe a alavanca para enfrentar quatro slimes azuis.');
+  }
+  if(creature.type==='slime' && creature.waveNumber===4 && currentWave===4 && !creatures.some(c=>c.alive&&c.waveNumber===4)){
    countdownWave=0;leverActivated=false;leverPivot.rotation.x=leverStartAngle;
-   say('Todas as criaturas foram derrotadas!');
+   say('Todas as criaturas das quatro primeiras hordas foram derrotadas!');
   }
  }
  return true;
@@ -785,7 +850,7 @@ const makePotion=(id,name,resource,color,size='pequena')=>{const restore=size===
 const chestItems=Array(20).fill(null);
 const hiddenBagItems=Array(5).fill(null);
 const silverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:10,description:'10 moedas de prata.'};
-[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,{...makePotion('health-potion','Poção pequena de vida','health','#e8343e'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
+[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6],chestItems[7]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,itemCatalog.simpleVestment,{...makePotion('health-potion','Poção pequena de vida','health','#e8343e'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
 itemCatalog.sword.rarity='white';itemCatalog.crossbow.rarity='white';itemCatalog.shield.rarity='white';
 const bagManaPotions=makePotion('mana-potion-small','Poção pequena de mana','mana','#258bff','pequena');bagManaPotions.quantity=3;
 const bagMediumHealth=makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média');bagMediumHealth.quantity=2;
@@ -796,24 +861,37 @@ const itemDetails=document.querySelector('#itemDetails');
 const itemQualityColors={white:'#f1f1f1',green:'#62e879',blue:'#61a9ff',purple:'#d28aff',gold:'#ffd45c'};
 const itemQualityNames={white:'Qualidade baixa',green:'Qualidade média',blue:'Qualidade boa',purple:'Qualidade muito boa',gold:'Qualidade suprema'};
 document.querySelector('#itemDetailsClose').addEventListener('click',()=>itemDetails.classList.remove('visible'));
+function getItemRarity(item){
+ // Equipamentos sem raridade explícita pertencem à categoria branca por padrão.
+ if(!item)return 'white';
+ if(item.rarity)return item.rarity;
+ if(item.weaponClass||item.itemRole==='support'||item.itemRole==='vestment'||item.itemCategory==='offhand'||item.itemCategory==='support'||item.itemCategory==='vestment')return 'white';
+ return null;
+}
 function formatItemDescription(item){
  if(!item)return '';
+ // Poções, moedas e consumíveis mantêm suas descrições próprias.
+ if(item.potion||item.itemRole==='currency')return item.description||'';
+ const isEquipment=!!(item.weaponClass||item.itemRole==='support'||item.itemRole==='vestment'||item.itemCategory==='offhand'||item.itemCategory==='support'||item.itemCategory==='vestment');
+ if(!isEquipment)return item.description||'';
  const lines=[];
- const qualityNames={white:'Branca — baixa qualidade',green:'Verde — qualidade média',blue:'Azul — qualidade boa',purple:'Roxa — qualidade muito boa',gold:'Dourada — qualidade suprema'};
- if(item.rarity&&qualityNames[item.rarity])lines.push(`Categoria: ${qualityNames[item.rarity]}`);
- if(item.weaponClass||item.itemRole==='support'||item.itemCategory==='offhand'||item.itemCategory==='support'){
-  lines.push(`Nível mínimo: ${getRequiredEquipmentLevel(item)}`);
-  if(item.weaponClass)lines.push(`Força: ${item.id==='knight-sword'?10:(item.damage||0)}`);
-  else if(item.itemRole==='support')lines.push('Força: Suporte');
-  const skills=item.skills||{};
-  Object.keys(skills).sort((a,b)=>Number(a)-Number(b)).forEach(key=>{
-   const skill=skills[key];
-   lines.push(`Habilidade ${key}: ${skill.name}`);
-  });
-  return lines.join('\n');
- }
- if(item.potion)return item.description||'';
- return item.description||'';
+ const rarity=getItemRarity(item);
+ const categoryNames={white:'branco - baixa qualidade',green:'verde - qualidade média',blue:'azul - boa qualidade',purple:'roxo - qualidade muito boa',gold:'dourado - qualidade suprema'};
+ lines.push(`Categoria: ${categoryNames[rarity]||categoryNames.white}`);
+ lines.push(`Nível mínimo: ${getRequiredEquipmentLevel(item)}`);
+ if(item.weaponClass)lines.push(`Força: ${Number(item.damage)||0}`);
+ else if(item.itemRole==='support')lines.push('Força: Suporte');
+ else lines.push('Força: —');
+ if(item.itemRole==='vestment')lines.push('Descrição: apenas visual; não concede atributos nem defesa.');
+ const enchantments=item.enchantments||item.effectsText||item.effectText;
+ const effectText=enchantments?(Array.isArray(enchantments)?enchantments.join(', '):enchantments):'Nenhum.';
+ lines.push(`Efeito: ${effectText}`);
+ const skills=item.skills||{};
+ Object.keys(skills).sort((a,b)=>Number(a)-Number(b)).forEach(key=>{
+  const skill=skills[key];
+  lines.push(`Habilidade ${key}: ${skill.name}`);
+ });
+ return lines.join('\n');
 }
 function getItemDisplayType(item){
  if(!item)return '';
@@ -828,8 +906,12 @@ function showItemDetails(item){
  const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon';bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
  document.querySelector('#itemDetailsNameText').textContent=item.name;
  const qualityLabel=document.querySelector('#itemQualityLabel');
- qualityLabel.textContent=item.rarity?(itemQualityNames[item.rarity]||''):'';
- qualityLabel.style.color=item.rarity?(itemQualityColors[item.rarity]||'#f1f1f1'):'';
+ const rarity=getItemRarity(item);
+ const isEquipment=!!(item.weaponClass||item.itemRole==='support'||item.itemRole==='vestment'||item.itemCategory==='offhand'||item.itemCategory==='support'||item.itemCategory==='vestment');
+ const rarityColor=rarity?(itemQualityColors[rarity]||'#f1f1f1'):'';
+ qualityLabel.textContent=isEquipment?(itemQualityNames[rarity]||itemQualityNames.white):(item.rarity?(itemQualityNames[item.rarity]||''):'');
+ qualityLabel.style.color=rarityColor;
+ document.querySelector('#itemDetailsNameText').style.color=rarityColor||'';
  document.querySelector('#itemDetailsType').textContent=getItemDisplayType(item);
  document.querySelector('#itemDetailsDescription').textContent=formatItemDescription(item);
  useBtn.style.display=item.potion&&playerItems.includes(item)?'inline-block':'none';
@@ -854,7 +936,7 @@ function transferOrMove(sourceItems,sourceIndex,targetItems,targetIndex){
  if(target)return false;
  sourceItems[sourceIndex]=null;targetItems[targetIndex]=normalizeStack(item);return true;
 }
-const equipmentSlots={rightHand:{label:'Mão principal',accepts:item=>item.itemRole==='weapon'||!!item.weaponClass},leftHand:{label:'Mão secundária',accepts:item=>item.itemRole==='support'||item.itemCategory==='support'||item.itemCategory==='offhand'},amulet:{label:'Amuleto',accepts:item=>item.itemCategory==='amulet'||item.itemRole==='amulet'||item.id==='amulet'}};
+const equipmentSlots={rightHand:{label:'Mão principal',accepts:item=>item.itemRole==='weapon'||!!item.weaponClass},leftHand:{label:'Mão secundária',accepts:item=>item.itemRole==='support'||item.itemCategory==='support'||item.itemCategory==='offhand'},amulet:{label:'Amuleto',accepts:item=>item.itemCategory==='amulet'||item.itemRole==='amulet'||item.id==='amulet'},vestment:{label:'Vestimenta',accepts:item=>item.itemCategory==='vestment'||item.itemRole==='vestment'||item.id==='vestment'}};
 function itemFitsEquipmentSlot(item,key){const rule=equipmentSlots[key];return !!(item&&rule&&rule.accepts(item));}
 function equipItemFromInventory(index){
  const item=playerItems[index];if(!item)return;
@@ -871,7 +953,7 @@ function equipItemFromInventory(index){
  renderInventory();showItemDetails(displaced||item);say(`${item.name} equipado.`);
 }
 
-function getRequiredEquipmentLevel(item){if(!item)return 1;if(item.id==='knight-sword')return 5;if(item.id==='crossbow')return 3;if(item.id==='shield')return 2;return 1;}
+function getRequiredEquipmentLevel(item){if(!item)return 1;if(item.id==='knight-sword')return 4;if(item.id==='crossbow')return 3;if(item.id==='shield')return 2;return 1;}
 function getSkillSource(slotNumber){if(slotNumber===1||slotNumber===2)return equippedItems.rightHand;if(slotNumber===3)return equippedItems.leftHand;if(slotNumber===4)return equippedItems.amulet;return null;}
 function getSkillDefinition(slotNumber){const item=getSkillSource(slotNumber);return item&&item.skills?item.skills[slotNumber]||null:null;}
 function getSkillStaminaCost(slotNumber,skill=getSkillDefinition(slotNumber)){const item=getSkillSource(slotNumber);if(!skill||!item||!['sword','crossbow'].includes(item.id))return Number(skill?.staminaCost)||0;return Number(skill.staminaCost)||(slotNumber===1?5:slotNumber===2?10:0);}
@@ -887,7 +969,9 @@ function renderSpecialSkills(){
    nameEl.textContent=skill.name||`Habilidade ${n}`;
    const force=skill.effect==='defenseVeil'?`Bloqueio de projéteis por ${skill.duration||0} segundos`:skill.duration&&skill.damage?`${skill.damage} por segundo`:`${skill.damage||0} por contato`;
    const mana=Number(skill.manaCost)||0,stamina=getSkillStaminaCost(n,skill),cooldown=Number(skill.cooldown)||0;
-   sourceEl.textContent=`Força: ${force}\nCusto: ${mana} de mana e ${stamina} de stamina\nRecarga: ${cooldown} segundos`;
+   sourceEl.textContent=`Força: ${force}
+Custo: ${mana} de mana e ${stamina} de stamina
+Recarga: ${cooldown} segundos`;
    sourceEl.style.display='';
   }
   else{nameEl.textContent=`Habilidade ${n} não configurada`;sourceEl.textContent='';sourceEl.style.display='none';}
@@ -895,7 +979,7 @@ function renderSpecialSkills(){
  updateSkillButtons();
 }
 let crossbowSkill1Cooldown=0,crossbowSkill2Cooldown=0;
-function getSkillCooldown(n){if((n===1||n===2)&&equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow')return n===1?crossbowSkill1Cooldown:crossbowSkill2Cooldown;if(equippedItems.rightHand?.weaponClass==='melee'){const skill=getSkillDefinition(n);if(skill?.effect==='windSlash')return windSlashCooldown;if(skill?.effect==='swordSpin')return swordSpinCooldown;}if(n===3)return defenseVeilCooldown;return 0;}
+function getSkillCooldown(n){if((n===1||n===2)&&equippedItems.rightHand&&equippedItems.rightHand.id==='crossbow')return n===1?crossbowSkill1Cooldown:crossbowSkill2Cooldown;if(equippedItems.rightHand?.weaponClass==='melee'){const skill=getSkillDefinition(n);if(skill?.effect==='windSlash')return windSlashCooldown;if(skill?.effect==='swordSpin')return swordSpinCooldown;if(skill?.effect==='knightDash')return knightDashCooldown;if(skill?.effect==='knightLeap')return knightLeapCooldown;}if(n===3)return defenseVeilCooldown;return 0;}
 function updateSkillButtons(){
  document.querySelectorAll('[data-action^="skill"]').forEach(button=>{
   const n=Number(button.dataset.action.replace('skill','')),item=getSkillSource(n),skill=getSkillDefinition(n),status=button.querySelector('.skill-status'),label=button.querySelector('.skill-label');
@@ -907,7 +991,7 @@ function updateSkillButtons(){
   button.title=!equipped?'Equipe o item correspondente para liberar esta habilidade':cooldown>0?`${skill.name}: recarga de ${cooldown.toFixed(1)} segundos`:!enoughMana?`Mana insuficiente para ${skill.name}`:!enoughStamina?`Estamina insuficiente para ${skill.name}`:`${skill.name} — habilidade pronta`;
  });
 }
-const equippedItems={rightHand:null,leftHand:null,amulet:null};
+const equippedItems={rightHand:null,leftHand:null,amulet:null,vestment:null};
 // Ícones ilustrados para que os itens da mochila se pareçam com os modelos equipados.
 function appendItemIcon(container,item,fallback=''){
  const id=item?.id;
@@ -916,7 +1000,7 @@ function appendItemIcon(container,item,fallback=''){
   svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
   if(id==='sword'||id==='knight-sword'){
    // Uma única espada diagonal, com lâmina, guarda, empunhadura e pomo claramente separados.
-   svg.innerHTML='<path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#e6f0f8" stroke="#596b7b" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#ffffff"/><path d="M20 28 L35 43" stroke="#e2bf70" stroke-width="6" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#6c4a28" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#9a6336" stroke-width="7" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#55351f" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#d6b16a" stroke="#68451f" stroke-width="1.5"/>';
+   svg.innerHTML=id==='knight-sword'?' <path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#45484d" stroke="#202226" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#858990"/><path d="M20 28 L35 43" stroke="#55585e" stroke-width="7" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#222429" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#3c3f44" stroke-width="8" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#1c1e22" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#4a4d52" stroke="#202226" stroke-width="1.5"/>' : '<path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#e6f0f8" stroke="#596b7b" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#ffffff"/><path d="M20 28 L35 43" stroke="#e2bf70" stroke-width="6" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#6c4a28" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#9a6336" stroke-width="7" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#55351f" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#d6b16a" stroke="#68451f" stroke-width="1.5"/>'; 
   }else if(id==='shield'){
    svg.innerHTML='<path d="M32 4 L54 12 L52 34 Q49 49 32 59 Q15 49 12 34 L10 12 Z" fill="#2475d5" stroke="#b9d8ff" stroke-width="3" stroke-linejoin="round"/><path d="M32 9 L48 15 L46 33 Q43 44 32 51 Q21 44 18 33 L16 15 Z" fill="#1558a7" stroke="#438fe8" stroke-width="1.5"/><circle cx="32" cy="29" r="10" fill="#f4c542" stroke="#fff0a0" stroke-width="2.5"/><circle cx="32" cy="29" r="4" fill="#ffe88a"/>';
   }else{
@@ -929,14 +1013,17 @@ function appendItemIcon(container,item,fallback=''){
 function renderEquipment(){
  // Armas e escudo só aparecem nas mãos quando estão equipados.
  swordGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.weaponClass==='melee';
+ const knightSwordEquipped=equippedItems.rightHand?.id==='knight-sword';
+ grip.material=knightSwordEquipped?knightDarkGripMat:defaultGripMat;pommel.material=knightSwordEquipped?knightDarkMat:defaultPommelMat;guard.material=knightSwordEquipped?knightDarkLightMat:defaultGuardMat;blade.material=knightSwordEquipped?knightDarkMat:defaultBladeMat;tip.material=knightSwordEquipped?knightDarkLightMat:defaultTipMat;
+ const wearingSimple=equippedItems.vestment?.id==='simple-vestment';hero.traverse(o=>{if(!o.isMesh)return;if(o.material===shirt||o.material===vestmentShirtMat)o.material=wearingSimple?vestmentShirtMat:shirt;if(o.material===pants||o.material===vestmentPantsMat)o.material=wearingSimple?vestmentPantsMat:pants;if(o.material===shoe)o.visible=!wearingSimple;});
  crossbowGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.id==='crossbow';
  quiverGroup.visible=crossbowGroup.visible;
  shieldGroup.visible=!!equippedItems.leftHand && equippedItems.leftHand.id==='shield';
  document.querySelectorAll('.equipmentSlot').forEach(slot=>{
   const key=slot.dataset.equipSlot,item=equippedItems[key];slot.replaceChildren();slot.classList.toggle('equipped',!!item);
   slot.setAttribute('aria-label',item?`${equipmentSlots[key].label}: ${item.name}`:`Espaço de ${equipmentSlots[key].label}`);
-  const icon=document.createElement('span');icon.className='equipIcon';appendItemIcon(icon,item,key==='rightHand'?'🗡️':key==='leftHand'?'🛡️':'📿');slot.appendChild(icon);
-  const label=document.createElement('span');label.className='equipLabel';label.textContent=item?item.name:equipmentSlots[key].label;slot.appendChild(label);
+  const icon=document.createElement('span');icon.className='equipIcon';appendItemIcon(icon,item,key==='rightHand'?'🗡️':key==='leftHand'?'🛡️':key==='amulet'?'📿':'🧥');slot.appendChild(icon);
+  const label=document.createElement('span');label.className='equipLabel';label.textContent=item?item.name:equipmentSlots[key].label;slot.appendChild(label);if(item?.itemRole==='vestment'){icon.textContent='👕';icon.style.filter='hue-rotate(75deg) saturate(1.4)';}
   slot.onclick=()=>{if(item)showItemDetails(item);};
   slot.onpointerdown=e=>{if(!item||e.button!==0)return;dragState={source:'equipment',sourceIndex:key,item,startX:e.clientX,startY:e.clientY,active:false,slot};};
  });
@@ -1059,10 +1146,10 @@ openBagBtn.addEventListener('click',()=>{openBagBtn.classList.remove('visible');
 const useLeverBtn=document.querySelector('#useLeverBtn');
 const tutorialOverlay=document.querySelector('#tutorialOverlay');
 const spawnCountdownEl=document.querySelector('#spawnCountdown');
-let spawnCountdown=0,slimeSpawned=false,countdownWave=1,wave2Started=false,wave3Started=false;
+let spawnCountdown=0,slimeSpawned=false,countdownWave=1,wave2Started=false,wave3Started=false,wave4Started=false;
 let currentWave=0;
 const waveHud=document.querySelector('#waveHud');
-const waveInfo={1:{label:'Orda 1',name:'Slime rosa',total:1},2:{label:'Orda 2',name:'Slime amarelo',total:3},3:{label:'Orda 3',name:'Slime verde',total:3},4:{label:'Orda 4',name:'Slime azul',total:3},5:{label:'Orda 5',name:'Criaturas',total:0}};
+const waveInfo={1:{label:'Horda 1',name:'Slime rosa',total:1},2:{label:'Horda 2',name:'Slime amarelo',total:3},3:{label:'Horda 3',name:'Slime verde',total:3},4:{label:'Horda 4',name:'Slime azul',total:4},5:{label:'Horda 5',name:'Criaturas',total:0}};
 function updateWaveHudProgress(){
  const markerEl=document.querySelector('#waveSlimeMarkers');
  const speciesByWave={
@@ -1071,7 +1158,7 @@ function updateWaveHudProgress(){
   3:{label:'Slime verde',emoji:'🟢',variants:['green','acid']},
   4:{label:'Slime azul',emoji:'🔵',variants:['blue']}
  };
- // Conta somente criaturas reais criadas para a orda atual; derrotadas permanecem no array.
+ // Conta somente criaturas reais criadas para a horda atual; derrotadas permanecem no array.
  const spec=speciesByWave[currentWave];
  if(spec){
   const matching=creatures.filter(c=>c.waveNumber===currentWave && spec.variants.includes(String(c.variant||'').toLowerCase()));
@@ -1079,13 +1166,19 @@ function updateWaveHudProgress(){
   const total=matching.length;
   markerEl.innerHTML=total?`<span>${spec.emoji} ${defeated}/${total} ${spec.label.toLowerCase()}</span>`:'';
  }else{ markerEl.innerHTML=''; }
- if(!currentWave){waveHud.innerHTML='<span>Orda 0</span>';return;}
- const info=waveInfo[currentWave]||{label:`Orda ${currentWave}`,name:'Criaturas',total:0};
+ if(!currentWave){waveHud.innerHTML='<span>Horda 0</span>';return;}
+ const info=waveInfo[currentWave]||{label:`Horda ${currentWave}`,name:'Criaturas',total:0};
  waveHud.innerHTML=`<span>${info.label}</span>`;
 }
 function setWave(number){currentWave=number;updateWaveHudProgress();}
 useLeverBtn.addEventListener('click',()=>{
  if(leverActivated||leverPulling)return;
+ // Recupera o estado de transição caso um salvamento antigo tenha registrado a horda 3 concluída, mas countdownWave zerado.
+ if(currentWave===3&&wave4Started&&countdownWave===0&&!creatures.some(c=>c.alive&&c.waveNumber===3))countdownWave=4;
+ if(countdownWave===4&&!attributePointsDistributed){
+  say('O mago recomenda aprimorar seus atributos primeiro. Abra o menu de Atributos e distribua seus pontos pelo menos uma vez antes de puxar esta alavanca.');
+  return;
+ }
  // Só permite iniciar o combate quando houver uma arma equipada na mão direita.
  // A verificação é genérica: qualquer item cadastrado com weaponClass conta como arma.
  if(!getWeaponData()){
@@ -1234,10 +1327,10 @@ function createSlime(x,z,groundY=0,variant='pink',waveNumber=1){
  const pos=bodyGeo.attributes.position;
  for(let i=0;i<pos.count;i++){const y=pos.getY(i);pos.setZ(i,pos.getZ(i)-Math.max(0,y)*.105);}
  bodyGeo.computeVertexNormals();
- const bodyMaterial=variant==='yellow'?mat(0xf4d52d,.52):creatureShared.pink.clone();
+ const bodyMaterial=variant==='yellow'?mat(0xf4d52d,.52):(variant==='blue'?mat(0x168cff,.48):creatureShared.pink.clone());
  const body=new THREE.Mesh(bodyGeo,bodyMaterial);body.castShadow=true;body.receiveShadow=true;root.add(body);
  const bodyBaseColor=body.material.color.clone();
- const sheen=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),variant==='yellow'?mat(0xfff18a,.45):creatureShared.pinkLight);sheen.position.set(-.20,.69,.30);sheen.scale.set(.62,1.2,.35);root.add(sheen);
+ const sheen=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),variant==='yellow'?mat(0xfff18a,.45):(variant==='blue'?mat(0x9be6ff,.45):creatureShared.pinkLight));sheen.position.set(-.20,.69,.30);sheen.scale.set(.62,1.2,.35);root.add(sheen);
  // Rosto cartunesco de slime: olhos escuros estreitos, sem branco nem pupilas humanas.
  const eyeGeo=new THREE.SphereGeometry(.073,8,6);
  const eyeL=new THREE.Mesh(eyeGeo,creatureShared.eyeDark);eyeL.position.set(-.17,.575,.414);eyeL.scale.set(1.25,.42,.42);eyeL.rotation.z=-.16;root.add(eyeL);
@@ -1247,16 +1340,16 @@ function createSlime(x,z,groundY=0,variant='pink',waveNumber=1){
  const browR=browL.clone();browR.position.x=.17;browR.rotation.z=.28;root.add(browR);
  const mouth=new THREE.Mesh(new THREE.BoxGeometry(.13,.027,.026),creatureShared.mouth);mouth.position.set(0,.415,.448);mouth.rotation.z=.04;root.add(mouth);
  // Anel de perigo no chão: mostra a área atingida antes do impacto do salto.
- const attackRing=new THREE.Mesh(new THREE.RingGeometry(2.24,2.64,32),new THREE.MeshBasicMaterial({color:variant==='yellow'?0xffe34d:0xff4c92,transparent:true,opacity:.58,side:THREE.DoubleSide}));
+ const attackRing=new THREE.Mesh(new THREE.RingGeometry(variant==='blue'?.85:2.24,variant==='blue'?1.2:2.64,32),new THREE.MeshBasicMaterial({color:variant==='yellow'?0xffe34d:(variant==='blue'?0x48bfff:0xff4c92),transparent:true,opacity:.58,side:THREE.DoubleSide}));
  attackRing.rotation.x=-Math.PI/2;attackRing.position.y=.025;attackRing.visible=false;root.add(attackRing);
  // Barra de vida simples, voltada para a câmera no loop de atualização.
  const healthGroup=new THREE.Group();healthGroup.position.y=1.36;root.add(healthGroup);
  const barBack=new THREE.Mesh(new THREE.PlaneGeometry(.72,.09),mat(0x29151f));healthGroup.add(barBack);
  const barFill=new THREE.Mesh(new THREE.PlaneGeometry(.68,.055),mat(0x55e36b));barFill.position.z=.006;healthGroup.add(barFill);
- const isYellow=variant==='yellow';
- // Slimes amarelos da horda 2: 45 de vida, 2x a velocidade e 40% maiores.
- if(isYellow)root.scale.setScalar(1.4);
- const slime={type:'slime',variant,waveNumber,xpReward:isYellow?60:50,root,body,bodyBaseColor,health:isYellow?45:30,maxHealth:isYellow?45:30,radius:isYellow?.672:.48,height:isYellow?1.624:1.16,speed:isYellow?3.05:1.25,attackCooldown:isYellow?.65:1.1,attackState:'chase',attackTimer:0,attackTime:0,evadeCooldown:Math.random()*.35,alive:true,healthGroup,barFill,attackRing,phase:Math.random()*Math.PI*2,damage:10,attackRadius:2.6,groundY,leapStartX:x,leapStartZ:z,leapTargetX:x,leapTargetZ:z,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0};
+ const isYellow=variant==='yellow',isBlue=variant==='blue';
+ // Slimes amarelos são maiores; os azuis têm metade da altura do herói e alta velocidade.
+ if(isYellow)root.scale.setScalar(1.4);if(isBlue)root.scale.setScalar(.62);
+ const slime={type:'slime',variant,waveNumber,xpReward:isBlue?50:(isYellow?60:50),root,body,bodyBaseColor,health:isBlue?35:(isYellow?45:30),maxHealth:isBlue?35:(isYellow?45:30),radius:isBlue?.30:(isYellow?.672:.48),height:isBlue?.72:(isYellow?1.624:1.16),speed:isBlue?8:(isYellow?3.05:1.25),attackCooldown:isBlue?.5:(isYellow?.65:1.1),attackState:isBlue?'blueSlide':'chase',attackTimer:0,attackTime:0,evadeCooldown:Math.random()*.35,alive:true,healthGroup,barFill,attackRing,phase:Math.random()*Math.PI*2,damage:isBlue?5:10,attackRadius:isBlue?1.15:2.6,groundY,leapStartX:x,leapStartZ:z,leapTargetX:x,leapTargetZ:z,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0,blueSlideCount:0,blueDirX:Math.random()<.5?1:-1,blueDirZ:0,blueStartX:x,blueStartZ:z,blueTargetX:x,blueTargetZ:z,blueChargeHit:false};
  creatures.push(slime);return slime;
 }
 function createAcidSlime(x,z,groundY=0,waveNumber=3){
@@ -1406,6 +1499,34 @@ function updateCreatures(dt){
     if(c.attackTimer<=0){fireAcid(c);c.attackState='slide';c.mouth.scale.set(.78,.18,.22);c.mouthGlow.material.opacity=0;c.attackCooldown=3;}
    }else{c.mouth.scale.set(.78,.18,.22);c.mouthGlow.material.opacity=0;if(c.damageFlashTimer<=0)c.body.material.color.copy(c.bodyBaseColor);if(c.attackCooldown<=0){c.attackState='acidCharge';c.attackTimer=.42;}}
    c.healthGroup.quaternion.copy(c.root.quaternion).invert().multiply(camera.quaternion);c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.595;continue;
+  }
+  if(c.variant==='blue'){
+   c.root.position.y=c.groundY;
+   if(c.attackCooldown>0)c.attackCooldown-=dt;
+   if(!beingKnockedBack){
+    if(c.attackState==='blueSlide'){
+     if(c.attackTimer<=0){
+      // Três deslocamentos retos de aproximadamente 5 m; alterna eixos cardinais sem zigue-zague contínuo.
+      const angleChoices=[0,Math.PI/2,Math.PI,Math.PI*1.5];const a=angleChoices[Math.floor(Math.random()*angleChoices.length)];
+      c.blueDirX=Math.sin(a);c.blueDirZ=Math.cos(a);c.blueStartX=c.root.position.x;c.blueStartZ=c.root.position.z;
+      c.blueTargetX=THREE.MathUtils.clamp(c.blueStartX+c.blueDirX*5,-29,29);c.blueTargetZ=THREE.MathUtils.clamp(c.blueStartZ+c.blueDirZ*5,-29,29);
+      c.attackTimer=.46;c.root.rotation.y=Math.atan2(c.blueDirX,c.blueDirZ);
+     }
+     const t=Math.min(1,dt*11.5/Math.max(.001,Math.hypot(c.blueTargetX-c.root.position.x,c.blueTargetZ-c.root.position.z)));
+     const nx=THREE.MathUtils.lerp(c.root.position.x,c.blueTargetX,t),nz=THREE.MathUtils.lerp(c.root.position.z,c.blueTargetZ,t);
+     if(creatureCanOccupy(c,nx,nz)){c.root.position.x=nx;c.root.position.z=nz;}
+     c.attackTimer-=dt;
+     if(Math.hypot(c.root.position.x-c.blueTargetX,c.root.position.z-c.blueTargetZ)<.12||c.attackTimer<=0){c.blueSlideCount++;c.attackTimer=.12;if(c.blueSlideCount>=3){c.attackState='blueCharge';c.attackTimer=.28;c.blueSlideCount=0;c.blueStartX=c.root.position.x;c.blueStartZ=c.root.position.z;c.blueTargetX=hero.position.x;c.blueTargetZ=hero.position.z;c.root.rotation.y=Math.atan2(c.blueTargetX-c.root.position.x,c.blueTargetZ-c.root.position.z);c.blueChargeHit=false;}}
+    }else if(c.attackState==='blueCharge'){
+     c.attackTimer-=dt;const dx2=c.blueTargetX-c.root.position.x,dz2=c.blueTargetZ-c.root.position.z,len=Math.hypot(dx2,dz2)||1;const step=Math.min(len,19*dt);const nx=c.root.position.x+dx2/len*step,nz=c.root.position.z+dz2/len*step;
+     if(creatureCanOccupy(c,nx,nz)){c.root.position.x=nx;c.root.position.z=nz;}
+     c.root.rotation.y=Math.atan2(dx2,dz2);
+     const hitDist=Math.hypot(hero.position.x-c.root.position.x,hero.position.z-c.root.position.z);
+     if(!c.blueChargeHit&&hitDist<1.35){c.blueChargeHit=true;const defending=actions.defend&&equippedItems.leftHand&&equippedItems.leftHand.id==='shield';const damage=defending?Math.ceil(c.damage*.5):c.damage;currentResources.health=Math.max(0,currentResources.health-damage);applyPlayerDamage(damage,defending,'Investida do slime azul',true);if(currentResources.health<=0)triggerPlayerDeath();}
+     if(c.attackTimer<=0||Math.hypot(c.blueTargetX-c.root.position.x,c.blueTargetZ-c.root.position.z)<.3){c.attackState='blueSlide';c.attackTimer=0;c.attackCooldown=.15;}
+    }
+   }
+   c.healthGroup.quaternion.copy(c.root.quaternion).invert().multiply(camera.quaternion);c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.34;continue;
   }
   // Define o piso sob a criatura (gramado, escadas ou topo do pedestal).
   let supportY=0;
@@ -1561,6 +1682,7 @@ let activeArrowRain=null;
 let arrowRainAim=null;
 const flyingWindSlashes=[];
 let windSlashCooldown=0;
+let knightDashCooldown=0,knightLeapCooldown=0;
 let windSlashCastTime=0;
 let windSlashCastElapsed=0;
 let windSlashCastDirection=null;
@@ -1594,6 +1716,70 @@ function finishWindSlashAim(cancel=false){
  if(cancel)return false;const skill=getSkillDefinition(2);if(!skill||skill.effect!=='windSlash'||windSlashCooldown>0||currentResources.mana<(Number(skill.manaCost)||0)||currentResources.stamina<getSkillStaminaCost(2,skill))return false;
  const started=beginWindSlash(skill,aim.direction);if(started){currentResources.mana=Math.max(0,currentResources.mana-(Number(skill.manaCost)||0));currentResources.stamina=Math.max(0,currentResources.stamina-getSkillStaminaCost(2,skill));updateAttributeHud();announceSkill(skill.name);updateSkillButtons();}return started;
 }
+
+let knightDashAim=null,knightLeapAim=null,knightDashAction=null,knightLeapAction=null;
+function makeKnightDashAim(){
+ if(knightDashAim||knightDashCooldown>0)return false;
+ const group=new THREE.Group(),materials=[];
+ const shape=new THREE.Shape();shape.moveTo(-1.05,.25);shape.lineTo(-1.5,7.2);shape.quadraticCurveTo(-1.55,10,-1.05,10);shape.lineTo(1.05,10);shape.quadraticCurveTo(1.55,10,1.5,7.2);shape.lineTo(1.05,.25);shape.quadraticCurveTo(0,-.08,-1.05,.25);
+ const fillMat=new THREE.MeshBasicMaterial({color:0xff2020,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide});
+ const fill=new THREE.Mesh(new THREE.ShapeGeometry(shape,24),fillMat);fill.rotation.x=Math.PI/2;fill.position.y=.04;group.add(fill);materials.push(fillMat);
+ const lineMat=new THREE.LineBasicMaterial({color:0xff4545,transparent:true,opacity:.95,depthWrite:false});
+ const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-1.05,.05,.25),new THREE.Vector3(-1.5,.05,7.2),new THREE.Vector3(-1.05,.05,10),new THREE.Vector3(1.05,.05,10),new THREE.Vector3(1.5,.05,7.2),new THREE.Vector3(1.05,.05,.25)]),lineMat);group.add(line);materials.push(lineMat);
+ scene.add(group);knightDashAim={group,materials,direction:new THREE.Vector3()};updateKnightDashAim();return true;
+}
+function updateKnightDashAim(){if(!knightDashAim)return;const d=new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();knightDashAim.direction.copy(d);knightDashAim.group.position.set(hero.position.x,0,hero.position.z);knightDashAim.group.rotation.y=hero.rotation.y;}
+function clearKnightAim(aim){scene.remove(aim.group);aim.group.traverse(o=>{if(o.geometry)o.geometry.dispose();});for(const m of aim.materials)m.dispose();}
+function finishKnightDashAim(cancel=false){
+ if(!knightDashAim)return false;const aim=knightDashAim;knightDashAim=null;clearKnightAim(aim);if(cancel)return false;
+ const skill=getSkillDefinition(1);if(!skill||skill.effect!=='knightDash'||knightDashCooldown>0)return false;
+ const cost=Number(skill.manaCost)||0,stam=getSkillStaminaCost(1,skill);if(currentResources.mana<cost||currentResources.stamina<stam)return false;
+ knightDashCooldown=Number(skill.cooldown)||16;knightDashAction={elapsed:0,duration:.58,start:hero.position.clone(),direction:aim.direction.clone(),distance:Number(skill.range)||10,damage:Number(skill.damage)||24,width:(Number(skill.laneWidth)||3)/2,hit:new Set()};
+ currentResources.mana-=cost;currentResources.stamina-=stam;updateAttributeHud();announceSkill(skill.name);updateSkillButtons();return true;
+}
+function makeKnightLeapAim(){
+ if(knightLeapAim||knightLeapAction||knightLeapCooldown>0)return false;
+ const radius=Number(getSkillDefinition(2)?.radius)||3,area=makeArrowRainArea(radius),center=getArrowRainAimPoint().addScaledVector(new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize(),4);
+ center.y=0;area.group.position.set(center.x,0,center.z);knightLeapAim={area,center,radius};updateKnightLeapAim();return true;
+}
+function updateKnightLeapAim(){
+ if(!knightLeapAim)return;const d=new THREE.Vector3(Math.sin(hero.rotation.y),0,Math.cos(hero.rotation.y)).normalize();const center=hero.position.clone().addScaledVector(d,Number(getSkillDefinition(2)?.range)||14);center.y=0;knightLeapAim.center.copy(center);knightLeapAim.area.group.position.set(center.x,0,center.z);knightLeapAim.area.group.scale.setScalar(.97+.03*Math.sin(clock.elapsedTime*7));
+}
+function finishKnightLeapAim(cancel=false){
+ if(!knightLeapAim)return false;const aim=knightLeapAim;knightLeapAim=null;
+ if(cancel){clearKnightAim(aim.area);return false;}
+ const skill=getSkillDefinition(2);if(!skill||skill.effect!=='knightLeap'||knightLeapCooldown>0){clearKnightAim(aim.area);return false;}
+ const cost=Number(skill.manaCost)||0,stam=getSkillStaminaCost(2,skill);if(currentResources.mana<cost||currentResources.stamina<stam){clearKnightAim(aim.area);return false;}
+ knightLeapCooldown=Number(skill.cooldown)||20;knightLeapAction={elapsed:0,duration:.9,start:hero.position.clone(),target:aim.center.clone(),damage:Number(skill.damage)||30,radius:aim.radius,area:aim.area};
+ currentResources.mana-=cost;currentResources.stamina-=stam;updateAttributeHud();announceSkill(skill.name);updateSkillButtons();return true;
+}
+function updateKnightActions(dt){
+ if(knightDashAction){
+  const a=knightDashAction;a.elapsed+=dt;const t=Math.min(1,a.elapsed/a.duration),previous=hero.position.clone();
+  const travel=a.distance*t;hero.position.x=a.start.x+a.direction.x*travel;hero.position.z=a.start.z+a.direction.z*travel;hero.rotation.y=Math.atan2(a.direction.x,a.direction.z);
+  // A dourada trilha de corte acompanha a investida, e cada criatura só recebe dano uma vez.
+  for(const c of creatures){if(!c.alive||a.hit.has(c))continue;const dx=c.root.position.x-hero.position.x,dz=c.root.position.z-hero.position.z;const along=(c.root.position.x-a.start.x)*a.direction.x+(c.root.position.z-a.start.z)*a.direction.z;const lateral=Math.abs((c.root.position.x-a.start.x)*a.direction.z-(c.root.position.z-a.start.z)*a.direction.x);if(along>=0&&along<=travel+1&&lateral<=a.width+c.radius){a.hit.add(c);damageCreature(c,a.damage,'knightDash');}}
+  if(Math.floor(a.elapsed*24)!==Math.floor((a.elapsed-dt)*24)){
+   const trailMat=new THREE.MeshBasicMaterial({color:0xffe66a,transparent:true,opacity:.7,depthWrite:false,blending:THREE.AdditiveBlending});
+   const trail=new THREE.Mesh(new THREE.PlaneGeometry(2.3,1.35),trailMat);trail.position.set(hero.position.x,1.05,hero.position.z);trail.rotation.y=hero.rotation.y;scene.add(trail);
+   setTimeout(()=>{scene.remove(trail);trail.geometry.dispose();trailMat.dispose();},250);
+  }
+  if(t>=1)knightDashAction=null;
+ }
+ if(knightLeapAction){
+  const a=knightLeapAction;a.elapsed+=dt;const t=Math.min(1,a.elapsed/a.duration);
+  hero.position.x=THREE.MathUtils.lerp(a.start.x,a.target.x,t);hero.position.z=THREE.MathUtils.lerp(a.start.z,a.target.z,t);hero.position.y=Math.sin(Math.PI*t)*3.4;jumping=t<1;hero.rotation.y=Math.atan2(a.target.x-a.start.x,a.target.z-a.start.z);
+  if(t>=1){
+   hero.position.y=0;jumping=false;vy=0;
+   for(const c of creatures){if(!c.alive)continue;if(Math.hypot(c.root.position.x-a.target.x,c.root.position.z-a.target.z)<=a.radius+c.radius*.3)damageCreature(c,a.damage,'knightLeap');}
+   const impactMat=new THREE.MeshBasicMaterial({color:0xffd34d,transparent:true,opacity:.55,depthWrite:false,side:THREE.DoubleSide});
+   const impact=new THREE.Mesh(new THREE.RingGeometry(.2,a.radius,48),impactMat);impact.rotation.x=-Math.PI/2;impact.position.set(a.target.x,.08,a.target.z);scene.add(impact);
+   setTimeout(()=>{scene.remove(impact);impact.geometry.dispose();impactMat.dispose();},450);
+   clearKnightAim(a.area);knightLeapAction=null;
+  }
+ }
+}
+
 let swordHitThisSwing=false;
 function shootWindSlash(skill){
  const item=equippedItems.rightHand;
@@ -1791,6 +1977,15 @@ function beginBasicAttack(){
 document.querySelectorAll('[data-action]').forEach(b=>{
  const a=b.dataset.action;
  const start=e=>{e.preventDefault();if(playerDead){actions[a]=false;b.classList.remove('active');return;}actions[a]=true;b.classList.add('active');
+  if(a==='skill1'&&equippedItems.rightHand?.id==='knight-sword'&&getSkillDefinition(1)?.effect==='knightDash'){
+   actions[a]=false;if(!makeKnightDashAim())b.classList.remove('active');return;
+  }
+  if(a==='skill2'&&equippedItems.rightHand?.id==='knight-sword'&&getSkillDefinition(2)?.effect==='knightLeap'){
+   actions[a]=false;const skill=getSkillDefinition(2);
+   if(!skill||getSkillCooldown(2)>0){b.classList.remove('active');if(skill)say(`${skill.name}: aguarde ${getSkillCooldown(2).toFixed(1)}s.`);return;}
+   if(currentResources.mana<(Number(skill.manaCost)||0)||currentResources.stamina<getSkillStaminaCost(2,skill)){b.classList.remove('active');say('Recursos insuficientes para Impacto do Cavaleiro.');return;}
+   if(!makeKnightLeapAim())b.classList.remove('active');return;
+  }
   if(a==='skill1'&&equippedItems.rightHand?.id==='crossbow'&&getSkillDefinition(1)?.effect==='arrowRain'){
    const item=getSkillSource(1),skill=getSkillDefinition(1);actions[a]=false;
    if(!item||!skill){b.classList.remove('active');return;}
@@ -1828,7 +2023,7 @@ document.querySelectorAll('[data-action]').forEach(b=>{
    updateSkillButtons();
   }
  };
- const end=e=>{e.preventDefault();actions[a]=false;b.classList.remove('active');if(playerDead)return;if(a==='skill1'&&arrowRainAim){if(e.type==='pointercancel'||e.type==='pointerleave')cancelArrowRainAim();else releaseArrowRainAim();}if(a==='skill2'&&windSlashAim){if(e.type==='pointercancel'||e.type==='pointerleave')finishWindSlashAim(true);else finishWindSlashAim(false);}};
+ const end=e=>{e.preventDefault();actions[a]=false;b.classList.remove('active');if(playerDead)return;if(a==='skill1'&&knightDashAim){if(e.type==='pointercancel'||e.type==='pointerleave')finishKnightDashAim(true);else finishKnightDashAim(false);}if(a==='skill2'&&knightLeapAim){if(e.type==='pointercancel'||e.type==='pointerleave')finishKnightLeapAim(true);else finishKnightLeapAim(false);}if(a==='skill1'&&arrowRainAim){if(e.type==='pointercancel'||e.type==='pointerleave')cancelArrowRainAim();else releaseArrowRainAim();}if(a==='skill2'&&windSlashAim){if(e.type==='pointercancel'||e.type==='pointerleave')finishWindSlashAim(true);else finishWindSlashAim(false);}};
  b.addEventListener('pointerdown',start);b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end);b.addEventListener('pointerleave',end);
 });
 
@@ -1887,6 +2082,7 @@ function animate(){
  if(gameplayPaused){renderer.render(scene,camera);return;}
  crossbowCooldown=Math.max(0,crossbowCooldown-dt);
  windSlashCooldown=Math.max(0,windSlashCooldown-dt);
+ knightDashCooldown=Math.max(0,knightDashCooldown-dt);knightLeapCooldown=Math.max(0,knightLeapCooldown-dt);
  swordSpinCooldown=Math.max(0,swordSpinCooldown-dt);
  crossbowSkill1Cooldown=Math.max(0,crossbowSkill1Cooldown-dt);
  crossbowSkill2Cooldown=Math.max(0,crossbowSkill2Cooldown-dt);
@@ -1894,6 +2090,8 @@ function animate(){
  if(levelUpAura){levelUpAuraTimer-=dt;levelUpAura.position.set(hero.position.x,hero.position.y+1.12,hero.position.z);const pulse=1+Math.sin((3.5-levelUpAuraTimer)*9)*.12;levelUpAura.scale.set(pulse,1,pulse);levelUpAura.material.opacity=.62*Math.max(0,levelUpAuraTimer/3.5);const inner=levelUpAura.children[0];if(inner)inner.material.opacity=.5*Math.max(0,levelUpAuraTimer/3.5);if(levelUpAuraTimer<=0){scene.remove(levelUpAura);levelUpAura.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});levelUpAura=null;}}
  updateArrowRainAim();
  updateWindSlashAim();
+ updateKnightDashAim();
+ updateKnightLeapAim();
  if(defenseVeil){defenseVeil.elapsed+=dt;defenseVeil.group.position.set(hero.position.x,hero.position.y,hero.position.z);defenseVeil.group.rotation.y=0;const pulse=.82+Math.sin(defenseVeil.elapsed*8)*.12;defenseVeil.group.scale.set(pulse,1+Math.sin(defenseVeil.elapsed*5)*.035,1);defenseVeil.materials[0].opacity=.38+Math.sin(defenseVeil.elapsed*7)*.09;if(defenseVeil.elapsed>=defenseVeil.duration){stopDefenseVeil();}}
  updateSkillButtons();
  if(windSlashCastTime>0){
@@ -2213,7 +2411,7 @@ function animate(){
    }
  }
  // Durante a mira, espada erguida; ao soltar, a animação conclui em poucos frames.
- if((windSlashAim||windSlashCastTime>0)&&equippedItems.rightHand&&equippedItems.rightHand.weaponClass==='melee'){
+ if((windSlashAim||knightDashAim||windSlashCastTime>0)&&equippedItems.rightHand&&equippedItems.rightHand.weaponClass==='melee'){
   const aiming=!!windSlashAim;
   const t=aiming?0:THREE.MathUtils.clamp(windSlashCastElapsed/.08,0,1);
   const release=t*t*(3-2*t);
@@ -2277,12 +2475,12 @@ function animate(){
    }
    if(pull>=1){
      leverPulling=false;leverActivated=true;leverPivot.rotation.x=leverEndAngle;
-     if(countdownWave>=1&&countdownWave<=3){
+     if(countdownWave>=1&&countdownWave<=4){
       spawnCountdown=5;spawnCountdownEl.textContent='5';spawnCountdownEl.classList.add('visible');
       // Limpa qualquer mensagem anterior: durante a contagem aparecem somente os números.
       message.classList.remove('show');clearTimeout(messageTimer);
      }else{
-      say('Você já concluiu todas as ordas disponíveis.');
+      say('Você já concluiu todas as hordas disponíveis.');
      }
    }
  }else if(leverActivated){
@@ -2304,21 +2502,25 @@ function animate(){
     const pinkSlime=createSlime(0,8,0,'pink',1);
     updateWaveHudProgress();
     countdownWave=0;
-    say('Orda 1: Slime rosa');
+    say('Horda 1: Slime rosa');
    }else if(countdownWave===2){
     setWave(2);
     createSlime(-15,-7,0,'yellow',2);
     createSlime(15,-7,0,'yellow',2);
     createSlime(0,8,0,'yellow',2);
     updateWaveHudProgress();
-    say('Orda 2: Slimes amarelos');
+    say('Horda 2: Slimes amarelos');
     countdownWave=0;
    }
    else if(countdownWave===3){
     setWave(3);
     createAcidSlime(-15,-7,0,3);createAcidSlime(15,-7,0,3);createAcidSlime(0,8,0,3);
     updateWaveHudProgress();
-    say('Orda 3: Slimes verdes');countdownWave=0;
+    say('Horda 3: Slimes verdes');countdownWave=0;
+   }else if(countdownWave===4){
+    setWave(4);
+    createSlime(-15,-7,0,'blue',4);createSlime(15,-7,0,'blue',4);createSlime(-10,8,0,'blue',4);createSlime(10,8,0,'blue',4);
+    updateWaveHudProgress();say('Horda 4: Quatro slimes azuis');countdownWave=0;
    }
   }
  }
@@ -2361,6 +2563,7 @@ function animate(){
    hero.position.z+Math.cos(cameraYaw)*camHorizontal
  );
  camera.position.lerp(desired,1-Math.exp(-5*dt));camera.lookAt(camTarget);
+ updateKnightActions(dt);
  renderer.render(scene,camera);
 }
 // Diário: salvamento MANUAL, sem gravar progresso automaticamente.
@@ -2388,7 +2591,9 @@ function refreshJournalStatus(){
  const date=saved.savedAt?new Date(saved.savedAt).toLocaleString('pt-BR'):'Data desconhecida';
  const level=saved.experienceState?.level??1;
  const x=Number(saved.hero?.x||0),z=Number(saved.hero?.z||0);
- journalStatus.textContent=`Último salvamento: ${date}\nNível ${level} · Posição: ${x.toFixed(1)}, ${z.toFixed(1)}\nO progresso salvo está pronto para carregar.`;
+ journalStatus.textContent=`Último salvamento: ${date}
+Nível ${level} · Posição: ${x.toFixed(1)}, ${z.toFixed(1)}
+O progresso salvo está pronto para carregar.`;
  loadGameBtn.disabled=false;
 }
 function cloneSaveValue(value){return JSON.parse(JSON.stringify(value));}
@@ -2399,9 +2604,9 @@ function saveGameManually(){
    format:'UmbraRPGSave',version:1,savedAt:new Date().toISOString(),
    hero:{x:hero.position.x,y:hero.position.y,z:hero.position.z,rotationX:hero.rotation.x,rotationY:hero.rotation.y,rotationZ:hero.rotation.z,vy,jumping,jumpSquat},
    camera:{yaw:cameraYaw,pitch:cameraPitch},
-   attributeState:cloneSaveValue(attributeState),currentResources:cloneSaveValue(currentResources),experienceState:cloneSaveValue(experienceState),skillPoints,
+   attributeState:cloneSaveValue(attributeState),currentResources:cloneSaveValue(currentResources),experienceState:cloneSaveValue(experienceState),skillPoints,attributePointsDistributed,
    playerItems:cloneSaveValue(playerItems),chestItems:cloneSaveValue(chestItems),hiddenBagItems:cloneSaveValue(hiddenBagItems),equippedItems:cloneSaveValue(equippedItems),
-   chestOpened,leverActivated,leverPivotAngle:leverPivot.rotation.x,slimeSpawned,countdownWave,wave2Started,wave3Started,currentWave,
+   chestOpened,leverActivated,leverPivotAngle:leverPivot.rotation.x,slimeSpawned,countdownWave,wave2Started,wave3Started,wave4Started,currentWave,
    creatures:creatures.map(c=>({type:c.type,variant:c.variant,waveNumber:c.waveNumber,x:c.root.position.x,y:c.root.position.y,z:c.root.position.z,rotationY:c.root.rotation.y,health:c.health,maxHealth:c.maxHealth,alive:c.alive,phase:c.phase,attackState:c.attackState,attackTimer:c.attackTimer,attackTime:c.attackTime,attackCooldown:c.attackCooldown,slideDir:c.slideDir,slideCenterX:c.slideCenterX,slideCenterZ:c.slideCenterZ,slidePhase:c.slidePhase,groundY:c.groundY})),
    lootDrops:lootDrops.map(d=>({type:d.type,amount:d.amount,x:d.group.position.x,z:d.group.position.z,groundY:d.groundY}))
   };
@@ -2430,15 +2635,16 @@ function loadGameManually(){
    if(data.currentResources&&Number.isFinite(data.currentResources[key]))currentResources[key]=THREE.MathUtils.clamp(data.currentResources[key],0,attributeState[key]);
   }
   if(data.experienceState){experienceState.current=Number(data.experienceState.current)||0;experienceState.required=Math.max(100,Number(data.experienceState.required)||100);experienceState.level=Math.max(1,Number(data.experienceState.level)||1);}
-  skillPoints=Math.max(0,Number(data.skillPoints)||0);
+  skillPoints=Math.max(0,Number(data.skillPoints)||0);attributePointsDistributed=!!data.attributePointsDistributed||[attributeState.health,attributeState.mana,attributeState.stamina].some(v=>v>100);
   if(Array.isArray(data.playerItems)){playerItems.fill(null);data.playerItems.slice(0,playerItems.length).forEach((item,i)=>playerItems[i]=item||null);}
   if(Array.isArray(data.chestItems)){chestItems.fill(null);data.chestItems.slice(0,chestItems.length).forEach((item,i)=>chestItems[i]=item||null);}
+  if(!chestItems.some(item=>item&&item.id==='simple-vestment')){const emptyVestmentSlot=chestItems.findIndex(item=>!item);if(emptyVestmentSlot>=0)chestItems[emptyVestmentSlot]=itemCatalog.simpleVestment;}
   if(Array.isArray(data.hiddenBagItems)){hiddenBagItems.fill(null);data.hiddenBagItems.slice(0,hiddenBagItems.length).forEach((item,i)=>hiddenBagItems[i]=item||null);}
   if(data.equippedItems){for(const key of Object.keys(equippedItems))equippedItems[key]=data.equippedItems[key]||null;}
   chestOpened=!!data.chestOpened;
   leverActivated=!!data.leverActivated;leverPulling=false;leverPullTime=0;leverPivot.rotation.x=Number(data.leverPivotAngle)||0;
-  slimeSpawned=!!data.slimeSpawned;countdownWave=Number(data.countdownWave)||0;wave2Started=!!data.wave2Started;wave3Started=!!data.wave3Started;
-  currentWave=Number(data.currentWave)||0;if(currentWave>0)setWave(currentWave);else waveHud.innerHTML='<span>Orda - 0</span>';updateWaveHudProgress();
+  slimeSpawned=!!data.slimeSpawned;countdownWave=Number(data.countdownWave)||0;wave2Started=!!data.wave2Started;wave3Started=!!data.wave3Started;wave4Started=!!data.wave4Started;
+  currentWave=Number(data.currentWave)||0;if(currentWave>0)setWave(currentWave);else waveHud.innerHTML='<span>Horda - 0</span>';updateWaveHudProgress();
   spawnCountdown=0;spawnCountdownEl.classList.remove('visible');
   // Recriar criaturas com a mesma posição, vida e estado vivo/morto registrados.
   for(const c of creatures){scene.remove(c.root);}
@@ -2446,12 +2652,16 @@ function loadGameManually(){
   for(const saved of (Array.isArray(data.creatures)?data.creatures:[])){
    let c;
    if(saved.variant==='green')c=createAcidSlime(Number(saved.x)||0,Number(saved.z)||0,Number(saved.groundY)||0,Number(saved.waveNumber)||3);
-   else c=createSlime(Number(saved.x)||0,Number(saved.z)||0,Number(saved.groundY)||0,saved.variant==='yellow'?'yellow':'pink',Number(saved.waveNumber)||1);
+   else c=createSlime(Number(saved.x)||0,Number(saved.z)||0,Number(saved.groundY)||0,['yellow','blue'].includes(saved.variant)?saved.variant:'pink',Number(saved.waveNumber)||1);
    c.root.position.set(Number(saved.x)||0,Number(saved.y)||0,Number(saved.z)||0);c.root.rotation.y=Number(saved.rotationY)||0;
    c.health=THREE.MathUtils.clamp(Number(saved.health)||0,0,Number(saved.maxHealth)||c.maxHealth);c.maxHealth=Number(saved.maxHealth)||c.maxHealth;c.alive=!!saved.alive;c.phase=Number(saved.phase)||0;
    if(saved.attackState)c.attackState=saved.attackState;if(Number.isFinite(saved.attackTimer))c.attackTimer=saved.attackTimer;if(Number.isFinite(saved.attackTime))c.attackTime=saved.attackTime;if(Number.isFinite(saved.attackCooldown))c.attackCooldown=saved.attackCooldown;
    if(Number.isFinite(saved.slideDir))c.slideDir=saved.slideDir;if(Number.isFinite(saved.slideCenterX))c.slideCenterX=saved.slideCenterX;if(Number.isFinite(saved.slideCenterZ))c.slideCenterZ=saved.slideCenterZ;if(Number.isFinite(saved.slidePhase))c.slidePhase=saved.slidePhase;
    c.root.visible=c.alive;c.healthGroup.visible=c.alive;c.attackRing&&(c.attackRing.visible=false);if(c.barFill)c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);
+  }
+  // Recuperação da transição para a quarta horda em salvamentos antigos ou incompletos.
+  if(currentWave===3&&wave4Started&&!creatures.some(c=>c.alive&&c.waveNumber===3)&&!creatures.some(c=>c.alive&&c.waveNumber===4)){
+   countdownWave=4;leverActivated=false;leverPulling=false;leverPivot.rotation.x=leverStartAngle;
   }
   // Recriar os orbes de mana que ainda estavam no chão quando o jogador salvou.
   for(const d of lootDrops){scene.remove(d.group);d.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else o.material.dispose();}});}
