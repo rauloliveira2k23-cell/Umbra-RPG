@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Umbra: O Segredo da Torre — v153</title>
+<title>Umbra: O Segredo da Torre — v158</title>
 <style>
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9bc8e8;font-family:system-ui,Arial;touch-action:none}
   #stage{position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;touch-action:none;z-index:0;background:#9bc8e8}
@@ -134,10 +134,10 @@
   #itemDetailsName{font-size:15px;font-weight:950;color:#f4d69b}
   #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}#itemQualityLabel{display:none;font-size:12px;font-weight:900}
   #itemDetailsDescription{font-size:12px;line-height:1.45;color:#e6dfcf;white-space:pre-line}
-  .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}
+  .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}.potionIcon.potion-small{width:12px;height:22px;border-radius:3px 3px 5px 5px}.potionIcon.potion-small:before{left:2px;width:4px}.potionIcon.potion-medium{width:17px;height:24px}.potionIcon.potion-large{width:20px;height:27px;border-radius:5px 5px 7px 7px}.potionIcon.potion-max{width:23px;height:29px;border-radius:6px 6px 8px 8px}
   .potionIcon:before{content:"";position:absolute;left:4px;top:-7px;width:6px;height:5px;border:1px solid #d7d9c8;border-bottom:0;border-radius:2px 2px 0 0;background:#a7aa9d}
   #usePotionBtn,#equipItemBtn{justify-self:start;border:1px solid #b6d9a0;border-radius:7px;background:#315b37;color:#fff5d8;font-weight:900;padding:7px 12px;touch-action:manipulation}#equipItemBtn{background:#765329;border-color:#f0d08a}#itemDetailsName{display:flex;align-items:center;gap:8px}#itemDetailsIcon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px}#itemDetailsIcon svg{width:30px;height:30px;display:block}
-  .inventorySlot.filled{border-color:#d8b16b;background:linear-gradient(145deg,#655034,#382b1e);box-shadow:inset 0 0 0 1px #f1d49a22}
+  .inventorySlot.filled{border-color:var(--category-color,#f1f1f1);background:linear-gradient(145deg,#655034,#382b1e);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--category-color,#f1f1f1) 18%,transparent)}
   .inventorySlot .itemIcon{position:relative;display:inline-flex;align-items:center;justify-content:center;font-size:clamp(17px,3.1vw,29px);line-height:1.1}
   .inventorySlot .itemIcon svg,.equipmentSlot .equipIcon svg{display:block;width:1.35em;height:1.35em;overflow:visible}
   .inventorySlot .itemIcon svg{width:1.65em;height:1.65em}
@@ -194,10 +194,10 @@
  <button id="fullscreenBtn" type="button" aria-label="Ativar tela cheia" title="Tela cheia / sair da tela cheia">⛶</button>
  <button id="openChestBtn" type="button">📦 ABRIR BAÚ</button>
  <button id="openBagBtn" type="button">🎒 ABRIR BOLSA</button>
- <button id="useLeverBtn" type="button">⚙️ VIRAR A ALAVANCA</button>
- <button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
- <div id="wizardSpeech" role="status" aria-live="polite"><button id="wizardSpeechClose" type="button" aria-label="Fechar balão de fala" title="Fechar diálogo">✕</button><span id="wizardSpeechText"></span></div>
- <div id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle"><div id="tutorialCard"><h2 id="tutorialTitle">📜 Tutorial ativado!</h2><p>A alavanca despertou o campo de treinamento. Use os controles para aprender os movimentos básicos.</p><ul><li><b>Joystick / WASD:</b> movimentar o personagem.</li><li><b>BATER / J:</b> atacar ou disparar com a balestra.</li><li><b>DEFENDER / K:</b> bloquear com o escudo equipado.</li><li><b>PULAR / Espaço:</b> saltar obstáculos.</li><li><b>CORRER / Shift:</b> correr mais rápido.</li></ul><button id="tutorialClose" type="button">ENTENDI</button></div></div>
+ <button id="useLeverBtn" type="button" style="display:none!important" aria-hidden="true">⚙️ VIRAR A ALAVANCA</button>
+ <div id="wizardBossBar" style="display:none;position:absolute;z-index:24;top:7%;left:50%;transform:translateX(-50%);width:min(72vw,520px);padding:7px 10px;border:2px solid #d5b4ff;border-radius:10px;background:#171021eF;color:#fff;text-align:center;font-weight:900;box-shadow:0 3px 14px #0008"><div style="font-size:13px;letter-spacing:1px;margin-bottom:5px">MAGO — CHEFE</div><div style="height:13px;background:#3b243d;border-radius:8px;overflow:hidden"><div id="wizardBossFill" style="height:100%;width:100%;background:linear-gradient(90deg,#7a39dc,#c69aff);transition:width .15s"></div></div><div id="wizardBossHealthText" style="font-size:11px;margin-top:3px">250 / 250</div></div><button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
+ <div id="wizardSpeech" role="status" aria-live="polite"><button id="wizardSpeechClose" type="button" aria-label="Fechar balão de fala" title="Fechar diálogo">✕</button><span id="wizardSpeechText"></span><div id="wizardDialogueChoices" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px"><button id="wizardStartCombat" type="button" style="display:none">Iniciar combate</button><button id="wizardPrepare" type="button" style="display:none">Vou me preparar</button><button id="wizardContinue" type="button" style="display:none">Continuar</button></div></div>
+ <div id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle"><div id="tutorialCard"><h2 id="tutorialTitle">📜 Tutorial ativado!</h2><p>Converse com o mago para iniciar cada combate. Use os controles para aprender os movimentos básicos.</p><ul><li><b>Joystick / WASD:</b> movimentar o personagem.</li><li><b>BATER / J:</b> atacar ou disparar com a balestra.</li><li><b>DEFENDER / K:</b> bloquear com o escudo equipado.</li><li><b>PULAR / Espaço:</b> saltar obstáculos.</li><li><b>CORRER / Shift:</b> correr mais rápido.</li></ul><button id="tutorialClose" type="button">ENTENDI</button></div></div>
  <div id="spawnCountdown" aria-live="assertive">5</div>
 
  <div id="inventoryOverlay" aria-label="Inventários" role="dialog" aria-modal="true">
@@ -237,7 +237,7 @@
       <div class="specialSkillSlot" data-skill-slot="1"><span class="specialSkillNumber">1</span><span class="specialSkillText"><span class="specialSkillName">Habilidade da mão principal</span><span class="specialSkillSource">Mão principal: equipe uma arma</span></span></div>
       <div class="specialSkillSlot" data-skill-slot="2"><span class="specialSkillNumber">2</span><span class="specialSkillText"><span class="specialSkillName">Habilidade da mão principal</span><span class="specialSkillSource">Mão principal: equipe uma arma</span></span></div>
       <div class="specialSkillSlot" data-skill-slot="3"><span class="specialSkillNumber">3</span><span class="specialSkillText"><span class="specialSkillName">Habilidade da mão secundária</span><span class="specialSkillSource">Mão secundária: equipe um item de suporte</span></span></div>
-      <div class="specialSkillSlot" data-skill-slot="4"><span class="specialSkillNumber">4</span><span class="specialSkillText"><span class="specialSkillName">Habilidade do amuleto</span><span class="specialSkillSource">Amuleto: equipe um amuleto</span></span></div>
+      <div class="specialSkillSlot" data-skill-slot="4"><span class="specialSkillNumber">4</span><span class="specialSkillText"><span class="specialSkillName">Hiper raio</span><span class="specialSkillSource">Amuleto: equipe um amuleto</span></span></div>
      </div>
      
     </section>
@@ -407,14 +407,14 @@ part(hero,new THREE.SphereGeometry(.035,6,6),eye,.105,1.79,.252);
 
 // Braços articulados em ombro, cotovelo e mão para permitir gestos naturais.
 const armL=new THREE.Group();armL.position.set(-.36,1.38,0);hero.add(armL);
-part(armL,new THREE.CapsuleGeometry(.105,.20,3,6),skin,0,-.14,0);
+const upperArmL=part(armL,new THREE.CapsuleGeometry(.105,.20,3,6),skin,0,-.14,0);
 const elbowL=new THREE.Group();elbowL.position.set(0,-.29,0);armL.add(elbowL);
 part(elbowL,new THREE.SphereGeometry(.092,8,7),skin,0,0,0);
 const handL=new THREE.Group();handL.position.set(0,-.035,0);elbowL.add(handL);
 part(handL,new THREE.CapsuleGeometry(.085,.20,3,6),skin,0,-.12,0);
 part(handL,new THREE.SphereGeometry(.105,7,6),skin,0,-.255,.035);
 const armR=new THREE.Group();armR.position.set(.36,1.38,0);hero.add(armR);
-part(armR,new THREE.CapsuleGeometry(.105,.20,3,6),skin,0,-.14,0);
+const upperArmR=part(armR,new THREE.CapsuleGeometry(.105,.20,3,6),skin,0,-.14,0);
 const elbowR=new THREE.Group();elbowR.position.set(0,-.29,0);armR.add(elbowR);
 part(elbowR,new THREE.SphereGeometry(.092,8,7),skin,0,0,0);
 const handR=new THREE.Group();handR.position.set(0,-.035,0);elbowR.add(handR);
@@ -505,9 +505,10 @@ function makeLeg(x){
 }
 const legL=makeLeg(-.16),legR=makeLeg(.16);
 hero.position.set(0,0,7.5); // Ponto inicial mais distante do pedestal, com espaço para explorar.
+const wizardRobeShirtMat=new THREE.MeshStandardMaterial({color:0x164fc2,roughness:.48,emissive:0x073b9e,emissiveIntensity:.48});const wizardRobePantsMat=new THREE.MeshStandardMaterial({color:0x102a69,roughness:.62,emissive:0x031b56,emissiveIntensity:.22});const heroWizardRobeMesh=new THREE.Mesh(new THREE.CapsuleGeometry(.31,.62,4,10),new THREE.MeshStandardMaterial({color:0x1558d8,roughness:.42,emissive:0x087dff,emissiveIntensity:.28,transparent:true,opacity:.88}));heroWizardRobeMesh.position.set(0,.92,-.015);heroWizardRobeMesh.scale.set(1.13,1.14,.9);heroWizardRobeMesh.visible=false;heroWizardRobeMesh.castShadow=true;hero.add(heroWizardRobeMesh);const heroRobeGlow=new THREE.Mesh(new THREE.CapsuleGeometry(.325,.64,4,10),new THREE.MeshBasicMaterial({color:0x52cfff,transparent:true,opacity:.20,side:THREE.BackSide}));heroRobeGlow.position.copy(heroWizardRobeMesh.position);heroRobeGlow.scale.copy(heroWizardRobeMesh.scale).multiplyScalar(1.045);heroRobeGlow.visible=false;hero.add(heroRobeGlow);heroWizardRobeMesh.userData.glow=heroRobeGlow;
 
 // NPC guia: mago humano com túnica azul, chapéu pontudo, cajado e livro.
-const wizard=new THREE.Group();wizard.position.set(-1.45,.69,-4.85);wizard.rotation.y=0;scene.add(wizard); // No topo do pedestal, pés apoiados na mesma altura do jogador.
+const wizard=new THREE.Group();wizard.position.set(0,.94,-7);wizard.rotation.y=0;scene.add(wizard); // Centro do pedestal; permanece ali até começar a quinta horda.
 const wizardBlue=mat(0x123bba),wizardBlueLight=mat(0x285ce0),wizardTrim=mat(0xe2d6a6),wizardSkin=mat(0xe6bd98),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x633c28),bookPages=mat(0xf4e7c8),wizardBeard=mat(0xf0eee4);
 part(wizard,new THREE.CapsuleGeometry(.34,.62,4,8),wizardBlue,0,1.02,0,1.1,1.2,.82);
 part(wizard,new THREE.ConeGeometry(.22,.34,8),wizardBlue,0,.42,0,1.6,1,1.5); // base larga da túnica
@@ -573,27 +574,41 @@ part(wizardBookOpen,new THREE.BoxGeometry(.15,.37,.018),bookPages,.085,0,.036);
 function setWizardBookOpen(open){wizardBookClosed.visible=!open;wizardBookOpen.visible=!!open;}
 const wizardInteractBtn=document.querySelector('#wizardInteractBtn'),wizardSpeech=document.querySelector('#wizardSpeech');
 const wizardSpeechText=document.querySelector('#wizardSpeechText');
-document.querySelector('#wizardSpeechClose').addEventListener('click',()=>{wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');});
+document.querySelector('#wizardSpeechClose').addEventListener('click',()=>{wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');wizardInteractBtn.classList.remove('visible');});
 let wizardSpeechOpen=false;
 function getWizardDialogue(){
  const aliveInWave=n=>creatures.some(c=>c.alive&&c.waveNumber===n);
- if(!slimeSpawned&&currentWave===0)return 'Há um baú por aí com alguns itens. Pegue a espada e algumas poções; elas podem ser muito úteis para derrotar os slimes.';
- if(currentWave===1&&wave2Started&&!aliveInWave(1))return 'Muito bem! Antes de começar o próximo combate, use poções para recuperar sua vida. E não se esqueça das suas habilidades especiais: elas podem facilitar bastante a luta.';
- if(currentWave===2&&wave3Started&&!aliveInWave(2))return 'Parabéns por subir de nível! Recomendo pegar o escudo que está no baú. Ele pode ajudar bastante a sobreviver aos próximos combates.';
- if(currentWave===3&&!aliveInWave(3))return 'Você foi muito bem! Antes da próxima horda, abra o menu de Atributos e distribua seus pontos para aprimorar seu personagem. Se preferir, agora você também pode equipar a balestra como arma e atacar de longa distância. Quando tiver distribuído pontos pelo menos uma vez, puxe a alavanca para iniciar a quarta horda.';
- if(currentWave===4&&!aliveInWave(4))return 'Meus parabéns por chegar tão longe! Mas não baixe a guarda: a próxima horda não será tão simples.';
- if(currentWave===0)return 'Prepare-se para o desafio. Explore o campo e confira os itens do baú antes de começar.';
- return 'Continue assim, aventureiro. Prepare seus equipamentos e fique atento aos próximos desafios.';
+ if(wizardCombatEnded&&tutorialStage>=2)return 'Muito bem! Receba o Robe de mago como recompensa. Ele aumenta sua mana e sua stamina. Depois venha comigo conhecer a cidade de Umbra.';
+ if(currentWave===4&&!aliveInWave(4))return 'Você derrotou os quatro slimes azuis! Está pronto para a quinta e última horda? Desta vez, eu mesmo entrarei em combate.';
+ if(currentWave===3&&!aliveInWave(3))return 'Você foi muito bem! Distribua seus pontos de atributo e, quando estiver pronto, podemos iniciar a quarta horda.';
+ if(currentWave===2&&!aliveInWave(2))return 'Parabéns por subir de nível! Confira seu equipamento e poções. Quando estiver pronto, podemos iniciar a próxima horda.';
+ if(currentWave===1&&!aliveInWave(1))return 'Muito bem! Recupere sua vida e prepare-se para o próximo combate quando estiver pronto.';
+ if(!slimeSpawned&&currentWave===0)return 'Há um baú por aí com itens úteis. Pegue sua arma e poções. Quando estiver pronto, fale comigo para começar.';
+ if(currentWave===5&&wizardCombatEnded)return 'Você venceu! Tenho uma recompensa para você.';
+ return 'Prepare-se, aventureiro. Quando estiver pronto, escolha iniciar o combate ou continuar se preparando.';
 }
-function openWizardDialogue(){
- // Interagir sempre abre (ou atualiza) o balão. O botão não alterna para fechado por engano.
- wizardSpeechText.textContent=getWizardDialogue();
- wizardSpeech.setAttribute('aria-label','Diálogo do mago');
- wizardSpeechOpen=true;
- wizardSpeech.classList.add('visible');
+function refreshWizardDialogueChoices(){
+ const start=document.querySelector('#wizardStartCombat'),prep=document.querySelector('#wizardPrepare'),cont=document.querySelector('#wizardContinue');
+ const aliveInWave=n=>creatures.some(c=>c.alive&&c.waveNumber===n);
+ const canStart=(!slimeSpawned&&currentWave===0)||(currentWave===1&&!aliveInWave(1))||(currentWave===2&&!aliveInWave(2))||(currentWave===3&&!aliveInWave(3))||(currentWave===4&&!aliveInWave(4));
+ start.style.display=canStart?'inline-block':'none';prep.style.display=canStart?'inline-block':'none';
+ cont.style.display=wizardCombatEnded?'inline-block':'none';
 }
+function openWizardDialogue(){wizardSpeechText.textContent=getWizardDialogue();wizardSpeech.setAttribute('aria-label','Diálogo do mago');wizardSpeechOpen=true;wizardSpeech.classList.add('visible');refreshWizardDialogueChoices();}
+function startNextWizardCombat(){
+ if(!getWeaponData()){wizardSpeechText.textContent='Ainda não, aventureiro. Equipe uma arma na mão direita antes de começarmos. Não vou deixar você entrar despreparado!';wizardSpeechOpen=true;wizardSpeech.classList.add('visible');refreshWizardDialogueChoices();return;}
+ if(!slimeSpawned&&currentWave===0){countdownWave=1;}
+ else if(currentWave===1&&!creatures.some(c=>c.alive&&c.waveNumber===1)){countdownWave=2;wave2Started=true;}
+ else if(currentWave===2&&!creatures.some(c=>c.alive&&c.waveNumber===2)){countdownWave=3;wave3Started=true;}
+ else if(currentWave===3&&!creatures.some(c=>c.alive&&c.waveNumber===3)){if(!attributePointsDistributed){wizardSpeechText.textContent='Espere um pouco! Antes da próxima horda, distribua seus pontos na tela Atributos. Preciso ver que você melhorou seus status antes de continuar.';wizardSpeechOpen=true;wizardSpeech.classList.add('visible');refreshWizardDialogueChoices();return;}countdownWave=4;wave4Started=true;}
+ else if(currentWave===4&&!creatures.some(c=>c.alive&&c.waveNumber===4)){countdownWave=5;wave5Started=true;}
+ else return;
+ spawnCountdown=5;spawnCountdownEl.textContent='5';spawnCountdownEl.classList.add('visible');wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');
+}
+document.querySelector('#wizardStartCombat').addEventListener('click',startNextWizardCombat);
+document.querySelector('#wizardPrepare').addEventListener('click',()=>{wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');say('Tudo bem. Prepare seu equipamento e fale comigo quando estiver pronto.');});
+document.querySelector('#wizardContinue').addEventListener('click',()=>{tutorialStage=2;wizardSpeechText.textContent='Há hahahaha, HAHAHA, Aiaiai, não consigo parar de rir, AUAIAIAI, Epa epa! Parabéns! Se quiser explorar a Torre Umbra de verdade, você tem minha bênção. Como recompensa, receba o Robe de mago!';document.querySelector('#wizardContinue').style.display='none';});
 wizardInteractBtn.addEventListener('click',openWizardDialogue);
-wizardInteractBtn.addEventListener('pointerup',e=>{e.preventDefault();openWizardDialogue();});
 
 
 // Helper for solid architectural pieces.
@@ -782,7 +797,7 @@ const itemCatalog={
  shield:{id:'shield',name:'Escudo do aprendiz',icon:'🛡️',type:'Item de suporte — mão esquerda',itemRole:'support',itemCategory:'offhand',skills:{3:{name:'Véu de Defesa',description:'Cria uma barreira circular de luz amarela ao redor do personagem por 6 segundos. A barreira acompanha seus movimentos e bloqueia projéteis em 360°.',effect:'defenseVeil',duration:6,manaCost:20,cooldown:20}},description:'Enquanto estiver equipado, segure o botão DEFENDER para bloquear e reduzir o dano recebido. Habilidade 3: Véu de Defesa — barreira circular de 360° por 6 segundos, custo de 20 de mana e recarga de 20 segundos.'},
  sword:{id:'sword',name:'Espada do aprendiz',icon:'🗡️',type:'Arma de corpo a corpo - Mão principal',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:7,skills:{1:{name:'Lâmina Giratória',description:'Aponta a espada à frente com as duas mãos e gira por 5 segundos, causando 10 de dano por segundo em uma área circular de 6 metros de diâmetro.',effect:'swordSpin',damage:10,duration:5,radius:3,manaCost:25,staminaCost:5,cooldown:15},2:{name:'Disparo Cortante',description:'Segure para mirar a trajetória do disparo cortante; a espada se ergue durante a mira e, ao soltar, dispara quase instantaneamente, causando 20 de dano a cada criatura atingida.',effect:'windSlash',damage:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Use o botão ATACAR para executar um corte para a frente que causa 7 de dano por acerto. Habilidade 1: Lâmina Giratória (5 segundos, área circular de 6 metros de diâmetro). Habilidade 2: Disparo Cortante (golpe em linha reta).'},
  crossbow:{id:'crossbow',name:'Balestra do aprendiz',icon:'⌁',type:'Arma de longo alcance — mão direita',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'projectile',damage:12,skills:{1:{name:'Chuva de Flechas',description:'Invoca por 4 segundos uma chuva de flechas numa área circular de 6 metros, posicionada cerca de 4 metros à frente do personagem no momento da conjuração. A área fica fixa no local escolhido. Causa 11 de dano por segundo dentro da área.',effect:'arrowRain',damage:11,duration:4,radius:6,manaCost:25,staminaCost:5,cooldown:20},2:{name:'Disparo Múltiplo',description:'Após uma animação de recarga, dispara 20 flechas imbuídas em mana em um leque mais fechado para a frente, causando 7 de dano por flecha que acertar.',effect:'multiShot',damage:7,arrows:20,manaCost:25,staminaCost:10,cooldown:15}},description:'Dispara uma flecha para a frente ao atacar. Cada flecha causa 12 de dano ao atingir uma criatura. Habilidade 1: Chuva de Flechas (4 segundos, raio de 6 metros, área fixa a cerca de 4 metros à frente, 11 de dano por segundo). Habilidade 2: Disparo Múltiplo (20 flechas azuis em leque fechado, 7 de dano cada). Enquanto estiver equipada, não é possível usar item na mão esquerda.'},
- simpleVestment:{id:'simple-vestment',name:'Vestes simples',icon:'👕',type:'Vestimenta - Visual',itemRole:'vestment',itemCategory:'vestment',rarity:'white',description:'Camisa regata branca, bermuda curta marrom e pés descalços. Este item altera apenas a aparência; não concede atributos, defesa ou efeitos encantados.'},
+ simpleVestment:{id:'simple-vestment',name:'Roupa verde',icon:'<svg viewBox="0 0 64 64" aria-label="Camisa verde" style="width:1.4em;height:1.4em;vertical-align:middle"><path fill="#21a447" stroke="#b7efc4" stroke-width="2" d="M20 8 8 15 2 29 14 35 20 26 20 56 44 56 44 26 50 35 62 29 56 15 44 8 38 13 26 13Z"/></svg>',type:'Vestimenta - Visual',itemRole:'vestment',itemCategory:'vestment',rarity:'white',description:'Camisa verde de manga longa e calça verde-escura. Altera apenas a aparência; não concede atributos, defesa ou efeitos encantados.'},
  knightSword:{id:'knight-sword',name:'Espada de cavaleiro',icon:'🗡️',type:'Arma de corpo a corpo - Mão principal',itemRole:'weapon',itemCategory:'rightHand',weaponClass:'melee',damage:10,rarity:'green',skills:{1:{name:'Investida Dourada',description:'Prepara a espada apontada para a frente e desliza até 10 metros, cortando todas as criaturas no caminho. Mira em linha reta e deixa um rastro luminoso de corte.',effect:'knightDash',damage:24,range:10,laneWidth:3,manaCost:25,staminaCost:10,cooldown:16},2:{name:'Impacto do Cavaleiro',description:'Salta alto e avança até 14 metros, caindo com força e causando dano numa área de 6 metros de diâmetro.',effect:'knightLeap',damage:30,range:14,radius:3,manaCost:30,staminaCost:15,cooldown:20}},description:'Espada de qualidade média (categoria verde). Ataque básico causa 10 de dano por acerto. Habilidade 1: Lâmina fatiadora. Habilidade 2: Espada esmagadora.'}
 };
 // Sistema genérico de armas: o dano vem dos dados do próprio item na mochila.
@@ -794,6 +809,14 @@ function getWeaponData(){
 }
 function damageCreature(creature,amount,source='weapon'){
  if(!creature||!creature.alive||!Number.isFinite(amount)||amount<=0)return false;
+ if(creature.type==='wizard'){
+  creature.health=Math.max(0,creature.health-amount);creature.damageFlashTimer=.28;
+  const awayX=creature.root.position.x-hero.position.x,awayZ=creature.root.position.z-hero.position.z;const awayLen=Math.hypot(awayX,awayZ)||1;
+  creature.knockbackX=awayX/awayLen;creature.knockbackZ=awayZ/awayLen;creature.knockbackTimer=.24;creature.knockbackPower=5.2;
+  creature.barFill.scale.x=Math.max(.001,creature.health/creature.maxHealth);creature.barFill.position.x=-(1-creature.health/creature.maxHealth)*.495;
+  if(creature.health<=creature.maxHealth*.30){creature.health=creature.maxHealth*.30;creature.alive=false;wizardCombatEnded=true;for(const summoned of creatures){if(summoned!==creature&&summoned.type==='slime'&&summoned.waveNumber===5&&summoned.alive){summoned.alive=false;summoned.root.visible=false;if(summoned.attackRing)summoned.attackRing.visible=false;}}document.querySelector('#wizardBossBar').style.display='none';creature.barFill.scale.x=.30;wizardBookOpen.visible=false;wizard.rotation.z=.42;wizard.position.y=.94;wizardSpeechText.textContent='Há hahahaha, HAHAHA, Aiaiai, não consigo parar de rir, AUAIAIAI, Epa epa!';wizardSpeechOpen=true;wizardSpeech.classList.add('visible');tutorialStage=1;countdownWave=0;leverActivated=false;leverPivot.rotation.x=leverStartAngle;setTimeout(()=>{if(!robeRewardGranted){robeRewardGranted=true;wizardLeaving=true;const empty=playerItems.findIndex(it=>!it);if(empty>=0)playerItems[empty]={...itemCatalog.simpleVestment,id:'wizard-robe',name:'Robe de mago',icon:'',type:'Vestimenta - Visual',itemRole:'vestment',itemCategory:'vestment',rarity:'purple',manaBonus:100,staminaBonus:30,description:'Robe de mago: túnica azul de manga longa com brilho azul-claro. Concede +100 de mana máxima e +30 de stamina máxima.'};attributeState.mana+=100;attributeState.stamina+=30;currentResources.mana=Math.min(attributeState.mana,currentResources.mana+100);currentResources.stamina=Math.min(attributeState.stamina,currentResources.stamina+30);updateAttributeHud();renderAttributes();renderEquipment();renderInventory();}wizardSpeechText.textContent='Parabéns! Se quiser explorar a Torre Umbra de verdade, você tem minha bênção. Como recompensa, receba o Robe de mago: +100 de mana e +30 de stamina. Depois vou para minha casa; venha comigo conhecer a cidade de Umbra.';refreshWizardDialogueChoices();},4000);say('Você venceu a quinta horda!');}
+  return true;
+ }
  creature.health=Math.max(0,creature.health-amount);
  // Feedback visual e físico para confirmar cada acerto. Cada criatura tem material próprio
  // para que o flash vermelho não altere a cor de outros slimes.
@@ -812,6 +835,7 @@ function damageCreature(creature,amount,source='weapon'){
   // Finalização universal: qualquer criatura viva que chegue a zero concede XP uma única vez.
   // O valor fica registrado na própria criatura ao nascer, sem depender de onda ou drop visual.
   creature.alive=false;
+  if(creature.type==='slime'&&creature.waveNumber===5&&wizardCombat&&!wizardCombatEnded){wizardCombat.totalSummonDeaths=(wizardCombat.totalSummonDeaths||0)+1;if(wizardCombat.summonStage<1){wizardCombat.summonStage=1;wizardCombat.summonWait=0;createSlime(-4.2,1.5,0,'yellow',5);createSlime(4.2,1.5,0,'yellow',5);}else if(wizardCombat.summonStage<2){wizardCombat.summonStage=2;wizardCombat.summonWait=0;createAcidSlime(-4.5,3.2,0,5);createAcidSlime(4.5,3.2,0,5);}}
   updateWaveHudProgress();
   creature.root.visible=false;
   updateWaveHudProgress();
@@ -846,11 +870,11 @@ function damageCreature(creature,amount,source='weapon'){
  return true;
 }
 const playerItems=Array(30).fill(null);
-const makePotion=(id,name,resource,color,size='pequena')=>{const restore=size==='grande'?100:size==='média'||size==='media'?50:10;return {id,name,icon:'🧪',potion:true,stackable:true,quantity:1,resource,color,restore,size,type:'Poção consumível',description:`Restaura ${restore} pontos de ${resource==='health'?'vida':resource==='stamina'?'estamina':'mana'}.`};};
+const makePotion=(id,name,resource,color,size='pequena')=>{const normalized=String(size).toLowerCase();const restore=(normalized==='máxima'||normalized==='maxima'||normalized==='máxima'||normalized==='max')?200:(normalized==='grande'||normalized==='large')?100:(normalized==='média'||normalized==='media'||normalized==='medium')?50:10;return {id,name,icon:'🧪',potion:true,stackable:true,quantity:1,resource,color,restore,size,type:'Poção consumível',description:`Restaura ${restore} pontos de ${resource==='health'?'vida':resource==='stamina'?'estamina':'mana'}.`};};
 const chestItems=Array(20).fill(null);
 const hiddenBagItems=Array(5).fill(null);
 const silverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:10,description:'10 moedas de prata.'};
-[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6],chestItems[7]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,itemCatalog.simpleVestment,{...makePotion('health-potion','Poção pequena de vida','health','#e8343e'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
+[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6],chestItems[7]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,itemCatalog.simpleVestment,{...makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
 itemCatalog.sword.rarity='white';itemCatalog.crossbow.rarity='white';itemCatalog.shield.rarity='white';
 const bagManaPotions=makePotion('mana-potion-small','Poção pequena de mana','mana','#258bff','pequena');bagManaPotions.quantity=3;
 const bagMediumHealth=makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média');bagMediumHealth.quantity=2;
@@ -861,9 +885,11 @@ const itemDetails=document.querySelector('#itemDetails');
 const itemQualityColors={white:'#f1f1f1',green:'#62e879',blue:'#61a9ff',purple:'#d28aff',gold:'#ffd45c'};
 const itemQualityNames={white:'Qualidade baixa',green:'Qualidade média',blue:'Qualidade boa',purple:'Qualidade muito boa',gold:'Qualidade suprema'};
 document.querySelector('#itemDetailsClose').addEventListener('click',()=>itemDetails.classList.remove('visible'));
+function potionSizeClass(item){const size=String(item?.size||'pequena').toLowerCase();if(size==='média'||size==='media'||size==='medium')return 'potion-medium';if(size==='grande'||size==='large')return 'potion-large';if(size==='máxima'||size==='maxima'||size==='max')return 'potion-max';return 'potion-small';}
 function getItemRarity(item){
- // Equipamentos sem raridade explícita pertencem à categoria branca por padrão.
+ // Poções usam categoria pela capacidade: pequena branca, média verde, grande azul, máxima roxa.
  if(!item)return 'white';
+ if(item.potion){const size=String(item.size||'pequena').toLowerCase();if(size==='média'||size==='media'||size==='medium')return 'green';if(size==='grande'||size==='large')return 'blue';if(size==='máxima'||size==='maxima'||size==='max')return 'purple';return 'white';}
  if(item.rarity)return item.rarity;
  if(item.weaponClass||item.itemRole==='support'||item.itemRole==='vestment'||item.itemCategory==='offhand'||item.itemCategory==='support'||item.itemCategory==='vestment')return 'white';
  return null;
@@ -903,7 +929,7 @@ function getItemDisplayType(item){
 function showItemDetails(item){
  const useBtn=document.querySelector('#usePotionBtn'),equipBtn=document.querySelector('#equipItemBtn');
  if(!item){itemDetails.classList.remove('visible');useBtn.style.display='none';equipBtn.style.display='none';return;}
- const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon';bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
+ const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();iconHost.style.filter='';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon '+potionSizeClass(item);bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
  document.querySelector('#itemDetailsNameText').textContent=item.name;
  const qualityLabel=document.querySelector('#itemQualityLabel');
  const rarity=getItemRarity(item);
@@ -940,7 +966,7 @@ const equipmentSlots={rightHand:{label:'Mão principal',accepts:item=>item.itemR
 function itemFitsEquipmentSlot(item,key){const rule=equipmentSlots[key];return !!(item&&rule&&rule.accepts(item));}
 function equipItemFromInventory(index){
  const item=playerItems[index];if(!item)return;
- const key=itemFitsEquipmentSlot(item,'rightHand')?'rightHand':itemFitsEquipmentSlot(item,'leftHand')?'leftHand':itemFitsEquipmentSlot(item,'amulet')?'amulet':null;
+ const key=itemFitsEquipmentSlot(item,'rightHand')?'rightHand':itemFitsEquipmentSlot(item,'leftHand')?'leftHand':itemFitsEquipmentSlot(item,'amulet')?'amulet':itemFitsEquipmentSlot(item,'vestment')?'vestment':null;
  if(!key){say('Esse item não pode ser equipado.');return;}
  const requiredLevel=getRequiredEquipmentLevel(item);
  if(experienceState.level<requiredLevel){say(`Você ainda não tem nível suficiente para usar ${item.name}. Requer nível ${requiredLevel}.`);return;}
@@ -964,7 +990,7 @@ function renderSpecialSkills(){
   const numberEl=slot.querySelector('.specialSkillNumber');
   if(numberEl){numberEl.replaceChildren();if(item){appendItemIcon(numberEl,item, n===3?'🛡️':n===4?'📿':'🗡️');numberEl.setAttribute('aria-label',`Ícone do item ${item.name}`);numberEl.title=item.name;}else{numberEl.textContent=String(n);numberEl.setAttribute('aria-label',`Habilidade ${n}`);numberEl.removeAttribute('title');}}
   slot.classList.toggle('available',!!item&&!!skill);
-  if(!item){nameEl.textContent=n<=2?'Habilidade da mão principal':n===3?'Habilidade da mão secundária':'Habilidade do amuleto';sourceEl.textContent='';sourceEl.style.display='none';}
+  if(!item){nameEl.textContent=n<=2?'Habilidade da mão principal':n===3?'Habilidade da mão secundária':'Hiper raio';sourceEl.textContent='';sourceEl.style.display='none';}
   else if(skill){
    nameEl.textContent=skill.name||`Habilidade ${n}`;
    const force=skill.effect==='defenseVeil'?`Bloqueio de projéteis por ${skill.duration||0} segundos`:skill.duration&&skill.damage?`${skill.damage} por segundo`:`${skill.damage||0} por contato`;
@@ -995,7 +1021,7 @@ const equippedItems={rightHand:null,leftHand:null,amulet:null,vestment:null};
 // Ícones ilustrados para que os itens da mochila se pareçam com os modelos equipados.
 function appendItemIcon(container,item,fallback=''){
  const id=item?.id;
- if(id==='sword'||id==='knight-sword'||id==='shield'||id==='crossbow'){
+ if(id==='sword'||id==='knight-sword'||id==='shield'||id==='crossbow'||id==='simple-vestment'||id==='wizard-robe'){
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
   if(id==='sword'||id==='knight-sword'){
@@ -1003,6 +1029,10 @@ function appendItemIcon(container,item,fallback=''){
    svg.innerHTML=id==='knight-sword'?' <path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#45484d" stroke="#202226" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#858990"/><path d="M20 28 L35 43" stroke="#55585e" stroke-width="7" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#222429" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#3c3f44" stroke-width="8" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#1c1e22" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#4a4d52" stroke="#202226" stroke-width="1.5"/>' : '<path d="M51 4 L60 2 L57 13 L31 39 L24 32 Z" fill="#e6f0f8" stroke="#596b7b" stroke-width="2" stroke-linejoin="round"/><path d="M51 4 L60 2 L57 13 Z" fill="#ffffff"/><path d="M20 28 L35 43" stroke="#e2bf70" stroke-width="6" stroke-linecap="round"/><path d="M20 28 L35 43" stroke="#6c4a28" stroke-width="1.5" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#9a6336" stroke-width="7" stroke-linecap="round"/><path d="M28 35 L14 49" stroke="#55351f" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="53" r="3.5" fill="#d6b16a" stroke="#68451f" stroke-width="1.5"/>'; 
   }else if(id==='shield'){
    svg.innerHTML='<path d="M32 4 L54 12 L52 34 Q49 49 32 59 Q15 49 12 34 L10 12 Z" fill="#2475d5" stroke="#b9d8ff" stroke-width="3" stroke-linejoin="round"/><path d="M32 9 L48 15 L46 33 Q43 44 32 51 Q21 44 18 33 L16 15 Z" fill="#1558a7" stroke="#438fe8" stroke-width="1.5"/><circle cx="32" cy="29" r="10" fill="#f4c542" stroke="#fff0a0" stroke-width="2.5"/><circle cx="32" cy="29" r="4" fill="#ffe88a"/>';
+  }else if(id==='simple-vestment'){
+   svg.innerHTML='<path d="M20 8 L8 15 L2 29 L14 35 L20 26 L20 56 L44 56 L44 26 L50 35 L62 29 L56 15 L44 8 L38 13 L26 13 Z" fill="#21a447" stroke="#b7efc4" stroke-width="2" stroke-linejoin="round"/><path d="M26 13 Q32 18 38 13" fill="none" stroke="#0d7130" stroke-width="2"/>';
+  }else if(id==='wizard-robe'){
+   svg.innerHTML='<defs><filter id="robeGlow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M21 7 L8 14 L2 30 L14 35 L20 25 L20 57 L44 57 L44 25 L50 35 L62 30 L56 14 L43 7 L38 13 L26 13 Z" fill="#176ce8" stroke="#9eeeff" stroke-width="3" stroke-linejoin="round" filter="url(#robeGlow)"/><path d="M26 13 Q32 18 38 13" fill="none" stroke="#c8f8ff" stroke-width="2"/><path d="M32 17 L32 51" stroke="#75dfff" stroke-width="2"/>';
   }else{
    // Balestra: coronha, trilho central, arco transversal e corda — não um arco de mão.
    svg.innerHTML='<path d="M26 27 L36 27 L40 57 L30 59 Z" fill="#8a542d" stroke="#4b2b18" stroke-width="2" stroke-linejoin="round"/><path d="M28 30 L34 30 L36 53 L32 54 Z" fill="#bd874c"/><rect x="28" y="19" width="8" height="25" rx="2" fill="#596775" stroke="#c3d0d8" stroke-width="1.5"/><path d="M32 23 L32 5" stroke="#dce7ed" stroke-width="3" stroke-linecap="round"/><path d="M32 7 Q17 2 7 13 Q14 25 29 25" fill="none" stroke="#8d5a34" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 7 Q47 2 57 13 Q50 25 35 25" fill="none" stroke="#8d5a34" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13 Q32 37 57 13" fill="none" stroke="#e5d9bd" stroke-width="1.8"/><path d="M32 6 L32 31" stroke="#f3d27b" stroke-width="1.5"/><path d="M28 20 L36 20" stroke="#d6b36a" stroke-width="3" stroke-linecap="round"/>';
@@ -1015,7 +1045,7 @@ function renderEquipment(){
  swordGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.weaponClass==='melee';
  const knightSwordEquipped=equippedItems.rightHand?.id==='knight-sword';
  grip.material=knightSwordEquipped?knightDarkGripMat:defaultGripMat;pommel.material=knightSwordEquipped?knightDarkMat:defaultPommelMat;guard.material=knightSwordEquipped?knightDarkLightMat:defaultGuardMat;blade.material=knightSwordEquipped?knightDarkMat:defaultBladeMat;tip.material=knightSwordEquipped?knightDarkLightMat:defaultTipMat;
- const wearingSimple=equippedItems.vestment?.id==='simple-vestment';hero.traverse(o=>{if(!o.isMesh)return;if(o.material===shirt||o.material===vestmentShirtMat)o.material=wearingSimple?vestmentShirtMat:shirt;if(o.material===pants||o.material===vestmentPantsMat)o.material=wearingSimple?vestmentPantsMat:pants;if(o.material===shoe)o.visible=!wearingSimple;});
+ const wearingGreenOutfit=equippedItems.vestment?.id==='simple-vestment';const wearingWizardRobe=equippedItems.vestment?.id==='wizard-robe';hero.traverse(o=>{if(!o.isMesh)return;if(o.material===shirt||o.material===vestmentShirtMat||o.material===wizardRobeShirtMat)o.material=wearingWizardRobe?wizardRobeShirtMat:(wearingGreenOutfit?vestmentShirtMat:shirt);if(o.material===pants||o.material===vestmentPantsMat||o.material===wizardRobePantsMat)o.material=wearingWizardRobe?wizardRobePantsMat:(wearingGreenOutfit?vestmentPantsMat:pants);if(o.material===shoe)o.visible=true;});[upperArmL,upperArmR].forEach(segment=>{segment.material=wearingWizardRobe?wizardRobeShirtMat:(wearingGreenOutfit?vestmentShirtMat:skin);});if(heroWizardRobeMesh){heroWizardRobeMesh.visible=wearingWizardRobe;heroRobeGlow.visible=wearingWizardRobe;}
  crossbowGroup.visible=!!equippedItems.rightHand && equippedItems.rightHand.id==='crossbow';
  quiverGroup.visible=crossbowGroup.visible;
  shieldGroup.visible=!!equippedItems.leftHand && equippedItems.leftHand.id==='shield';
@@ -1023,7 +1053,7 @@ function renderEquipment(){
   const key=slot.dataset.equipSlot,item=equippedItems[key];slot.replaceChildren();slot.classList.toggle('equipped',!!item);
   slot.setAttribute('aria-label',item?`${equipmentSlots[key].label}: ${item.name}`:`Espaço de ${equipmentSlots[key].label}`);
   const icon=document.createElement('span');icon.className='equipIcon';appendItemIcon(icon,item,key==='rightHand'?'🗡️':key==='leftHand'?'🛡️':key==='amulet'?'📿':'🧥');slot.appendChild(icon);
-  const label=document.createElement('span');label.className='equipLabel';label.textContent=item?item.name:equipmentSlots[key].label;slot.appendChild(label);if(item?.itemRole==='vestment'){icon.textContent='👕';icon.style.filter='hue-rotate(75deg) saturate(1.4)';}
+  const label=document.createElement('span');label.className='equipLabel';label.textContent=item?item.name:equipmentSlots[key].label;slot.appendChild(label);
   slot.onclick=()=>{if(item)showItemDetails(item);};
   slot.onpointerdown=e=>{if(!item||e.button!==0)return;dragState={source:'equipment',sourceIndex:key,item,startX:e.clientX,startY:e.clientY,active:false,slot};};
  });
@@ -1036,9 +1066,10 @@ function renderInventory(){
    const item=items[i],slot=document.createElement('button');
    slot.type='button';slot.className='inventorySlot'+(item?' filled':'')+(item&&experienceState.level<getRequiredEquipmentLevel(item)?' level-locked':'');
    slot.dataset.source=source;slot.dataset.index=String(i);
+   if(item){const rarity=getItemRarity(item)||'white';slot.style.setProperty('--category-color',itemQualityColors[rarity]||itemQualityColors.white);}
    slot.setAttribute('aria-label',item?`${item.name}, toque para ver informações e arraste para mover`:`Espaço vazio ${i+1}`);
    const number=document.createElement('span');number.className='slotNumber';number.textContent=String(i+1);slot.appendChild(number);
-   if(item){const icon=document.createElement('span');icon.className='itemIcon';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon';bottle.style.setProperty('--liquid',item.color);bottle.setAttribute('aria-label',item.name);icon.appendChild(bottle);}else appendItemIcon(icon,item);slot.appendChild(icon);if(isStackable(item)){const qty=document.createElement('span');qty.className='stackQuantity';qty.textContent=`×${item.quantity||1}`;qty.style.cssText='position:absolute;right:3px;bottom:2px;padding:1px 4px;border-radius:8px;background:#101710eF;color:#fff2bd;font-size:10px;font-weight:900';slot.appendChild(qty);}}
+   if(item){const icon=document.createElement('span');icon.className='itemIcon';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon '+potionSizeClass(item);bottle.style.setProperty('--liquid',item.color);bottle.setAttribute('aria-label',item.name);icon.appendChild(bottle);}else appendItemIcon(icon,item);slot.appendChild(icon);if(isStackable(item)){const qty=document.createElement('span');qty.className='stackQuantity';qty.textContent=`×${item.quantity||1}`;qty.style.cssText='position:absolute;right:3px;bottom:2px;padding:1px 4px;border-radius:8px;background:#101710eF;color:#fff2bd;font-size:10px;font-weight:900';slot.appendChild(qty);}}
    slot.addEventListener('click',()=>{if(Date.now()<suppressInventoryClickUntil)return;showItemDetails(item);});
    slot.addEventListener('pointerdown',e=>{if(!item||e.button!==0)return;dragState={source,sourceIndex:i,item,startX:e.clientX,startY:e.clientY,active:false,slot};});
    element.appendChild(slot);
@@ -1143,13 +1174,83 @@ openChestBtn.addEventListener('click',()=>{
  chestOpened=true;openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');openInventory('chest');
 });
 openBagBtn.addEventListener('click',()=>{openBagBtn.classList.remove('visible');openChestBtn.classList.remove('visible');openInventory('bag');});
+
+let wizardLeaving=false;let wizardCombat=null;const wizardOrbs=[];const wizardSpellEffects=[];let hyperRay=null;let hyperRayLockTimer=0;let wizardSkillTimers={yellow:0,blue:0,green:0,hat:200,basic:1.8};
+function beginWizardCombat(){
+ if(wizardCombat)return;
+ wizardCombatEnded=false;wizardSkillTimers={yellow:25,blue:20,green:50,hat:200,basic:1.8};
+ const body=wizard.children.find(o=>o.isMesh&&o.geometry&&o.geometry.type==='CapsuleGeometry')||wizard.children.find(o=>o.isMesh);
+ const healthGroup=new THREE.Group();healthGroup.position.set(0,2.72,0);wizard.add(healthGroup);
+ const back=new THREE.Mesh(new THREE.PlaneGeometry(1.05,.12),mat(0x29151f));healthGroup.add(back);
+ const barFill=new THREE.Mesh(new THREE.PlaneGeometry(.99,.075),mat(0x55e36b));barFill.position.z=.006;healthGroup.add(barFill);
+ wizardCombat={type:'wizard',variant:'wizard',waveNumber:5,xpReward:0,root:wizard,body,bodyBaseColor:body.material.color.clone(),health:250,maxHealth:250,mana:250,maxMana:250,radius:.55,height:2.5,speed:1.1,attackCooldown:0,attackState:'wizard',attackTimer:0,alive:true,healthGroup,barFill,attackRing:null,phase:0,damage:5,groundY:0,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0,castAnimTimer:0,castAnimDuration:0,castAnimType:null,castAnimBaseY:0,pedestalDescent:0};
+ creatures.push(wizardCombat);wizardCombat.root.visible=true;
+ showWizardSummonBeam(-3.8,-2.5,0xff66db);showWizardSummonBeam(3.8,-2.5,0xff66db);createSlime(-3.8,-2.5,0,'pink',5);createSlime(3.8,-2.5,0,'pink',5);wizardCombat.summonStage=0;wizardCombat.summonWait=0;wizardCombat.totalSummonDeaths=0;
+ say('Horda 5: o mago entrou em combate e invocou dois slimes rosas! Reduza a vida dele a 75 pontos para vencer.');
+}
+function showWizardSummonBeam(x,z,color){
+ const markerMat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.9,emissive:color});
+ const beamMat=new THREE.MeshBasicMaterial({color,transparent:true,opacity:.72,depthWrite:false});
+ const beam=new THREE.Mesh(new THREE.CylinderGeometry(.16,.28,7,12,1,true),beamMat);beam.position.set(x,3.5,z);scene.add(beam);
+ const marker=new THREE.Mesh(new THREE.RingGeometry(.25,.62,24),markerMat);marker.rotation.x=-Math.PI/2;marker.position.set(x,.035,z);scene.add(marker);
+ wizardSpellEffects.push({beam,marker,life:1.15,maxLife:1.15,beamMat,markerMat});
+}
+function updateWizardSpellEffects(dt){for(let i=wizardSpellEffects.length-1;i>=0;i--){const e=wizardSpellEffects[i];e.life-=dt;const pulse=.75+.25*Math.sin((e.maxLife-e.life)*24);e.beam.scale.x=pulse;e.beam.scale.z=pulse;e.beam.material.opacity=Math.min(.8,e.life/e.maxLife*.8);e.marker.material.opacity=Math.min(1,e.life/e.maxLife);if(e.life<=0){scene.remove(e.beam);scene.remove(e.marker);e.beam.geometry.dispose();e.marker.geometry.dispose();e.beamMat.dispose();e.markerMat.dispose();wizardSpellEffects.splice(i,1);}}}
+function castWizardOrb(){
+ const orb=new THREE.Mesh(new THREE.SphereGeometry(.18,12,10),new THREE.MeshStandardMaterial({color:0x258cff,emissive:0x1258c9,emissiveIntensity:1.2}));
+ const start=new THREE.Vector3();wizard.localToWorld(start.set(.0,1.45,.32));scene.add(orb);orb.position.copy(start);
+ const target=hero.position.clone().add(new THREE.Vector3(0,.8,0));const delta=target.clone().sub(start);wizardOrbs.push({mesh:orb,velocity:delta.normalize().multiplyScalar(8),life:3,hit:false});
+}
+function updateWizardOrbs(dt){for(let i=wizardOrbs.length-1;i>=0;i--){const o=wizardOrbs[i];o.life-=dt;o.mesh.position.addScaledVector(o.velocity,dt);if(!o.hit&&o.mesh.position.distanceTo(hero.position.clone().add(new THREE.Vector3(0,.8,0)))<.7){o.hit=true;const defending=actions.defend&&equippedItems.leftHand&&equippedItems.leftHand.id==='shield';const dmg=defending?3:5;currentResources.health=Math.max(0,currentResources.health-dmg);applyPlayerDamage(dmg,defending,'Esfera mágica do mago',true);if(currentResources.health<=0)triggerPlayerDeath();o.life=0;}if(o.life<=0){scene.remove(o.mesh);o.mesh.geometry.dispose();o.mesh.material.dispose();wizardOrbs.splice(i,1);}}}
+function startHyperRay(){
+ if(hyperRay)return;
+ const target=hero.position.clone();
+ const group=new THREE.Group();group.position.set(target.x,1.12,target.z);scene.add(group);
+ const coreMat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.94,depthWrite:false});
+ const glowMat=new THREE.MeshBasicMaterial({color:0xc9f1ff,transparent:true,opacity:.42,depthWrite:false,blending:THREE.AdditiveBlending});
+ const core=new THREE.Mesh(new THREE.CylinderGeometry(.62,.82,2.7,18,1,true),coreMat);group.add(core);
+ const glow=new THREE.Mesh(new THREE.CylinderGeometry(.95,1.18,2.85,18,1,true),glowMat);group.add(glow);
+ const top=new THREE.Mesh(new THREE.SphereGeometry(.82,16,12),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.9}));top.position.y=1.2;group.add(top);
+ hyperRay={group,coreMat,glowMat,life:3,elapsed:0,damageDone:0};hyperRayLockTimer=3;
+ say('Hiper raio! Você está preso no raio por 3 segundos!');
+}
+function updateHyperRay(dt){
+ if(!hyperRay)return;
+ const h=hyperRay;h.elapsed+=dt;h.life=Math.max(0,3-h.elapsed);h.group.rotation.y+=dt*1.8;
+ const pulse=1+.07*Math.sin(h.elapsed*22);h.group.scale.set(pulse,1,pulse);
+ const targetDamage=160*Math.min(1,h.elapsed/3);const delta=targetDamage-h.damageDone;
+ if(delta>0){currentResources.health=Math.max(0,currentResources.health-delta);h.damageDone=targetDamage;applyPlayerDamage(delta,false,'Hiper raio',true);if(currentResources.health<=0)triggerPlayerDeath();}
+ hyperRayLockTimer=Math.max(0,3-h.elapsed);
+ if(h.life<=0){scene.remove(h.group);h.group.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});hyperRay=null;hyperRayLockTimer=0;}
+}
+function updateWizardCombat(c,dt){
+ updateHyperRay(dt);
+ updateWizardSpellEffects(dt);c.phase+=dt*3;c.healthGroup.quaternion.copy(camera.quaternion);
+ // Reação de dano: pisca vermelho e sofre um pequeno empurrão, respeitando colisões.
+ if(c.damageFlashTimer>0){c.damageFlashTimer=Math.max(0,c.damageFlashTimer-dt);const pulse=.35+.65*Math.abs(Math.sin((.28-c.damageFlashTimer)*Math.PI*10));c.body.material.color.copy(c.bodyBaseColor).lerp(new THREE.Color(0xff1717),pulse);}else c.body.material.color.copy(c.bodyBaseColor);
+ if(c.knockbackTimer>0){const step=c.knockbackPower*dt,nx=c.root.position.x+c.knockbackX*step,nz=c.root.position.z+c.knockbackZ*step;if(creatureCanOccupy(c,nx,c.root.position.z))c.root.position.x=nx;if(creatureCanOccupy(c,c.root.position.x,nz))c.root.position.z=nz;c.knockbackTimer=Math.max(0,c.knockbackTimer-dt);c.knockbackPower*=Math.exp(-8*dt);}
+ let wizardFloor=0;const wr=Math.max(Math.abs(c.root.position.x-pedestal.x),Math.abs(c.root.position.z-pedestal.z));
+ for(const platform of platformColliders){const dx=Math.abs(c.root.position.x-platform.x),dz=Math.abs(c.root.position.z-platform.z),r=Math.max(dx,dz);const within=platform.isStep?(r>=platform.inner-.03&&r<=platform.outer+.04):(dx<=platform.halfX+.02&&dz<=platform.halfZ+.02);if(within&&platform.top>wizardFloor)wizardFloor=platform.top;}
+ if(c.pedestalDescent<1){
+  const hasLeftPedestal=wizardFloor<pedestal.top-.05&&(Math.abs(c.root.position.x-pedestal.x)>pedestal.halfX-.15||Math.abs(c.root.position.z-pedestal.z)>pedestal.halfZ-.15);
+  if(hasLeftPedestal)c.pedestalDescent=Math.min(1,c.pedestalDescent+dt/1.35);
+  c.root.position.y=hasLeftPedestal?THREE.MathUtils.lerp(pedestal.top,wizardFloor,c.pedestalDescent):wizardFloor;
+ }else c.root.position.y=wizardFloor;
+ c.barFill.scale.x=Math.max(.001,c.health/c.maxHealth);c.barFill.position.x=-(1-c.health/c.maxHealth)*.495;
+ wizardSkillTimers.yellow-=dt;wizardSkillTimers.blue-=dt;wizardSkillTimers.green-=dt;wizardSkillTimers.hat-=dt;wizardSkillTimers.basic-=dt;
+ const d=Math.hypot(hero.position.x-c.root.position.x,hero.position.z-c.root.position.z);c.root.rotation.y=Math.atan2(hero.position.x-c.root.position.x,hero.position.z-c.root.position.z);
+ if(currentWave>=5&&wave5Started&&d>2.25){const dx=(hero.position.x-c.root.position.x)/(d||1),dz=(hero.position.z-c.root.position.z)/(d||1);const nx=c.root.position.x+dx*c.speed*dt,nz=c.root.position.z+dz*c.speed*dt;if(creatureCanOccupy(c,nx,nz)){c.root.position.x=nx;c.root.position.z=nz;}}
+ if(wizardSkillTimers.green<=0&&c.mana>=50&&!creatures.some(q=>q.alive&&q.waveNumber===5&&q.variant==='yellow')){c.mana-=50;const sx=c.root.position.x+4.2,sz=c.root.position.z+1.5;showWizardSummonBeam(sx,sz,0xffe43b);createSlime(sx,sz,0,'yellow',5);wizardSkillTimers.green=50;wizardBookOpen.visible=true;setTimeout(()=>setWizardBookOpen(false),1100);say('Conjuração amarela: o livro do mago invoca um slime amarelo!');}
+ if(wizardSkillTimers.hat<=0&&c.mana>=80&&d<11){c.mana-=80;startHyperRay();wizardSkillTimers.hat=200;say('Hiper raio: o mago canaliza um raio branco por 3 segundos!');}
+ if(wizardSkillTimers.basic<=0){castWizardOrb();wizardSkillTimers.basic=2.8;}
+}
 const useLeverBtn=document.querySelector('#useLeverBtn');
 const tutorialOverlay=document.querySelector('#tutorialOverlay');
 const spawnCountdownEl=document.querySelector('#spawnCountdown');
-let spawnCountdown=0,slimeSpawned=false,countdownWave=1,wave2Started=false,wave3Started=false,wave4Started=false;
-let currentWave=0;
+let spawnCountdown=0,slimeSpawned=false,countdownWave=1,wave2Started=false,wave3Started=false,wave4Started=false,wave5Started=false,wizardCombatEnded=false;
+let currentWave=0;let tutorialStage=0;let robeRewardGranted=false;
 const waveHud=document.querySelector('#waveHud');
-const waveInfo={1:{label:'Horda 1',name:'Slime rosa',total:1},2:{label:'Horda 2',name:'Slime amarelo',total:3},3:{label:'Horda 3',name:'Slime verde',total:3},4:{label:'Horda 4',name:'Slime azul',total:4},5:{label:'Horda 5',name:'Criaturas',total:0}};
+const waveInfo={1:{label:'Horda 1',name:'Slime rosa',total:1},2:{label:'Horda 2',name:'Slime amarelo',total:3},3:{label:'Horda 3',name:'Slime verde',total:3},4:{label:'Horda 4',name:'Slime azul',total:4},5:{label:'Horda 5',name:'Mago e slimes invocados',total:1}};
 function updateWaveHudProgress(){
  const markerEl=document.querySelector('#waveSlimeMarkers');
  const speciesByWave={
@@ -1172,9 +1273,11 @@ function updateWaveHudProgress(){
 }
 function setWave(number){currentWave=number;updateWaveHudProgress();}
 useLeverBtn.addEventListener('click',()=>{
+ return;
  if(leverActivated||leverPulling)return;
  // Recupera o estado de transição caso um salvamento antigo tenha registrado a horda 3 concluída, mas countdownWave zerado.
  if(currentWave===3&&wave4Started&&countdownWave===0&&!creatures.some(c=>c.alive&&c.waveNumber===3))countdownWave=4;
+ if(currentWave===4&&!creatures.some(c=>c.alive&&c.waveNumber===4)&&!wave5Started&&countdownWave===0)countdownWave=5;
  if(countdownWave===4&&!attributePointsDistributed){
   say('O mago recomenda aprimorar seus atributos primeiro. Abra o menu de Atributos e distribua seus pontos pelo menos uma vez antes de puxar esta alavanca.');
   return;
@@ -1191,6 +1294,32 @@ useLeverBtn.addEventListener('click',()=>{
 document.querySelector('#closeInventoryBtn').addEventListener('click',closeInventory);
 renderAttributes();
 
+// Quatro caminhos de pedra saem do pedestal e seguem até a muralha, servindo como rotas para futuras áreas.
+const pathStone=mat(0x888b88);
+for(let i=0;i<4;i++){
+ const angle=i*Math.PI/2;
+ for(let dist=4.2;dist<=33.6;dist+=1.25){
+  const x=Math.sin(angle)*dist,z=-7+Math.cos(angle)*dist;
+  addBox(1.45,.10,1.15,pathStone,x,.06,z);
+ }
+}
+// Porta de madeira maciça no caminho leste, embutida na muralha. Por enquanto é apenas a saída visual da cidade.
+// O painel é fechado e sem vãos; a abertura física da muralha é reservada para esta porta.
+const trainingGateGroup=new THREE.Group();trainingGateGroup.position.set(34.15,0,-7);trainingGateGroup.scale.setScalar(1.2);scene.add(trainingGateGroup); // portão 20% maior
+const gateWood=mat(0x57351f),gateWoodLight=mat(0x704629),gateIron=mat(0x292724);
+// Folha maciça: tábuas sobrepostas, sem frestas visíveis.
+for(let i=0;i<7;i++){
+ const plank=new THREE.Mesh(new THREE.BoxGeometry(.30,3.05,.56),i%2?gateWood:gateWoodLight);
+ plank.position.set(0,1.57,-1.68+i*.56);plank.castShadow=true;plank.receiveShadow=true;trainingGateGroup.add(plank);
+}
+// Travessas e ferragens ficam na face interna da porta.
+for(const y of [.62,1.72,2.72]){
+ const beam=new THREE.Mesh(new THREE.BoxGeometry(.12,.18,3.98),gateIron);beam.position.set(-.19,y,0);beam.castShadow=true;trainingGateGroup.add(beam);
+}
+for(const z of [-1.92,1.92]){
+ const hinge=new THREE.Mesh(new THREE.BoxGeometry(.14,3.08,.16),gateIron);hinge.position.set(-.20,1.56,z);hinge.castShadow=true;trainingGateGroup.add(hinge);
+}
+const gateHandle=new THREE.Mesh(new THREE.BoxGeometry(.10,.34,.14),gateIron);gateHandle.position.set(-.27,1.55,-1.25);trainingGateGroup.add(gateHandle);
 // Rounded 6x6 stone pedestal with beveled edges; avoids coplanar surfaces that caused flickering.
 const pedestal={x:0,z:-7,halfX:3,halfZ:3,top:.94};
 const pedestalStone=mat(0x777b79),pedestalTrim=mat(0xa4a69d),pedestalDark=mat(0x5e6665);
@@ -1349,7 +1478,7 @@ function createSlime(x,z,groundY=0,variant='pink',waveNumber=1){
  const isYellow=variant==='yellow',isBlue=variant==='blue';
  // Slimes amarelos são maiores; os azuis têm metade da altura do herói e alta velocidade.
  if(isYellow)root.scale.setScalar(1.4);if(isBlue)root.scale.setScalar(.62);
- const slime={type:'slime',variant,waveNumber,xpReward:isBlue?50:(isYellow?60:50),root,body,bodyBaseColor,health:isBlue?35:(isYellow?45:30),maxHealth:isBlue?35:(isYellow?45:30),radius:isBlue?.30:(isYellow?.672:.48),height:isBlue?.72:(isYellow?1.624:1.16),speed:isBlue?8:(isYellow?3.05:1.25),attackCooldown:isBlue?.5:(isYellow?.65:1.1),attackState:isBlue?'blueSlide':'chase',attackTimer:0,attackTime:0,evadeCooldown:Math.random()*.35,alive:true,healthGroup,barFill,attackRing,phase:Math.random()*Math.PI*2,damage:isBlue?5:10,attackRadius:isBlue?1.15:2.6,groundY,leapStartX:x,leapStartZ:z,leapTargetX:x,leapTargetZ:z,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0,blueSlideCount:0,blueDirX:Math.random()<.5?1:-1,blueDirZ:0,blueStartX:x,blueStartZ:z,blueTargetX:x,blueTargetZ:z,blueChargeHit:false};
+ const slime={type:'slime',variant,waveNumber,xpReward:isBlue?50:(isYellow?60:50),root,body,bodyBaseColor,health:isBlue?35:(isYellow?45:80),maxHealth:isBlue?35:(isYellow?45:80),radius:isBlue?.30:(isYellow?.672:.48),height:isBlue?.72:(isYellow?1.624:1.16),speed:isBlue?6.2:(isYellow?3.05:1.25),attackCooldown:isBlue?.5:(isYellow?.65:1.1),attackState:isBlue?'blueSlide':'chase',attackTimer:0,attackTime:0,evadeCooldown:Math.random()*.35,alive:true,healthGroup,barFill,attackRing,phase:Math.random()*Math.PI*2,damage:isBlue?5:10,attackRadius:isBlue?1.15:2.6,groundY,leapStartX:x,leapStartZ:z,leapTargetX:x,leapTargetZ:z,damageFlashTimer:0,knockbackTimer:0,knockbackX:0,knockbackZ:0,knockbackPower:0,blueSlideCount:0,blueDirX:Math.random()<.5?1:-1,blueDirZ:0,blueStartX:x,blueStartZ:z,blueTargetX:x,blueTargetZ:z,blueChargeHit:false};
  creatures.push(slime);return slime;
 }
 function createAcidSlime(x,z,groundY=0,waveNumber=3){
@@ -1396,7 +1525,9 @@ function creatureCanOccupy(c,x,z){
  for(const a of archColliders){if(Math.hypot(x-a.x,z-a.z)<a.r+c.radius && c.root.position.y<a.top-.05)return false;}
  // Baú e alavanca são objetos sólidos para criaturas.
  if(Math.hypot(x-chestX,z-chestZ)<.92+c.radius)return false;
- if(Math.hypot(x-1.45,z-(-4.85))<.48+c.radius && c.root.position.y>pedestal.top-.1)return false;
+ if(c.type!=='wizard'&&Math.hypot(x-1.45,z-(-4.85))<.48+c.radius && c.root.position.y>pedestal.top-.1)return false;
+ // Degraus têm colisão própria: criatura não atravessa a face vertical; só sobe se alcançar o próximo patamar.
+ for(const step of platformColliders){if(!step.isStep)continue;const r=Math.max(Math.abs(x-step.x),Math.abs(z-step.z));if(r<step.outer+c.radius&&r>step.inner-c.radius&&c.root.position.y<step.top-.12){if(r>step.outer-.28||r<step.inner+.28)return false;}}
  // A borda vertical do pedestal bloqueia criaturas que ainda estão no chão.
  if(c.root.position.y<.55 && Math.abs(x-pedestal.x)<pedestal.halfX+c.radius && Math.abs(z-pedestal.z)<pedestal.halfZ+c.radius)return false;
  for(const other of creatures){if(other===c||!other.alive)continue;const separation=(c.variant==='yellow'&&other.variant==='yellow')?2.7:c.radius+other.radius;if(Math.hypot(x-other.root.position.x,z-other.root.position.z)<separation)return false;}
@@ -1449,18 +1580,20 @@ function triggerPlayerDeath(){
 function revivePlayer(restart=false){
  if(restart){location.reload();return;}
  if(deathScreenTimer){clearTimeout(deathScreenTimer);deathScreenTimer=null;}
- playerDead=false;deathAnimationTime=0;hero.rotation.z=0;hero.rotation.x=0;hero.position.y=0;vy=0;jumping=false;jumpSquat=0;
+ playerDead=false;deathAnimationTime=0;hero.rotation.z=0;hero.rotation.x=0;hero.position.y=0;vy=0;jumping=false;jumpSquat=0;heroKnockbackTimer=0;heroKnockbackPower=0;
  heroKnockbackTimer=0;heroKnockbackPower=0;
  currentResources.health=attributeState.health;currentResources.mana=attributeState.mana;currentResources.stamina=attributeState.stamina;updateAttributeHud();
  const overlay=document.querySelector('#deathOverlay');overlay.classList.remove('visible','announcing');overlay.style.background='';overlay.style.display='none';overlay.style.pointerEvents='';
  const announcement=document.querySelector('#deathAnnouncement');if(announcement)announcement.style.display='';const card=document.querySelector('#deathCard');if(card)card.style.display='';
- for(const c of creatures){if(!c.alive)continue;c.attackState='chase';c.attackTimer=0;c.attackCooldown=Math.max(c.attackCooldown,1.2);c.attackRing.visible=false;}
- slimeAttackOwner=null;actions.attack=false;actions.defend=false;actions.run=false;say('Você voltou à vida com todos os atributos restaurados!');
+ for(const c of creatures){if(!c.alive)continue;if(c.attackRing)c.attackRing.visible=false;}
+ actions.attack=false;actions.defend=false;actions.run=false;say('Você voltou à vida com todos os atributos restaurados! As criaturas continuam em combate.');
 }
 document.querySelector('#restoreBtn').addEventListener('click',()=>revivePlayer(false));
 document.querySelector('#restartBtn').addEventListener('click',()=>revivePlayer(true));
 function updateCreatures(dt){
+ if(wizardSpellEffects.length&&!wizardCombat?.alive)updateWizardSpellEffects(dt);
  for(const c of creatures){if(!c.alive)continue;
+  if(c.type==='wizard'){updateWizardCombat(c,dt);continue;}
   c.phase+=dt*3.2;
   // Flash rouge court : l'intensité pulse e retorna à cor original sem piscar permanentemente.
   if(c.damageFlashTimer>0){
@@ -1620,16 +1753,19 @@ function updateCreatures(dt){
 
 // Continuous stone perimeter walls keep the compact tutorial map enclosed.
 const wallStone=mat(0x777f7d),wallTrim=mat(0x9da39a),wallDark=mat(0x626b69);
-const MAP_HALF=35, WALL_H=3.25, WALL_T=1.15;
+const MAP_HALF=35, WALL_H=5.20, WALL_T=1.84; // muralhas 60% maiores em altura e espessura
 addBox(70,WALL_H,WALL_T,wallStone,0,WALL_H/2,-MAP_HALF+.15);
 addBox(70,WALL_H,WALL_T,wallStone,0,WALL_H/2, MAP_HALF-.15);
 addBox(WALL_T,WALL_H,70,wallStone,-MAP_HALF+.15,WALL_H/2,0);
-addBox(WALL_T,WALL_H,70,wallStone, MAP_HALF-.15,WALL_H/2,0);
+// Muralha leste dividida em dois trechos para acomodar a porta fechada no caminho da cidade.
+addBox(WALL_T,WALL_H,25.8,wallStone, MAP_HALF-.15,WALL_H/2,-22.1);
+addBox(WALL_T,WALL_H,39.8,wallStone, MAP_HALF-.15,WALL_H/2,15.0);
 // Broad stone coping and regularly spaced crenellations give the walls a finished silhouette.
 addBox(70.8,.22,1.42,wallTrim,0,WALL_H+.06,-MAP_HALF+.15);
 addBox(70.8,.22,1.42,wallTrim,0,WALL_H+.06, MAP_HALF-.15);
 addBox(1.42,.22,70.8,wallTrim,-MAP_HALF+.15,WALL_H+.06,0);
-addBox(1.42,.22,70.8,wallTrim, MAP_HALF-.15,WALL_H+.06,0);
+addBox(1.42,.22,26.6,wallTrim, MAP_HALF-.15,WALL_H+.06,-22.1);
+addBox(1.42,.22,40.6,wallTrim, MAP_HALF-.15,WALL_H+.06,15.0);
 for(let i=-32;i<=32;i+=4){
   for(const z of [-MAP_HALF+.15,MAP_HALF-.15]) addBox(1.15,.48,1.48,wallTrim,i,WALL_H+.37,z);
   for(const x of [-MAP_HALF+.15,MAP_HALF-.15]) addBox(1.48,.48,1.15,x,WALL_H+.37,i);
@@ -2199,6 +2335,7 @@ function animate(){
  const forward=-mz;
  let vx=(mx*Math.cos(cameraYaw)-forward*Math.sin(cameraYaw))*speed;
  let vz=(-mx*Math.sin(cameraYaw)-forward*Math.cos(cameraYaw))*speed;
+ if(hyperRayLockTimer>0){vx=0;vz=0;}
  if(heroKnockbackTimer>0){vx+=heroKnockbackX*heroKnockbackPower;vz+=heroKnockbackZ*heroKnockbackPower;heroKnockbackTimer=Math.max(0,heroKnockbackTimer-dt);heroKnockbackPower*=Math.exp(-7*dt);}
  // Colisão horizontal com todas as pedras: bloqueia a lateral, mas permite passar por cima no salto.
  const nextX=THREE.MathUtils.clamp(hero.position.x+vx*dt,-33.98,33.98);
@@ -2229,14 +2366,15 @@ function animate(){
  }
  // Walk-up support: gently snap onto each stair when its top is within one step of the creature's feet.
  for(const platform of platformColliders){
-  const dx=Math.abs(nextX-platform.x),dz=Math.abs(nextZ-platform.z);
-  const rise=platform.top-hero.position.y;
-  // Stair rings use a square-ring footprint: between their inner and outer edges.
-  const radius=Math.max(dx,dz);
-  const within=platform.isStep
-   ? radius>=platform.inner-.16 && radius<=platform.outer-.02
-   : dx<=platform.halfX-.10 && dz<=platform.halfZ-.10;
-  if(within && rise>.001 && rise<=.255 && !jumping && jumpSquat<=0){hero.position.y=platform.top;vy=0;}
+  const dx=Math.abs(nextX-platform.x),dz=Math.abs(nextZ-platform.z),rise=platform.top-hero.position.y,radius=Math.max(dx,dz);
+  const within=platform.isStep?(radius>=platform.inner-.20&&radius<=platform.outer+.03):(dx<=platform.halfX-.10&&dz<=platform.halfZ-.10);
+  // Each stair tier is its own physical platform: step up when reachable, and keep grounded feet on its top.
+  if(within&&!jumping&&jumpSquat<=0&&rise>=-.06&&rise<=.27){hero.position.y=platform.top;vy=0;}
+  if(platform.isStep&&hero.position.y<platform.top-.10&&radius<platform.outer+.29&&radius>platform.inner-.29){
+   const edge=platform.outer+.30;const inner=platform.inner-.30;
+   if(radius>platform.outer-.30){if(Math.abs(dx)>Math.abs(dz))resolvedX=platform.x+Math.sign(resolvedX-platform.x||1)*edge;else resolvedZ=platform.z+Math.sign(resolvedZ-platform.z||1)*edge;}
+   else if(radius<platform.inner+.30){if(Math.abs(dx)>Math.abs(dz))resolvedX=platform.x+Math.sign(resolvedX-platform.x||1)*inner;else resolvedZ=platform.z+Math.sign(resolvedZ-platform.z||1)*inner;}
+  }
  }
  // The main pedestal blocks movement through its sides; the stair blocks are walkable risers.
  for(const platform of platformColliders){
@@ -2475,7 +2613,7 @@ function animate(){
    }
    if(pull>=1){
      leverPulling=false;leverActivated=true;leverPivot.rotation.x=leverEndAngle;
-     if(countdownWave>=1&&countdownWave<=4){
+     if(countdownWave>=1&&countdownWave<=5){
       spawnCountdown=5;spawnCountdownEl.textContent='5';spawnCountdownEl.classList.add('visible');
       // Limpa qualquer mensagem anterior: durante a contagem aparecem somente os números.
       message.classList.remove('show');clearTimeout(messageTimer);
@@ -2521,10 +2659,14 @@ function animate(){
     setWave(4);
     createSlime(-15,-7,0,'blue',4);createSlime(15,-7,0,'blue',4);createSlime(-10,8,0,'blue',4);createSlime(10,8,0,'blue',4);
     updateWaveHudProgress();say('Horda 4: Quatro slimes azuis');countdownWave=0;
+   }else if(countdownWave===5){
+    setWave(5);wave5Started=true;beginWizardCombat();updateWaveHudProgress();countdownWave=0;
    }
   }
  }
- updateCreatures(dt);
+ if(wizardLeaving&&!wizardSpeechOpen){const dx=34.1-wizard.position.x,dz=-7-wizard.position.z,d=Math.hypot(dx,dz);if(d>.45){wizard.position.x+=dx/d*1.5*dt;wizard.position.z+=dz/d*1.5*dt;wizard.rotation.y=Math.atan2(dx,dz);}else{wizard.visible=false;wizardLeaving=false;}}
+ updateCreatures(dt);updateWizardOrbs(dt);
+ if(wizardCombat&&!wizardCombatEnded&&wizardCombat.alive){wizardCombat.summonWait=(wizardCombat.summonWait||0)+dt;const variants=['pink','yellow','green'];for(const variant of variants){const active=creatures.some(c=>c.type==='slime'&&c.waveNumber===5&&c.variant===variant&&c.alive);const unlocked=variant==='pink'||(variant==='yellow'&&(wizardCombat.summonStage||0)>=1)||(variant==='green'&&(wizardCombat.summonStage||0)>=2);if(unlocked&&!active&&wizardCombat.summonWait>=5){if(variant==='pink'){createSlime(-3.8,-2.5,0,'pink',5);createSlime(3.8,-2.5,0,'pink',5);}else if(variant==='yellow'){createSlime(-4.2,1.5,0,'yellow',5);createSlime(4.2,1.5,0,'yellow',5);}else{createAcidSlime(-4.5,3.2,0,5);createAcidSlime(4.5,3.2,0,5);}wizardCombat.summonWait=0;break;}}}
  if(hero.userData.damageFlashTimer>0){hero.userData.damageFlashTimer=Math.max(0,hero.userData.damageFlashTimer-dt);hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color){if(!o.userData.damageBaseColor)o.userData.damageBaseColor=o.material.color.clone();o.material.color.copy(o.userData.damageBaseColor).lerp(new THREE.Color(0xff1717),.55);}});}else{hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&o.userData.damageBaseColor)o.material.color.copy(o.userData.damageBaseColor);});}
  updateAcidProjectiles(dt);
  updateLootDrops(dt);
@@ -2533,8 +2675,8 @@ function animate(){
  const wizardDistance=Math.hypot(wizardDx,wizardDz);
  const wizardFacingDot=wizardDistance>.001?(Math.sin(hero.rotation.y)*wizardDx+Math.cos(hero.rotation.y)*wizardDz)/wizardDistance:1;
  const wizardCanInteract=wizardDistance<3.25&&wizardFacingDot>.2&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
- wizardInteractBtn.classList.toggle('visible',wizardCanInteract);
- if(wizardSpeechOpen&&(wizardDistance>4.8||inventoryOverlay.classList.contains('open')||attributesOverlay.classList.contains('open')||tutorialOverlay.classList.contains('open')||playerDead)){wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');}
+ wizardInteractBtn.classList.toggle('visible',wizardCanInteract&&!wizardSpeechOpen);
+ if(wizardSpeechOpen&&((wizardDistance>4.8&&!wizardCombatEnded)||inventoryOverlay.classList.contains('open')||attributesOverlay.classList.contains('open')||tutorialOverlay.classList.contains('open')||playerDead)){wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');}
 
  // Opção contextual para virar a alavanca quando o personagem se aproxima e olha para ela.
  const leverWorld=new THREE.Vector3(1.45,pedestal.top,-4.85);
@@ -2542,7 +2684,7 @@ function animate(){
  const leverDistance=Math.hypot(leverDx,leverDz);
  const leverFacingDot=leverDistance>.001?(Math.sin(hero.rotation.y)*leverDx+Math.cos(hero.rotation.y)*leverDz)/leverDistance:1;
  const leverInFront=leverDistance<2.25&&leverFacingDot>.35&&!leverActivated&&!leverPulling&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open');
- useLeverBtn.classList.toggle('visible',leverInFront);
+ useLeverBtn.classList.remove('visible');
 
  // Show the contextual chest action only when the creature is close and looking toward it.
  const chestDx=chestX-hero.position.x, chestDz=chestZ-hero.position.z;
@@ -2606,7 +2748,7 @@ function saveGameManually(){
    camera:{yaw:cameraYaw,pitch:cameraPitch},
    attributeState:cloneSaveValue(attributeState),currentResources:cloneSaveValue(currentResources),experienceState:cloneSaveValue(experienceState),skillPoints,attributePointsDistributed,
    playerItems:cloneSaveValue(playerItems),chestItems:cloneSaveValue(chestItems),hiddenBagItems:cloneSaveValue(hiddenBagItems),equippedItems:cloneSaveValue(equippedItems),
-   chestOpened,leverActivated,leverPivotAngle:leverPivot.rotation.x,slimeSpawned,countdownWave,wave2Started,wave3Started,wave4Started,currentWave,
+   chestOpened,leverActivated,leverPivotAngle:leverPivot.rotation.x,slimeSpawned,countdownWave,wave2Started,wave3Started,wave4Started,wave5Started,wizardCombatEnded,currentWave,tutorialStage,robeRewardGranted,wizardLeaving,
    creatures:creatures.map(c=>({type:c.type,variant:c.variant,waveNumber:c.waveNumber,x:c.root.position.x,y:c.root.position.y,z:c.root.position.z,rotationY:c.root.rotation.y,health:c.health,maxHealth:c.maxHealth,alive:c.alive,phase:c.phase,attackState:c.attackState,attackTimer:c.attackTimer,attackTime:c.attackTime,attackCooldown:c.attackCooldown,slideDir:c.slideDir,slideCenterX:c.slideCenterX,slideCenterZ:c.slideCenterZ,slidePhase:c.slidePhase,groundY:c.groundY})),
    lootDrops:lootDrops.map(d=>({type:d.type,amount:d.amount,x:d.group.position.x,z:d.group.position.z,groundY:d.groundY}))
   };
@@ -2643,8 +2785,8 @@ function loadGameManually(){
   if(data.equippedItems){for(const key of Object.keys(equippedItems))equippedItems[key]=data.equippedItems[key]||null;}
   chestOpened=!!data.chestOpened;
   leverActivated=!!data.leverActivated;leverPulling=false;leverPullTime=0;leverPivot.rotation.x=Number(data.leverPivotAngle)||0;
-  slimeSpawned=!!data.slimeSpawned;countdownWave=Number(data.countdownWave)||0;wave2Started=!!data.wave2Started;wave3Started=!!data.wave3Started;wave4Started=!!data.wave4Started;
-  currentWave=Number(data.currentWave)||0;if(currentWave>0)setWave(currentWave);else waveHud.innerHTML='<span>Horda - 0</span>';updateWaveHudProgress();
+  slimeSpawned=!!data.slimeSpawned;countdownWave=Number(data.countdownWave)||0;wave2Started=!!data.wave2Started;wave3Started=!!data.wave3Started;wave4Started=!!data.wave4Started;wave5Started=!!data.wave5Started;wizardCombatEnded=!!data.wizardCombatEnded;
+  tutorialStage=Number(data.tutorialStage)||0;robeRewardGranted=!!data.robeRewardGranted;wizardLeaving=!!data.wizardLeaving;currentWave=Number(data.currentWave)||0;if(currentWave>0)setWave(currentWave);else waveHud.innerHTML='<span>Horda - 0</span>';updateWaveHudProgress();
   spawnCountdown=0;spawnCountdownEl.classList.remove('visible');
   // Recriar criaturas com a mesma posição, vida e estado vivo/morto registrados.
   for(const c of creatures){scene.remove(c.root);}
