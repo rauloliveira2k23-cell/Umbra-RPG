@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
+<!-- v1.69: textured masonry walls and paths; stone infill above the wooden gate. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Umbra: O Segredo da Torre — v158</title>
+<title>Umbra: O Segredo da Torre — v1.69</title>
 <style>
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9bc8e8;font-family:system-ui,Arial;touch-action:none}
   #stage{position:absolute;inset:0;width:100vw;height:100vh;overflow:hidden;touch-action:none;z-index:0;background:#9bc8e8}
@@ -53,6 +54,8 @@
   #openBagBtn.visible{display:block}
   #openBagBtn:active{transform:translate(-50%,-48%);filter:brightness(1.15)}
   
+  #openRockBagBtn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:12px 18px;border:1px solid #e5cda5;border-radius:14px;background:#71502df2;color:#fff;font-size:13px;font-weight:900;box-shadow:0 4px 0 #39220e,0 5px 16px #0008;touch-action:manipulation;white-space:nowrap}
+  #openRockBagBtn.visible{display:block}
   #useLeverBtn{position:absolute;left:50%;top:61%;transform:translate(-50%,-50%);z-index:45;display:none;pointer-events:auto;padding:13px 20px;border:1px solid #fff2b8;border-radius:14px;background:#8a5b1ff2;color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px;box-shadow:0 4px 0 #3d260c,0 5px 16px #0008;text-shadow:0 1px 2px #000;touch-action:manipulation;white-space:nowrap}
   #useLeverBtn.visible{display:block}
   #tutorialOverlay{display:none!important}
@@ -134,7 +137,7 @@
   #itemDetailsName{font-size:15px;font-weight:950;color:#f4d69b}
   #itemDetailsType{font-size:11px;font-weight:800;color:#b7d7c1}#itemQualityLabel{display:none;font-size:12px;font-weight:900}
   #itemDetailsDescription{font-size:12px;line-height:1.45;color:#e6dfcf;white-space:pre-line}
-  .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}.potionIcon.potion-small{width:12px;height:22px;border-radius:3px 3px 5px 5px}.potionIcon.potion-small:before{left:2px;width:4px}.potionIcon.potion-medium{width:17px;height:24px}.potionIcon.potion-large{width:20px;height:27px;border-radius:5px 5px 7px 7px}.potionIcon.potion-max{width:23px;height:29px;border-radius:6px 6px 8px 8px}
+  .potionIcon{position:relative;display:inline-block;width:17px;height:24px;margin:2px 0 0;border:2px solid #d7d9c8;border-radius:4px 4px 6px 6px;background:linear-gradient(to top,var(--liquid) 0 67%,#d9f5ff55 68% 100%);box-shadow:inset 2px 0 2px #ffffff55,0 1px 3px #0008;box-sizing:border-box}.potionIcon.potion-small{width:12px;height:22px;border-radius:3px 3px 5px 5px}.potionIcon.potion-small:before{left:2px;width:4px}.potionIcon.potion-medium{width:17px;height:24px}.potionIcon.potion-large{width:20px;height:27px;border-radius:8px 8px 10px 10px}.potionIcon.potion-large-health{width:20px;height:27px;border-radius:9px 9px 11px 11px;transform:scaleX(1.02)}.potionIcon.potion-max{width:23px;height:29px;border-radius:6px 6px 8px 8px}
   .potionIcon:before{content:"";position:absolute;left:4px;top:-7px;width:6px;height:5px;border:1px solid #d7d9c8;border-bottom:0;border-radius:2px 2px 0 0;background:#a7aa9d}
   #usePotionBtn,#equipItemBtn{justify-self:start;border:1px solid #b6d9a0;border-radius:7px;background:#315b37;color:#fff5d8;font-weight:900;padding:7px 12px;touch-action:manipulation}#equipItemBtn{background:#765329;border-color:#f0d08a}#itemDetailsName{display:flex;align-items:center;gap:8px}#itemDetailsIcon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 30px;width:30px;height:30px}#itemDetailsIcon svg{width:30px;height:30px;display:block}
   .inventorySlot.filled{border-color:var(--category-color,#f1f1f1);background:linear-gradient(145deg,#655034,#382b1e);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--category-color,#f1f1f1) 18%,transparent)}
@@ -194,8 +197,9 @@
  <button id="fullscreenBtn" type="button" aria-label="Ativar tela cheia" title="Tela cheia / sair da tela cheia">⛶</button>
  <button id="openChestBtn" type="button">📦 ABRIR BAÚ</button>
  <button id="openBagBtn" type="button">🎒 ABRIR BOLSA</button>
- <button id="useLeverBtn" type="button" style="display:none!important" aria-hidden="true">⚙️ VIRAR A ALAVANCA</button>
- <div id="wizardBossBar" style="display:none;position:absolute;z-index:24;top:7%;left:50%;transform:translateX(-50%);width:min(72vw,520px);padding:7px 10px;border:2px solid #d5b4ff;border-radius:10px;background:#171021eF;color:#fff;text-align:center;font-weight:900;box-shadow:0 3px 14px #0008"><div style="font-size:13px;letter-spacing:1px;margin-bottom:5px">MAGO — CHEFE</div><div style="height:13px;background:#3b243d;border-radius:8px;overflow:hidden"><div id="wizardBossFill" style="height:100%;width:100%;background:linear-gradient(90deg,#7a39dc,#c69aff);transition:width .15s"></div></div><div id="wizardBossHealthText" style="font-size:11px;margin-top:3px">250 / 250</div></div><button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
+ <button id="openRockBagBtn" type="button">🎒 ABRIR POCHETE</button>
+ <button id="useLeverBtn" type="button">⚙️ VIRAR A ALAVANCA</button>
+ <div id="wizardBossBar" style="display:none;position:absolute;z-index:24;top:7%;left:50%;transform:translateX(-50%);width:min(72vw,520px);padding:7px 10px;border:2px solid #d5b4ff;border-radius:10px;background:#171021eF;color:#fff;text-align:center;font-weight:900;box-shadow:0 3px 14px #0008"><div style="font-size:13px;letter-spacing:1px;margin-bottom:5px">GANDALF — CHEFE</div><div style="height:13px;background:#3b243d;border-radius:8px;overflow:hidden"><div id="wizardBossFill" style="height:100%;width:100%;background:linear-gradient(90deg,#7a39dc,#c69aff);transition:width .15s"></div></div><div id="wizardBossHealthText" style="font-size:11px;margin-top:3px">250 / 250</div></div><button id="wizardInteractBtn" type="button">💬 INTERAGIR</button>
  <div id="wizardSpeech" role="status" aria-live="polite"><button id="wizardSpeechClose" type="button" aria-label="Fechar balão de fala" title="Fechar diálogo">✕</button><span id="wizardSpeechText"></span><div id="wizardDialogueChoices" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px"><button id="wizardStartCombat" type="button" style="display:none">Iniciar combate</button><button id="wizardPrepare" type="button" style="display:none">Vou me preparar</button><button id="wizardContinue" type="button" style="display:none">Continuar</button></div></div>
  <div id="tutorialOverlay" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle"><div id="tutorialCard"><h2 id="tutorialTitle">📜 Tutorial ativado!</h2><p>Converse com o mago para iniciar cada combate. Use os controles para aprender os movimentos básicos.</p><ul><li><b>Joystick / WASD:</b> movimentar o personagem.</li><li><b>BATER / J:</b> atacar ou disparar com a balestra.</li><li><b>DEFENDER / K:</b> bloquear com o escudo equipado.</li><li><b>PULAR / Espaço:</b> saltar obstáculos.</li><li><b>CORRER / Shift:</b> correr mais rápido.</li></ul><button id="tutorialClose" type="button">ENTENDI</button></div></div>
  <div id="spawnCountdown" aria-live="assertive">5</div>
@@ -509,10 +513,15 @@ const wizardRobeShirtMat=new THREE.MeshStandardMaterial({color:0x164fc2,roughnes
 
 // NPC guia: mago humano com túnica azul, chapéu pontudo, cajado e livro.
 const wizard=new THREE.Group();wizard.position.set(0,.94,-7);wizard.rotation.y=0;scene.add(wizard); // Centro do pedestal; permanece ali até começar a quinta horda.
-const wizardBlue=mat(0x123bba),wizardBlueLight=mat(0x285ce0),wizardTrim=mat(0xe2d6a6),wizardSkin=mat(0xe6bd98),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x633c28),bookPages=mat(0xf4e7c8),wizardBeard=mat(0xf0eee4);
-part(wizard,new THREE.CapsuleGeometry(.34,.62,4,8),wizardBlue,0,1.02,0,1.1,1.2,.82);
+const wizardBlue=mat(0xbfc2c4),wizardBlueLight=mat(0xe0e2e3),wizardCrystal=mat(0x285ce0),wizardTrim=mat(0xd8cda8),wizardSkin=mat(0xe6bd98),wizardDark=mat(0x17213c),wizardWood=mat(0x694326),wizardGold=mat(0xe8bd55),bookCover=mat(0x633c28),bookPages=mat(0xf4e7c8),wizardBeard=mat(0xf0eee4);
+const wizardTorso=part(wizard,new THREE.CapsuleGeometry(.34,.62,4,8),wizardBlue,0,1.02,0,1.1,1.2,.82);
 part(wizard,new THREE.ConeGeometry(.22,.34,8),wizardBlue,0,.42,0,1.6,1,1.5); // base larga da túnica
 part(wizard,new THREE.SphereGeometry(.255,12,10),wizardSkin,0,1.78,0,.95,1,.9);
+const wizardHairMat=mat(0xf0eee8);
+part(wizard,new THREE.CapsuleGeometry(.075,.48,4,7),wizardHairMat,-.22,1.55,-.055,.9,1,.9).rotation.z=-.08;
+part(wizard,new THREE.CapsuleGeometry(.075,.48,4,7),wizardHairMat,.22,1.55,-.055,.9,1,.9).rotation.z=.08;
+part(wizard,new THREE.CapsuleGeometry(.06,.38,4,7),wizardHairMat,-.27,1.43,-.035,.8,1,.8).rotation.z=-.12;
+part(wizard,new THREE.CapsuleGeometry(.06,.38,4,7),wizardHairMat,.27,1.43,-.035,.8,1,.8).rotation.z=.12;
 // Rosto detalhado voltado para a frente (+Z): olhos, sobrancelhas, nariz e orelhas.
 const wizardEyeWhite=mat(0xf7f4e9),wizardEye=mat(0x26364a),wizardBrow=mat(0x9b9a91),wizardNose=mat(0xd5a17d);
 part(wizard,new THREE.SphereGeometry(.052,10,8),wizardEyeWhite,-.105,1.82,.238,1,.82,.48);
@@ -539,21 +548,15 @@ for(const side of [-1,1]){
  const seam=part(wizard,new THREE.CapsuleGeometry(.018,.42,3,5),wizardTrim,side*.235,1.02,.205,1,1,1);
  seam.rotation.z=side*.12;
 }
-// Chapéu de mago clássico: copa pontuda + aba larga e circular ao redor da cabeça.
-part(wizard,new THREE.CylinderGeometry(.44,.44,.075,24),wizardBlue,0,2.015,0,1,1,.92);
-part(wizard,new THREE.TorusGeometry(.37,.035,8,24),wizardTrim,0,2.055,0,1,1,.92);
-part(wizard,new THREE.ConeGeometry(.25,.58,12),wizardBlueLight,0,2.32,-.015,1,1,1);
-part(wizard,new THREE.TorusGeometry(.245,.025,6,16),wizardGold,0,2.12,0,1,1,.92);
-// Pequenas runas decorativas na frente do chapéu.
-part(wizard,new THREE.OctahedronGeometry(.055),wizardGold,0,2.12,.22);
-part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,-.38,1.16,0,1,1,.9).rotation.z=-.42;
-part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,.38,1.16,0,1,1,.9).rotation.z=.42;
+// Gandalf não usa chapéu: cabelo branco longo e barba branca compõem a silhueta.
+const wizardArmLeft=part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,-.38,1.16,0,1,1,.9);wizardArmLeft.rotation.z=-.42;
+const wizardArmRight=part(wizard,new THREE.CapsuleGeometry(.105,.45,3,6),wizardBlueLight,.38,1.16,0,1,1,.9);wizardArmRight.rotation.z=.42;
 part(wizard,new THREE.SphereGeometry(.105,8,8),wizardSkin,-.53,1.02,.015);
 part(wizard,new THREE.SphereGeometry(.105,8,8),wizardSkin,.53,1.02,.015);
 // Cajado na mão esquerda (haste e cristal azul).
 part(wizard,new THREE.CylinderGeometry(.035,.05,1.55,8),wizardWood,-.67,1.15,.02);
-part(wizard,new THREE.SphereGeometry(.13,10,8),wizardBlueLight,-.67,1.98,.02);
-part(wizard,new THREE.OctahedronGeometry(.115),wizardTrim,-.67,2.0,.02);
+part(wizard,new THREE.SphereGeometry(.13,10,8),wizardCrystal,-.67,1.98,.02);
+part(wizard,new THREE.OctahedronGeometry(.115),wizardCrystal,-.67,2.0,.02);
 // Livro do mago: fechado por padrão, com emblema de slime na capa.
 const wizardBook=new THREE.Group();wizardBook.position.set(.63,1.12,.035);wizard.add(wizardBook);
 const wizardBookClosed=new THREE.Group();wizardBook.add(wizardBookClosed);
@@ -607,7 +610,7 @@ function startNextWizardCombat(){
 }
 document.querySelector('#wizardStartCombat').addEventListener('click',startNextWizardCombat);
 document.querySelector('#wizardPrepare').addEventListener('click',()=>{wizardSpeechOpen=false;wizardSpeech.classList.remove('visible');say('Tudo bem. Prepare seu equipamento e fale comigo quando estiver pronto.');});
-document.querySelector('#wizardContinue').addEventListener('click',()=>{tutorialStage=2;wizardSpeechText.textContent='Há hahahaha, HAHAHA, Aiaiai, não consigo parar de rir, AUAIAIAI, Epa epa! Parabéns! Se quiser explorar a Torre Umbra de verdade, você tem minha bênção. Como recompensa, receba o Robe de mago!';document.querySelector('#wizardContinue').style.display='none';});
+document.querySelector('#wizardContinue').addEventListener('click',()=>{tutorialStage=2;wizardSpeechText.textContent='Há hahahaha, HAHAHA, Aiaiai, não consigo parar de rir, AUAIAIAI, Epa epa! Parabéns! Se quiser explorar a Torre Umbra de verdade, você tem minha bênção. Como recompensa, receba a Veste de Mago!';document.querySelector('#wizardContinue').style.display='none';});
 wizardInteractBtn.addEventListener('click',openWizardDialogue);
 
 
@@ -669,15 +672,20 @@ function addCoverRock(x,z,scale=1){
  rockColliders.push(collider);coverRockColliders.push(collider);
 }
 for(const r of coverRockLocations)addCoverRock(r.x,r.z,r.scale);
-// Bolsa escondida atrás da rocha da quina traseira esquerda.
-const hiddenBagX=-32.45,hiddenBagZ=-32.25;
-const hiddenBag=new THREE.Group();hiddenBag.position.set(hiddenBagX,0,hiddenBagZ);scene.add(hiddenBag);
-const bagLeather=mat(0x6f4528),bagLeatherLight=mat(0x9a6738),bagCord=mat(0xd7b66b,.8);
-const bagBody=new THREE.Mesh(new THREE.SphereGeometry(.43,10,8),bagLeather);bagBody.scale.set(1,.78,.62);bagBody.position.y=.42;bagBody.castShadow=true;bagBody.receiveShadow=true;hiddenBag.add(bagBody);
-const bagFold=new THREE.Mesh(new THREE.SphereGeometry(.28,9,7),bagLeatherLight);bagFold.scale.set(1,.48,.72);bagFold.position.set(0,.67,0);bagFold.castShadow=true;hiddenBag.add(bagFold);
-const bagTie=new THREE.Mesh(new THREE.TorusGeometry(.18,.035,6,12),bagCord);bagTie.rotation.x=Math.PI/2;bagTie.position.set(0,.64,.02);hiddenBag.add(bagTie);
-const bagToken=new THREE.Mesh(new THREE.OctahedronGeometry(.09),bagCord);bagToken.position.set(0,.38,.25);hiddenBag.add(bagToken);
-rockColliders.push({x:hiddenBagX,z:hiddenBagZ,r:.48,top:.85,platformR:.3});
+// Bolsa antiga preservada atrás da rocha próxima à muralha, independente da pochete na árvore.
+const rockBagX=-31,rockBagZ=-32.05;
+const rockBagGroup=new THREE.Group();rockBagGroup.position.set(rockBagX,.035,rockBagZ);rockBagGroup.rotation.y=Math.PI/7;scene.add(rockBagGroup);
+const rockBagBody=new THREE.Mesh(new THREE.SphereGeometry(.30,10,8),mat(0x684326));rockBagBody.scale.set(1,.75,.62);rockBagBody.position.y=.18;rockBagBody.castShadow=true;rockBagGroup.add(rockBagBody);
+const rockBagFlap=new THREE.Mesh(new THREE.SphereGeometry(.20,9,7),mat(0x94653a));rockBagFlap.scale.set(1,.45,.72);rockBagFlap.position.y=.35;rockBagGroup.add(rockBagFlap);
+// Pochete pequena, marrom-clara, colocada sobre a pedra média escalável a leste do campo.
+// A rocha existente em (12, 13) tem topo físico em y=.68; a base da pochete encosta nesse topo.
+const hiddenBagX=12,hiddenBagZ=13;
+const hiddenBag=new THREE.Group();hiddenBag.position.set(hiddenBagX,.616,hiddenBagZ);hiddenBag.rotation.y=Math.PI/2;hiddenBag.scale.set(.58,.58,.58);scene.add(hiddenBag);
+const bagLeather=mat(0xcaa879),bagLeatherLight=mat(0xe0c49a),bagCord=mat(0x8b633e,.8);
+const bagBody=new THREE.Mesh(new THREE.BoxGeometry(.66,.38,.24),bagLeather);bagBody.position.y=.30;bagBody.castShadow=true;bagBody.receiveShadow=true;hiddenBag.add(bagBody);
+const bagFlap=new THREE.Mesh(new THREE.BoxGeometry(.69,.14,.27),bagLeatherLight);bagFlap.position.set(0,.51,.015);bagFlap.castShadow=true;hiddenBag.add(bagFlap);
+const bagBuckle=new THREE.Mesh(new THREE.BoxGeometry(.085,.085,.04),bagCord);bagBuckle.position.set(0,.42,.145);hiddenBag.add(bagBuckle);
+// Sem alça suspensa: a pochete está apoiada diretamente sobre a pedra.
 
 let chestOpened=false;
 const openChestBtn=document.querySelector('#openChestBtn');
@@ -814,7 +822,7 @@ function damageCreature(creature,amount,source='weapon'){
   const awayX=creature.root.position.x-hero.position.x,awayZ=creature.root.position.z-hero.position.z;const awayLen=Math.hypot(awayX,awayZ)||1;
   creature.knockbackX=awayX/awayLen;creature.knockbackZ=awayZ/awayLen;creature.knockbackTimer=.24;creature.knockbackPower=5.2;
   creature.barFill.scale.x=Math.max(.001,creature.health/creature.maxHealth);creature.barFill.position.x=-(1-creature.health/creature.maxHealth)*.495;
-  if(creature.health<=creature.maxHealth*.30){creature.health=creature.maxHealth*.30;creature.alive=false;wizardCombatEnded=true;for(const summoned of creatures){if(summoned!==creature&&summoned.type==='slime'&&summoned.waveNumber===5&&summoned.alive){summoned.alive=false;summoned.root.visible=false;if(summoned.attackRing)summoned.attackRing.visible=false;}}document.querySelector('#wizardBossBar').style.display='none';creature.barFill.scale.x=.30;wizardBookOpen.visible=false;wizard.rotation.z=.42;wizard.position.y=.94;wizardSpeechText.textContent='Há hahahaha, HAHAHA, Aiaiai, não consigo parar de rir, AUAIAIAI, Epa epa!';wizardSpeechOpen=true;wizardSpeech.classList.add('visible');tutorialStage=1;countdownWave=0;leverActivated=false;leverPivot.rotation.x=leverStartAngle;setTimeout(()=>{if(!robeRewardGranted){robeRewardGranted=true;wizardLeaving=true;const empty=playerItems.findIndex(it=>!it);if(empty>=0)playerItems[empty]={...itemCatalog.simpleVestment,id:'wizard-robe',name:'Robe de mago',icon:'',type:'Vestimenta - Visual',itemRole:'vestment',itemCategory:'vestment',rarity:'purple',manaBonus:100,staminaBonus:30,description:'Robe de mago: túnica azul de manga longa com brilho azul-claro. Concede +100 de mana máxima e +30 de stamina máxima.'};attributeState.mana+=100;attributeState.stamina+=30;currentResources.mana=Math.min(attributeState.mana,currentResources.mana+100);currentResources.stamina=Math.min(attributeState.stamina,currentResources.stamina+30);updateAttributeHud();renderAttributes();renderEquipment();renderInventory();}wizardSpeechText.textContent='Parabéns! Se quiser explorar a Torre Umbra de verdade, você tem minha bênção. Como recompensa, receba o Robe de mago: +100 de mana e +30 de stamina. Depois vou para minha casa; venha comigo conhecer a cidade de Umbra.';refreshWizardDialogueChoices();},4000);say('Você venceu a quinta horda!');}
+  if(creature.health<=creature.maxHealth*.30){creature.health=creature.maxHealth*.30;creature.alive=false;wizardCombatEnded=true;for(const summoned of creatures){if(summoned!==creature&&summoned.type==='slime'&&summoned.waveNumber===5&&summoned.alive){summoned.alive=false;summoned.root.visible=false;if(summoned.attackRing)summoned.attackRing.visible=false;}}document.querySelector('#wizardBossBar').style.display='none';creature.barFill.scale.x=.30;wizardBookOpen.visible=false;wizard.rotation.z=.42;wizard.position.y=.94;wizardSpeechText.textContent='Há hahahaha, HAHAHA, Aiaiai, não consigo parar de rir, AUAIAIAI, Epa epa!';wizardSpeechOpen=true;wizardSpeech.classList.add('visible');tutorialStage=1;countdownWave=0;leverActivated=false;leverPivot.rotation.x=leverStartAngle;setTimeout(()=>{if(!robeRewardGranted){robeRewardGranted=true;wizardLeaving=true;const empty=playerItems.findIndex(it=>!it);if(empty>=0)playerItems[empty]={...itemCatalog.simpleVestment,id:'wizard-robe',name:'Veste de Mago',icon:'',type:'Vestimenta - Visual',itemRole:'vestment',itemCategory:'vestment',rarity:'purple',manaBonus:100,staminaBonus:30,description:'Veste de Mago: túnica azul de manga longa com brilho azul-claro. Concede +100 de mana máxima e +30 de stamina máxima.'};attributeState.mana+=100;attributeState.stamina+=30;currentResources.mana=Math.min(attributeState.mana,currentResources.mana+100);currentResources.stamina=Math.min(attributeState.stamina,currentResources.stamina+30);updateAttributeHud();renderAttributes();renderEquipment();renderInventory();}wizardSpeechText.textContent='Parabéns! Se quiser explorar a Torre Umbra de verdade, você tem minha bênção. Como recompensa, receba a Veste de Mago: +100 de mana e +30 de stamina. Depois vou para minha casa; venha comigo conhecer a cidade de Umbra.';refreshWizardDialogueChoices();},4000);say('Você venceu a quinta horda!');}
   return true;
  }
  creature.health=Math.max(0,creature.health-amount);
@@ -873,13 +881,21 @@ const playerItems=Array(30).fill(null);
 const makePotion=(id,name,resource,color,size='pequena')=>{const normalized=String(size).toLowerCase();const restore=(normalized==='máxima'||normalized==='maxima'||normalized==='máxima'||normalized==='max')?200:(normalized==='grande'||normalized==='large')?100:(normalized==='média'||normalized==='media'||normalized==='medium')?50:10;return {id,name,icon:'🧪',potion:true,stackable:true,quantity:1,resource,color,restore,size,type:'Poção consumível',description:`Restaura ${restore} pontos de ${resource==='health'?'vida':resource==='stamina'?'estamina':'mana'}.`};};
 const chestItems=Array(20).fill(null);
 const hiddenBagItems=Array(5).fill(null);
+const rockBagItems=Array(5).fill(null);
 const silverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:10,description:'10 moedas de prata.'};
-[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6],chestItems[7]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,itemCatalog.simpleVestment,{...makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
+[chestItems[0],chestItems[1],chestItems[2],chestItems[3],chestItems[4],chestItems[5],chestItems[6],chestItems[7]]=[itemCatalog.sword,itemCatalog.crossbow,itemCatalog.shield,itemCatalog.simpleVestment,{...makePotion('health-potion-small','Poção pequena de vida','health','#e8343e','pequena'),quantity:4},{...makePotion('stamina-potion','Poção pequena de stamina','stamina','#38c65b'),quantity:2},{...makePotion('mana-potion','Poção pequena de mana','mana','#258bff'),quantity:2},silverCoins];
 itemCatalog.sword.rarity='white';itemCatalog.crossbow.rarity='white';itemCatalog.shield.rarity='white';
-const bagManaPotions=makePotion('mana-potion-small','Poção pequena de mana','mana','#258bff','pequena');bagManaPotions.quantity=3;
-const bagMediumHealth=makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média');bagMediumHealth.quantity=2;
-const bagSilverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:20,description:'20 moedas de prata.'};
-hiddenBagItems[0]=bagManaPotions;hiddenBagItems[1]=bagMediumHealth;hiddenBagItems[2]=bagSilverCoins;hiddenBagItems[3]=itemCatalog.knightSword;
+const bagStaminaPotions=makePotion('stamina-potion-small','Poção pequena de stamina','stamina','#38c65b','pequena');bagStaminaPotions.quantity=4;
+const bagHealthPotions=makePotion('health-potion-small','Poção pequena de vida','health','#e8343e','pequena');bagHealthPotions.quantity=7;
+const bagManaPotions=makePotion('mana-potion-small','Poção pequena de mana','mana','#258bff','pequena');bagManaPotions.quantity=5;
+const bagLargeHealth=makePotion('health-potion-large','Poção grande de vida','health','#e8343e','grande');bagLargeHealth.quantity=1;bagLargeHealth.largeHealthIcon=true;
+const bagSilverCoins={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:15,description:'15 moedas de prata.'};
+hiddenBagItems[0]=bagStaminaPotions;hiddenBagItems[1]=bagHealthPotions;hiddenBagItems[2]=bagManaPotions;hiddenBagItems[3]=bagLargeHealth;hiddenBagItems[4]=bagSilverCoins;
+// Bolsa original atrás da rocha junto à muralha: preserva seu conteúdo próprio.
+const rockMana=makePotion('mana-potion-small','Poção pequena de mana','mana','#258bff','pequena');rockMana.quantity=3;
+const rockHealth=makePotion('health-potion-medium','Poção média de vida','health','#e8343e','média');rockHealth.quantity=2;
+const rockSilver={id:'silver-coins',name:'Moedas de prata',icon:'🪙',type:'Moeda',itemRole:'currency',stackable:true,quantity:20,description:'20 moedas de prata.'};
+rockBagItems[0]=rockMana;rockBagItems[1]=rockHealth;rockBagItems[2]=rockSilver;rockBagItems[3]=itemCatalog.knightSword;
 let suppressInventoryClickUntil=0,dragState=null;let activeStorageMode='chest';
 const itemDetails=document.querySelector('#itemDetails');
 const itemQualityColors={white:'#f1f1f1',green:'#62e879',blue:'#61a9ff',purple:'#d28aff',gold:'#ffd45c'};
@@ -929,7 +945,7 @@ function getItemDisplayType(item){
 function showItemDetails(item){
  const useBtn=document.querySelector('#usePotionBtn'),equipBtn=document.querySelector('#equipItemBtn');
  if(!item){itemDetails.classList.remove('visible');useBtn.style.display='none';equipBtn.style.display='none';return;}
- const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();iconHost.style.filter='';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon '+potionSizeClass(item);bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
+ const iconHost=document.querySelector('#itemDetailsIcon');iconHost.replaceChildren();iconHost.style.filter='';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon '+potionSizeClass(item)+(item.largeHealthIcon?' potion-large-health':'');bottle.style.setProperty('--liquid',item.color);iconHost.appendChild(bottle);}else appendItemIcon(iconHost,item,item.icon||'');
  document.querySelector('#itemDetailsNameText').textContent=item.name;
  const qualityLabel=document.querySelector('#itemQualityLabel');
  const rarity=getItemRarity(item);
@@ -1069,13 +1085,13 @@ function renderInventory(){
    if(item){const rarity=getItemRarity(item)||'white';slot.style.setProperty('--category-color',itemQualityColors[rarity]||itemQualityColors.white);}
    slot.setAttribute('aria-label',item?`${item.name}, toque para ver informações e arraste para mover`:`Espaço vazio ${i+1}`);
    const number=document.createElement('span');number.className='slotNumber';number.textContent=String(i+1);slot.appendChild(number);
-   if(item){const icon=document.createElement('span');icon.className='itemIcon';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon '+potionSizeClass(item);bottle.style.setProperty('--liquid',item.color);bottle.setAttribute('aria-label',item.name);icon.appendChild(bottle);}else appendItemIcon(icon,item);slot.appendChild(icon);if(isStackable(item)){const qty=document.createElement('span');qty.className='stackQuantity';qty.textContent=`×${item.quantity||1}`;qty.style.cssText='position:absolute;right:3px;bottom:2px;padding:1px 4px;border-radius:8px;background:#101710eF;color:#fff2bd;font-size:10px;font-weight:900';slot.appendChild(qty);}}
+   if(item){const icon=document.createElement('span');icon.className='itemIcon';if(item.potion){const bottle=document.createElement('span');bottle.className='potionIcon '+potionSizeClass(item)+(item.largeHealthIcon?' potion-large-health':'');bottle.style.setProperty('--liquid',item.color);bottle.setAttribute('aria-label',item.name);icon.appendChild(bottle);}else appendItemIcon(icon,item);slot.appendChild(icon);if(isStackable(item)){const qty=document.createElement('span');qty.className='stackQuantity';qty.textContent=`×${item.quantity||1}`;qty.style.cssText='position:absolute;right:3px;bottom:2px;padding:1px 4px;border-radius:8px;background:#101710eF;color:#fff2bd;font-size:10px;font-weight:900';slot.appendChild(qty);}}
    slot.addEventListener('click',()=>{if(Date.now()<suppressInventoryClickUntil)return;showItemDetails(item);});
    slot.addEventListener('pointerdown',e=>{if(!item||e.button!==0)return;dragState={source,sourceIndex:i,item,startX:e.clientX,startY:e.clientY,active:false,slot};});
    element.appendChild(slot);
   }
  };
- renderSlots(playerInventoryEl,playerItems,'player');renderSlots(chestInventoryEl,activeStorageMode==='bag'?hiddenBagItems:chestItems,activeStorageMode==='bag'?'bag':'chest');renderEquipment();
+ renderSlots(playerInventoryEl,playerItems,'player');renderSlots(chestInventoryEl,activeStorageMode==='bag'?hiddenBagItems:activeStorageMode==='rockbag'?rockBagItems:chestItems,activeStorageMode==='bag'?'bag':activeStorageMode==='rockbag'?'rockbag':'chest');renderEquipment();
 }
 document.addEventListener('pointermove',e=>{
  if(!dragState)return;
@@ -1089,7 +1105,7 @@ document.addEventListener('pointerup',e=>{
  if(!drag.active)return;
  suppressInventoryClickUntil=Date.now()+450;
  const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.inventorySlot,.equipmentSlot');if(!target)return;
- const sourceItems=drag.source==='player'?playerItems:drag.source==='chest'?chestItems:drag.source==='bag'?hiddenBagItems:null;
+ const sourceItems=drag.source==='player'?playerItems:drag.source==='chest'?chestItems:drag.source==='bag'?hiddenBagItems:drag.source==='rockbag'?rockBagItems:null;
  if(target.classList.contains('equipmentSlot')){
   const key=target.dataset.equipSlot,definition=equipmentSlots[key];
   if(!definition||!itemFitsEquipmentSlot(drag.item,key))return;
@@ -1139,7 +1155,7 @@ document.addEventListener('pointerup',e=>{
   }
   renderInventory();return;
  }
- const targetSource=target.dataset.source,targetIndex=Number(target.dataset.index),targetItems=targetSource==='player'?playerItems:targetSource==='bag'?hiddenBagItems:chestItems;
+ const targetSource=target.dataset.source,targetIndex=Number(target.dataset.index),targetItems=targetSource==='player'?playerItems:targetSource==='bag'?hiddenBagItems:targetSource==='rockbag'?rockBagItems:chestItems;
  if(!targetItems)return;
  if(drag.source==='equipment'){
   const key=drag.sourceIndex;
@@ -1154,26 +1170,27 @@ document.addEventListener('pointerup',e=>{
  if(transferOrMove(sourceItems,drag.sourceIndex,targetItems,targetIndex)){renderInventory();}
 });
 function openInventory(mode='chest'){
- activeStorageMode=mode==='bag'?'bag':'chest';
+ activeStorageMode=mode==='bag'?'bag':mode==='rockbag'?'rockbag':'chest';
  document.querySelector('#journalPanel').style.display='none';document.querySelector('#tabJournal').classList.remove('active');
  attributesOverlay.classList.remove('open');document.querySelector('#inventoryPanels').style.display='';document.querySelector('#itemDetails').style.display='';document.querySelector('#tabBackpack').classList.toggle('active',mode!=='attributes');document.querySelector('#tabAttributes').classList.remove('active');
  renderInventory();
- const showStorage=mode==='chest'||mode==='bag';
+ const showStorage=mode==='chest'||mode==='bag'||mode==='rockbag';
  document.querySelector('#inventoryPanels').classList.toggle('chestMode',showStorage);
  chestInventoryPanel.style.display=showStorage?'':'none';
  document.querySelector('#characterEquipmentPanel').style.display=showStorage?'none':'flex';
  document.querySelector('#playerInventoryPanel').querySelector('h3').textContent=showStorage?'🧍 INVENTÁRIO DO PERSONAGEM':'🎒 MOCHILA';
- chestInventoryPanel.querySelector('h3').textContent=mode==='bag'?'🎒 INVENTÁRIO DA BOLSA':'📦 INVENTÁRIO DO BAÚ';
- document.querySelector('#inventoryTitle').textContent=mode==='bag'?'🎒 BOLSA E MOCHILA':showStorage?'🎒 BAÚ E MOCHILA':'🎒 MOCHILA';
+ chestInventoryPanel.querySelector('h3').textContent=mode==='rockbag'?'🎒 BOLSA DA ROCHA':mode==='bag'?'🎒 POCHETE DA ÁRVORE':'📦 INVENTÁRIO DO BAÚ';
+ document.querySelector('#inventoryTitle').textContent=mode==='rockbag'?'🎒 BOLSA DA ROCHA E MOCHILA':mode==='bag'?'🎒 POCHETE E MOCHILA':showStorage?'📦 BAÚ E MOCHILA':'🎒 MOCHILA';
  document.querySelector('#inventoryHint').textContent='';
  showItemDetails(null);
- inventoryOverlay.classList.add('open');attributesOverlay.classList.remove('open');openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');
+ inventoryOverlay.classList.add('open');attributesOverlay.classList.remove('open');openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');document.querySelector('#openRockBagBtn').classList.remove('visible');
 }
 function closeInventory(){inventoryOverlay.classList.remove('open');attributesOverlay.classList.remove('open');}
 openChestBtn.addEventListener('click',()=>{
- chestOpened=true;openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');openInventory('chest');
+ chestOpened=true;openChestBtn.classList.remove('visible');openBagBtn.classList.remove('visible');document.querySelector('#openRockBagBtn').classList.remove('visible');openInventory('chest');
 });
-openBagBtn.addEventListener('click',()=>{openBagBtn.classList.remove('visible');openChestBtn.classList.remove('visible');openInventory('bag');});
+openBagBtn.addEventListener('click',()=>{openBagBtn.classList.remove('visible');openChestBtn.classList.remove('visible');document.querySelector('#openRockBagBtn').classList.remove('visible');openInventory('bag');});
+document.querySelector('#openRockBagBtn').addEventListener('click',()=>{document.querySelector('#openRockBagBtn').classList.remove('visible');openBagBtn.classList.remove('visible');openChestBtn.classList.remove('visible');openInventory('rockbag');});
 
 let wizardLeaving=false;let wizardCombat=null;const wizardOrbs=[];const wizardSpellEffects=[];let hyperRay=null;let hyperRayLockTimer=0;let wizardSkillTimers={yellow:0,blue:0,green:0,hat:200,basic:1.8};
 function beginWizardCombat(){
@@ -1273,7 +1290,6 @@ function updateWaveHudProgress(){
 }
 function setWave(number){currentWave=number;updateWaveHudProgress();}
 useLeverBtn.addEventListener('click',()=>{
- return;
  if(leverActivated||leverPulling)return;
  // Recupera o estado de transição caso um salvamento antigo tenha registrado a horda 3 concluída, mas countdownWave zerado.
  if(currentWave===3&&wave4Started&&countdownWave===0&&!creatures.some(c=>c.alive&&c.waveNumber===3))countdownWave=4;
@@ -1294,8 +1310,32 @@ useLeverBtn.addEventListener('click',()=>{
 document.querySelector('#closeInventoryBtn').addEventListener('click',closeInventory);
 renderAttributes();
 
-// Quatro caminhos de pedra saem do pedestal e seguem até a muralha, servindo como rotas para futuras áreas.
-const pathStone=mat(0x888b88);
+// Textura procedural de alvenaria: pedras irregulares em fiadas, com juntas escuras e variação natural.
+// A mesma família visual é usada nas muralhas e nos caminhos de pedra do chão.
+const masonryCanvas=document.createElement('canvas');masonryCanvas.width=512;masonryCanvas.height=256;
+const masonryCtx=masonryCanvas.getContext('2d');
+masonryCtx.fillStyle='#4d5554';masonryCtx.fillRect(0,0,512,256);
+const masonryRows=4,masonryH=64,masonryW=128;
+const masonryShades=['#7d8582','#737b79','#89908b','#68716f','#828984','#777f7c','#90958d'];
+for(let row=0;row<masonryRows;row++){
+ const offset=(row%2)*64;
+ for(let x=-masonryW;x<512+masonryW;x+=masonryW){
+  const idx=(Math.floor((x+masonryW)/masonryW)+row*3)%masonryShades.length;
+  const left=x+offset+3,top=row*masonryH+3,w=masonryW-6,h=masonryH-6;
+  masonryCtx.fillStyle=masonryShades[idx];masonryCtx.fillRect(left,top,w,h);
+  masonryCtx.fillStyle='rgba(255,255,255,.09)';masonryCtx.fillRect(left+3,top+3,w-6,3);
+  masonryCtx.fillStyle='rgba(25,30,29,.18)';masonryCtx.fillRect(left+3,top+h-5,w-6,2);
+  masonryCtx.strokeStyle='rgba(42,48,47,.72)';masonryCtx.lineWidth=2;masonryCtx.strokeRect(left,top,w,h);
+  // pequenas marcas e variações para a pedra não parecer uma cor chapada
+  masonryCtx.strokeStyle='rgba(42,48,47,.24)';masonryCtx.lineWidth=1;
+  masonryCtx.beginPath();masonryCtx.moveTo(left+w*.28,top+h*.38);masonryCtx.lineTo(left+w*.36,top+h*.43);masonryCtx.lineTo(left+w*.32,top+h*.52);masonryCtx.stroke();
+ }
+}
+const masonryTexture=new THREE.CanvasTexture(masonryCanvas);masonryTexture.colorSpace=THREE.SRGBColorSpace;masonryTexture.wrapS=THREE.RepeatWrapping;masonryTexture.wrapT=THREE.RepeatWrapping;masonryTexture.anisotropy=renderer.capabilities.getMaxAnisotropy();
+const wallMasonryTexture=masonryTexture.clone();wallMasonryTexture.repeat.set(18,2);wallMasonryTexture.needsUpdate=true;
+const wallMasonryMat=new THREE.MeshStandardMaterial({map:wallMasonryTexture,color:0xffffff,roughness:1,metalness:0});
+const pathMasonryTexture=masonryTexture.clone();pathMasonryTexture.repeat.set(1,1);pathMasonryTexture.needsUpdate=true;
+const pathStone=new THREE.MeshStandardMaterial({map:pathMasonryTexture,color:0xffffff,roughness:1,metalness:0});
 for(let i=0;i<4;i++){
  const angle=i*Math.PI/2;
  for(let dist=4.2;dist<=33.6;dist+=1.25){
@@ -1590,11 +1630,41 @@ function revivePlayer(restart=false){
 }
 document.querySelector('#restoreBtn').addEventListener('click',()=>revivePlayer(false));
 document.querySelector('#restartBtn').addEventListener('click',()=>revivePlayer(true));
+function ensureCreatureNameLabel(c){
+ if(!c.healthGroup||c.nameLabel)return;
+ const labelNames={
+  pink:'Slime rosa',yellow:'Slime amarelo',blue:'Slime azul',green:'Slime ácido',acid:'Slime ácido',
+  red:'Slime vermelho',purple:'Slime roxo'
+ };
+ const name=c.type==='wizard'?'Gandalf':(labelNames[String(c.variant||'').toLowerCase()]||((c.type||'Criatura').replace(/^./,m=>m.toUpperCase())));
+ const canvas=document.createElement('canvas');canvas.width=256;canvas.height=64;
+ const ctx=canvas.getContext('2d');ctx.clearRect(0,0,256,64);ctx.font='bold 30px system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.lineWidth=7;ctx.strokeStyle='rgba(12,15,18,.9)';ctx.strokeText(name,128,32);ctx.fillStyle='#fff7d8';ctx.fillText(name,128,32);
+ const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false,depthWrite:false}));sprite.scale.set(.92,.23,1);sprite.position.set(0,.16,.015);sprite.renderOrder=10;c.healthGroup.add(sprite);c.nameLabel=sprite;
+}
+function updateWizardIdleAnimation(t,dt){
+ const breathing=1+Math.sin(t*2.4)*.018;
+ wizardTorso.scale.y=1.2*breathing;
+ if(wizardLeaving){
+  wizard.position.y=.94+Math.abs(Math.sin(t*7.2))*.035;
+  wizard.rotation.z=Math.sin(t*7.2)*.018;
+  wizardArmLeft.rotation.x=Math.sin(t*7.2)*.24;wizardArmRight.rotation.x=-Math.sin(t*7.2)*.24;
+ }else if(!wizardCombat||wizardCombatEnded){
+  wizard.position.y=.94+Math.sin(t*2.1)*.022;
+  wizard.rotation.z=Math.sin(t*1.15)*.012;
+  wizardArmLeft.rotation.x=Math.sin(t*1.7)*.035;wizardArmRight.rotation.x=-Math.sin(t*1.7)*.035;
+ }else if(wizardCombat.alive){
+  wizardArmLeft.rotation.x=Math.sin(t*3.4)*.06;wizardArmRight.rotation.x=-.06+Math.sin(t*2.7)*.08;
+ }
+}
 function updateCreatures(dt){
  if(wizardSpellEffects.length&&!wizardCombat?.alive)updateWizardSpellEffects(dt);
  for(const c of creatures){if(!c.alive)continue;
+  ensureCreatureNameLabel(c);
   if(c.type==='wizard'){updateWizardCombat(c,dt);continue;}
   c.phase+=dt*3.2;
+  if(c.body&&c.attackState!=='windup'&&c.attackState!=='leap'&&c.attackState!=='impact'&&c.attackState!=='acidCharge'){const locomotion=(c.attackState==='chase'||c.attackState==='slide'||c.attackState==='evadeSlide'||c.attackState==='blueSlide')?1:0.35;const pulse=Math.sin(c.phase*2.2)*.035*locomotion;c.body.scale.y=1+pulse;c.body.scale.x=1-pulse*.45;}
   // Flash rouge court : l'intensité pulse e retorna à cor original sem piscar permanentemente.
   if(c.damageFlashTimer>0){
    c.damageFlashTimer=Math.max(0,c.damageFlashTimer-dt);
@@ -1752,7 +1822,7 @@ function updateCreatures(dt){
 
 
 // Continuous stone perimeter walls keep the compact tutorial map enclosed.
-const wallStone=mat(0x777f7d),wallTrim=mat(0x9da39a),wallDark=mat(0x626b69);
+const wallStone=wallMasonryMat,wallTrim=mat(0x9da39a),wallDark=mat(0x626b69);
 const MAP_HALF=35, WALL_H=5.20, WALL_T=1.84; // muralhas 60% maiores em altura e espessura
 addBox(70,WALL_H,WALL_T,wallStone,0,WALL_H/2,-MAP_HALF+.15);
 addBox(70,WALL_H,WALL_T,wallStone,0,WALL_H/2, MAP_HALF-.15);
@@ -1760,12 +1830,22 @@ addBox(WALL_T,WALL_H,70,wallStone,-MAP_HALF+.15,WALL_H/2,0);
 // Muralha leste dividida em dois trechos para acomodar a porta fechada no caminho da cidade.
 addBox(WALL_T,WALL_H,25.8,wallStone, MAP_HALF-.15,WALL_H/2,-22.1);
 addBox(WALL_T,WALL_H,39.8,wallStone, MAP_HALF-.15,WALL_H/2,15.0);
+// Preenche apenas o vão real acima do portão. As extremidades encostam nas muralhas sem sobreposição,
+// evitando z-fighting (piscadas) nas juntas. A textura mantém blocos do mesmo tamanho das outras muralhas.
+const gateTopY=3.80;
+const gateGapCenter=-7.05, gateGapLength=4.30;
+const gateTopTexture=wallMasonryTexture.clone();
+gateTopTexture.repeat.set(1.10,0.62);
+gateTopTexture.needsUpdate=true;
+const gateTopWallMat=new THREE.MeshStandardMaterial({map:gateTopTexture,color:0xffffff,roughness:1,metalness:0});
+addBox(WALL_T,WALL_H-gateTopY,gateGapLength,gateTopWallMat,MAP_HALF-.15,gateTopY+(WALL_H-gateTopY)/2,gateGapCenter);
 // Broad stone coping and regularly spaced crenellations give the walls a finished silhouette.
 addBox(70.8,.22,1.42,wallTrim,0,WALL_H+.06,-MAP_HALF+.15);
 addBox(70.8,.22,1.42,wallTrim,0,WALL_H+.06, MAP_HALF-.15);
 addBox(1.42,.22,70.8,wallTrim,-MAP_HALF+.15,WALL_H+.06,0);
 addBox(1.42,.22,26.6,wallTrim, MAP_HALF-.15,WALL_H+.06,-22.1);
 addBox(1.42,.22,40.6,wallTrim, MAP_HALF-.15,WALL_H+.06,15.0);
+addBox(1.42,.22,4.30,wallTrim, MAP_HALF-.15,WALL_H+.06,-7.05); // arremate alinhado ao vão, sem sobrepor as muralhas laterais
 for(let i=-32;i<=32;i+=4){
   for(const z of [-MAP_HALF+.15,MAP_HALF-.15]) addBox(1.15,.48,1.48,wallTrim,i,WALL_H+.37,z);
   for(const x of [-MAP_HALF+.15,MAP_HALF-.15]) addBox(1.48,.48,1.15,x,WALL_H+.37,i);
@@ -2209,6 +2289,7 @@ const camTarget=new THREE.Vector3();
 function animate(){
  requestAnimationFrame(animate);
  const dt=Math.min(clock.getDelta(),.035);
+ updateWizardIdleAnimation(clock.elapsedTime,dt);
  // Verificação central: qualquer caminho de dano que deixe a vida em zero aciona a morte.
  if(!playerDead && currentResources.health<=0) triggerPlayerDeath();
  if(playerDead){deathAnimationTime=Math.min(1,deathAnimationTime+dt);const t=Math.min(1,deathAnimationTime/.62);hero.rotation.z=1.42*t;hero.position.y=-.18*t;renderer.render(scene,camera);return;}
@@ -2343,6 +2424,8 @@ function animate(){
  let resolvedX=nextX,resolvedZ=nextZ;
  for(const rock of rockColliders){
   if(hero.position.y>=rock.top-.10)continue; // já está sobre a pedra ou acima dela
+  const rockRise=rock.top-hero.position.y;
+  if(rockRise>.015&&rockRise<=.235&&!jumping&&jumpSquat<=0){hero.position.y=rock.top;vy=0;continue;}
   let dx=resolvedX-rock.x,dz=resolvedZ-rock.z;
   const dist=Math.hypot(dx,dz),minDist=rock.r+.29;
   if(dist<minDist){
@@ -2364,18 +2447,7 @@ function animate(){
   const dist=Math.hypot(dx,dz),minDist=solid.r+.29;
   if(dist<minDist){if(dist<.001){dx=hero.position.x-solid.x;dz=hero.position.z-solid.z;const d=Math.hypot(dx,dz)||1;dx/=d;dz/=d;}else{dx/=dist;dz/=dist;}resolvedX=solid.x+dx*minDist;resolvedZ=solid.z+dz*minDist;}
  }
- // Walk-up support: gently snap onto each stair when its top is within one step of the creature's feet.
- for(const platform of platformColliders){
-  const dx=Math.abs(nextX-platform.x),dz=Math.abs(nextZ-platform.z),rise=platform.top-hero.position.y,radius=Math.max(dx,dz);
-  const within=platform.isStep?(radius>=platform.inner-.20&&radius<=platform.outer+.03):(dx<=platform.halfX-.10&&dz<=platform.halfZ-.10);
-  // Each stair tier is its own physical platform: step up when reachable, and keep grounded feet on its top.
-  if(within&&!jumping&&jumpSquat<=0&&rise>=-.06&&rise<=.27){hero.position.y=platform.top;vy=0;}
-  if(platform.isStep&&hero.position.y<platform.top-.10&&radius<platform.outer+.29&&radius>platform.inner-.29){
-   const edge=platform.outer+.30;const inner=platform.inner-.30;
-   if(radius>platform.outer-.30){if(Math.abs(dx)>Math.abs(dz))resolvedX=platform.x+Math.sign(resolvedX-platform.x||1)*edge;else resolvedZ=platform.z+Math.sign(resolvedZ-platform.z||1)*edge;}
-   else if(radius<platform.inner+.30){if(Math.abs(dx)>Math.abs(dz))resolvedX=platform.x+Math.sign(resolvedX-platform.x||1)*inner;else resolvedZ=platform.z+Math.sign(resolvedZ-platform.z||1)*inner;}
-  }
- }
+ // Os degraus não empurram o personagem para fora: o piso de cada anel é resolvido após o movimento horizontal.
  // The main pedestal blocks movement through its sides; the stair blocks are walkable risers.
  for(const platform of platformColliders){
   if(platform.isStep)continue;
@@ -2412,21 +2484,29 @@ function animate(){
   hero.position.y+=vy*dt;
  }
  let landingHeight=0;
- if(vy<=0 && jumpSquat===0){
-  for(const rock of rockColliders){
-   const dx=hero.position.x-rock.x,dz=hero.position.z-rock.z;
-   if(Math.hypot(dx,dz)<rock.platformR && previousY>=rock.top-.08 && hero.position.y<=rock.top && rock.top>landingHeight){landingHeight=rock.top;}
-  }
-  for(const platform of platformColliders){
-   const dx=Math.abs(hero.position.x-platform.x),dz=Math.abs(hero.position.z-platform.z);
-   const radius=Math.max(dx,dz);
-   const within=platform.isStep
-    ? radius>=platform.inner-.12 && radius<=platform.outer-.04
-    : dx<=platform.halfX-.12 && dz<=platform.halfZ-.12;
-   if(within && previousY>=platform.top-.08 && hero.position.y<=platform.top && platform.top>landingHeight){landingHeight=platform.top;}
-  }
+ // Piso contínuo: identifica o anel sob os pés e sobe automaticamente quando a diferença é de um degrau.
+ // As alturas são lidas dos próprios colliders, sem um segundo ajuste concorrente durante a colisão horizontal.
+ for(const rock of rockColliders){
+  const dx=hero.position.x-rock.x,dz=hero.position.z-rock.z;
+  if(Math.hypot(dx,dz)<rock.platformR && rock.top>landingHeight)landingHeight=rock.top;
  }
- if(hero.position.y<landingHeight){hero.position.y=landingHeight;vy=0;jumping=false}
+ for(const platform of platformColliders){
+  const dx=Math.abs(hero.position.x-platform.x),dz=Math.abs(hero.position.z-platform.z),radius=Math.max(dx,dz);
+  const within=platform.isStep
+   ? radius>=platform.inner-.015 && radius<=platform.outer+.015
+   : dx<=platform.halfX-.015 && dz<=platform.halfZ-.015;
+  if(within&&platform.top>landingHeight)landingHeight=platform.top;
+ }
+ if(jumpSquat===0){
+  // Ao sair de um degrau sem estar saltando, o personagem acompanha o piso mais baixo imediatamente.
+  // Um salto real continua usando gravidade e só termina ao tocar o piso durante a descida.
+  const groundedDescent=!jumping && landingHeight<hero.position.y-.02;
+  const canWalkUp=!jumping && landingHeight-hero.position.y>=-.02 && landingHeight-hero.position.y<=.255;
+  const landingFromAir=jumping && vy<=0 && previousY>=landingHeight-.08 && hero.position.y<=landingHeight;
+  if(groundedDescent){hero.position.y=landingHeight;vy=0;}
+  else if(canWalkUp){hero.position.y=landingHeight;vy=0;jumping=false;}
+  else if(landingFromAir){hero.position.y=landingHeight;vy=0;jumping=false;}
+ }
  const moving=len>.08;
  if(moving&&!jumping)walkTime+=dt*10;
  const stride=moving&&!jumping?Math.sin(walkTime)*.62:0;
@@ -2665,7 +2745,7 @@ function animate(){
   }
  }
  if(wizardLeaving&&!wizardSpeechOpen){const dx=34.1-wizard.position.x,dz=-7-wizard.position.z,d=Math.hypot(dx,dz);if(d>.45){wizard.position.x+=dx/d*1.5*dt;wizard.position.z+=dz/d*1.5*dt;wizard.rotation.y=Math.atan2(dx,dz);}else{wizard.visible=false;wizardLeaving=false;}}
- updateCreatures(dt);updateWizardOrbs(dt);
+ updateCreatures(dt);for(const c of creatures){if(c.alive&&c.healthGroup){ensureCreatureNameLabel(c);c.healthGroup.quaternion.copy(c.root.quaternion).invert().multiply(camera.quaternion);}}updateWizardOrbs(dt);
  if(wizardCombat&&!wizardCombatEnded&&wizardCombat.alive){wizardCombat.summonWait=(wizardCombat.summonWait||0)+dt;const variants=['pink','yellow','green'];for(const variant of variants){const active=creatures.some(c=>c.type==='slime'&&c.waveNumber===5&&c.variant===variant&&c.alive);const unlocked=variant==='pink'||(variant==='yellow'&&(wizardCombat.summonStage||0)>=1)||(variant==='green'&&(wizardCombat.summonStage||0)>=2);if(unlocked&&!active&&wizardCombat.summonWait>=5){if(variant==='pink'){createSlime(-3.8,-2.5,0,'pink',5);createSlime(3.8,-2.5,0,'pink',5);}else if(variant==='yellow'){createSlime(-4.2,1.5,0,'yellow',5);createSlime(4.2,1.5,0,'yellow',5);}else{createAcidSlime(-4.5,3.2,0,5);createAcidSlime(4.5,3.2,0,5);}wizardCombat.summonWait=0;break;}}}
  if(hero.userData.damageFlashTimer>0){hero.userData.damageFlashTimer=Math.max(0,hero.userData.damageFlashTimer-dt);hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color){if(!o.userData.damageBaseColor)o.userData.damageBaseColor=o.material.color.clone();o.material.color.copy(o.userData.damageBaseColor).lerp(new THREE.Color(0xff1717),.55);}});}else{hero.traverse(o=>{if(o.isMesh&&o.material&&o.material.color&&o.userData.damageBaseColor)o.material.color.copy(o.userData.damageBaseColor);});}
  updateAcidProjectiles(dt);
@@ -2684,7 +2764,7 @@ function animate(){
  const leverDistance=Math.hypot(leverDx,leverDz);
  const leverFacingDot=leverDistance>.001?(Math.sin(hero.rotation.y)*leverDx+Math.cos(hero.rotation.y)*leverDz)/leverDistance:1;
  const leverInFront=leverDistance<2.25&&leverFacingDot>.35&&!leverActivated&&!leverPulling&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open');
- useLeverBtn.classList.remove('visible');
+ useLeverBtn.classList.toggle('visible',leverInFront);
 
  // Show the contextual chest action only when the creature is close and looking toward it.
  const chestDx=chestX-hero.position.x, chestDz=chestZ-hero.position.z;
@@ -2694,8 +2774,9 @@ function animate(){
  const chestInFront=chestDistance<3.7 && facingDot>.62 && !inventoryOverlay.classList.contains('open') && !attributesOverlay.classList.contains('open') && !tutorialOverlay.classList.contains('open');
  openChestBtn.textContent=chestOpened?'📦 INVENTÁRIO DO BAÚ':'📦 ABRIR BAÚ';
  openChestBtn.classList.toggle('visible',chestInFront);
- const bagDx=hiddenBagX-hero.position.x,bagDz=hiddenBagZ-hero.position.z;const bagDistance=Math.hypot(bagDx,bagDz);const bagFacingDot=bagDistance>.001?(facingX*bagDx+facingZ*bagDz)/bagDistance:1;const bagInFront=bagDistance<2.9&&bagFacingDot>.05&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
- openBagBtn.classList.toggle('visible',bagInFront);
+ const bagDx=hiddenBagX-hero.position.x,bagDz=hiddenBagZ-hero.position.z;const bagDistance=Math.hypot(bagDx,bagDz);const bagFacingDot=bagDistance>.001?(facingX*bagDx+facingZ*bagDz)/bagDistance:1;const bagInFront=bagDistance<2.5&&bagFacingDot>-.1&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
+ const rockBagDx=rockBagX-hero.position.x,rockBagDz=rockBagZ-hero.position.z;const rockBagDistance=Math.hypot(rockBagDx,rockBagDz);const rockBagFacingDot=rockBagDistance>.001?(facingX*rockBagDx+facingZ*rockBagDz)/rockBagDistance:1;const rockBagInFront=rockBagDistance<3.0&&rockBagFacingDot>-.1&&!inventoryOverlay.classList.contains('open')&&!attributesOverlay.classList.contains('open')&&!tutorialOverlay.classList.contains('open')&&!playerDead;
+ openBagBtn.classList.toggle('visible',bagInFront);document.querySelector('#openRockBagBtn').classList.toggle('visible',rockBagInFront);
  chestLid.rotation.x=THREE.MathUtils.lerp(chestLid.rotation.x,chestOpened?-1.12:0,1-Math.exp(-7*dt));
  camTarget.set(hero.position.x,1.1,hero.position.z);
  const camDistance=8.5, camHorizontal=Math.cos(cameraPitch)*camDistance;
@@ -2747,7 +2828,7 @@ function saveGameManually(){
    hero:{x:hero.position.x,y:hero.position.y,z:hero.position.z,rotationX:hero.rotation.x,rotationY:hero.rotation.y,rotationZ:hero.rotation.z,vy,jumping,jumpSquat},
    camera:{yaw:cameraYaw,pitch:cameraPitch},
    attributeState:cloneSaveValue(attributeState),currentResources:cloneSaveValue(currentResources),experienceState:cloneSaveValue(experienceState),skillPoints,attributePointsDistributed,
-   playerItems:cloneSaveValue(playerItems),chestItems:cloneSaveValue(chestItems),hiddenBagItems:cloneSaveValue(hiddenBagItems),equippedItems:cloneSaveValue(equippedItems),
+   playerItems:cloneSaveValue(playerItems),chestItems:cloneSaveValue(chestItems),hiddenBagItems:cloneSaveValue(hiddenBagItems),rockBagItems:cloneSaveValue(rockBagItems),equippedItems:cloneSaveValue(equippedItems),
    chestOpened,leverActivated,leverPivotAngle:leverPivot.rotation.x,slimeSpawned,countdownWave,wave2Started,wave3Started,wave4Started,wave5Started,wizardCombatEnded,currentWave,tutorialStage,robeRewardGranted,wizardLeaving,
    creatures:creatures.map(c=>({type:c.type,variant:c.variant,waveNumber:c.waveNumber,x:c.root.position.x,y:c.root.position.y,z:c.root.position.z,rotationY:c.root.rotation.y,health:c.health,maxHealth:c.maxHealth,alive:c.alive,phase:c.phase,attackState:c.attackState,attackTimer:c.attackTimer,attackTime:c.attackTime,attackCooldown:c.attackCooldown,slideDir:c.slideDir,slideCenterX:c.slideCenterX,slideCenterZ:c.slideCenterZ,slidePhase:c.slidePhase,groundY:c.groundY})),
    lootDrops:lootDrops.map(d=>({type:d.type,amount:d.amount,x:d.group.position.x,z:d.group.position.z,groundY:d.groundY}))
@@ -2782,6 +2863,7 @@ function loadGameManually(){
   if(Array.isArray(data.chestItems)){chestItems.fill(null);data.chestItems.slice(0,chestItems.length).forEach((item,i)=>chestItems[i]=item||null);}
   if(!chestItems.some(item=>item&&item.id==='simple-vestment')){const emptyVestmentSlot=chestItems.findIndex(item=>!item);if(emptyVestmentSlot>=0)chestItems[emptyVestmentSlot]=itemCatalog.simpleVestment;}
   if(Array.isArray(data.hiddenBagItems)){hiddenBagItems.fill(null);data.hiddenBagItems.slice(0,hiddenBagItems.length).forEach((item,i)=>hiddenBagItems[i]=item||null);}
+  if(Array.isArray(data.rockBagItems)){rockBagItems.fill(null);data.rockBagItems.slice(0,rockBagItems.length).forEach((item,i)=>rockBagItems[i]=item||null);}
   if(data.equippedItems){for(const key of Object.keys(equippedItems))equippedItems[key]=data.equippedItems[key]||null;}
   chestOpened=!!data.chestOpened;
   leverActivated=!!data.leverActivated;leverPulling=false;leverPullTime=0;leverPivot.rotation.x=Number(data.leverPivotAngle)||0;
